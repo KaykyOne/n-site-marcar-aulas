@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { supabase } from './supabaseClient';
+import  supabase  from './controller/supabase';
 
 function App() {
   const [data, setData] = useState([]);
@@ -7,7 +7,7 @@ function App() {
   useEffect(() => {
     const fetchData = async () => {
       const { data: tableData, error } = await supabase
-        .from('sua_tabela')
+        .from('usuarios')
         .select('*');
 
       if (error) console.error(error);
