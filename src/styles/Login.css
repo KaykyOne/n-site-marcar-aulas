@@ -1,0 +1,60 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh; /* Usa toda a altura da janela */
+    background-color: #f5f5f5;
+    padding: 20px;
+  }
+  
+  .image {
+    height: 128px;
+    width: 250px;
+    margin: 20px;
+  }
+  
+  .textInput {
+    width: 80%;
+    background-color: #fff;
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 20px;
+    border: 1px solid #ddd;
+  }
+  
+  .button {
+    width: 80%;
+    background-color: blue;
+    border-radius: 10px;
+    padding: 15px;
+    color: #fff;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    border: none;
+    transition: background-color 0.3s;
+  }
+  
+  .button:disabled {
+    background-color: grey;
+    cursor: not-allowed;
+  }
+  
+  .button:hover:not(:disabled) {
+    background-color: darkblue;
+  }
+  
+  .link {
+    background: none;
+    border: none;
+    color: blue;
+    text-decoration: underline;
+    cursor: pointer;
+    margin-top: 10px;
+  }
+  
+  .loader {
+    color: white; /* Cor do texto enquanto carrega */
+  }
+  

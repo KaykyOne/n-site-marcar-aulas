@@ -1,30 +1,19 @@
-import React, { useEffect, useState } from 'react';
-import  supabase  from './controller/supabase';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import Home from './pages/Home';
+import Login from './pages/Login'
+
+// Componente de página não encontrada
+const NotFound = () => <h2>404 - Página não encontrada</h2>;
 
 function App() {
-  const [data, setData] = useState([]);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      const { data: tableData, error } = await supabase
-        .from('usuarios')
-        .select('*');
-
-      if (error) console.error(error);
-      else setData(tableData);
-    };
-
-    fetchData();
-  }, []);
-
   return (
     <div>
-      <h1>Dados do Supabase</h1>
-      <ul>
-        {data.map(item => (
-          <li key={item.id}>{item.nome}</li> // Ajuste conforme sua tabela
-        ))}
-      </ul>
+      <Router>
+        <Routes>
+          <Route path="/" element={<Login />} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </Router>
     </div>
   );
 }
