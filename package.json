@@ -2,6 +2,7 @@
   "name": "site-marcar-aulas",
   "version": "0.1.0",
   "private": true,
+  "homepage": "https://KaykyOne.github.io/site-marcar-aulas",
   "dependencies": {
     "@supabase/supabase-js": "^2.45.6",
     "@testing-library/jest-dom": "^5.17.0",
