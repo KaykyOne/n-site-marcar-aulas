@@ -11,6 +11,13 @@ node_modules
 # testing
 /coverage
 
+# Arquivos de ambiente
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+
 # production
 /build
 
