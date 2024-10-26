@@ -1,30 +1,18 @@
-import React, { useEffect, useState } from 'react';
-import  supabase  from './controller/supabase';
+import Login from './pages/Login';
+import Home from './pages/Home';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
 function App() {
-  const [data, setData] = useState([]);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      const { data: tableData, error } = await supabase
-        .from('usuarios')
-        .select('*');
-
-      if (error) console.error(error);
-      else setData(tableData);
-    };
-
-    fetchData();
-  }, []);
-
   return (
-    <div>
-      <h1>Dados do Supabase</h1>
-      <ul>
-        {data.map(item => (
-          <li key={item.id}>{item.nome}</li> // Ajuste conforme sua tabela
-        ))}
-      </ul>
+    <div className="App">
+      <BrowserRouter>
+        <Routes>
+          {/* Página de login */}
+          <Route path="/" element={<Login />} />
+          {/* Página principal (Home) */}
+          <Route path="/home" element={<Home />} />
+        </Routes>
+      </BrowserRouter>
     </div>
   );
 }

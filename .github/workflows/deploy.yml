@@ -25,6 +25,7 @@ jobs:
         env:
           REACT_APP_SUPABASE_URL: ${{ secrets.REACT_APP_SUPABASE_KEY }}
           REACT_APP_SUPABASE_KEY: ${{ secrets.REACT_APP_SUPABASE_KEY }}
+          REACT_APP_SECRET_KEY: ${{ secrets.REACT_APP_SECRET_KEY }}
         run: echo "Environment variables set."
 
       - name: Build project
