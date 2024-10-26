@@ -11,3 +11,4 @@ if(supabase){
 }
 
 export default supabase;
+
