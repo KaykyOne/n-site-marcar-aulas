@@ -1,0 +1,16 @@
+{
+  "files": {
+    "main.css": "/static/css/main.196733d9.css",
+    "main.js": "/static/js/main.4b8471a2.js",
+    "static/js/952.b52cf8d3.chunk.js": "/static/js/952.b52cf8d3.chunk.js",
+    "static/media/logoAutoEscolaIdeal.png": "/static/media/logoAutoEscolaIdeal.89f318846fb3758fde32.png",
+    "index.html": "/index.html",
+    "main.196733d9.css.map": "/static/css/main.196733d9.css.map",
+    "main.4b8471a2.js.map": "/static/js/main.4b8471a2.js.map",
+    "952.b52cf8d3.chunk.js.map": "/static/js/952.b52cf8d3.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.196733d9.css",
+    "static/js/main.4b8471a2.js"
+  ]
+}
