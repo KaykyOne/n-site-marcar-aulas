@@ -2,7 +2,7 @@
   "name": "site-marcar-aulas",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://autoescolaidealjales.com.br",
+  "homepage": "https://autoescolaidealjales.com.br/",
   "dependencies": {
     "@supabase/supabase-js": "^2.45.6",
     "@testing-library/jest-dom": "^5.17.0",
