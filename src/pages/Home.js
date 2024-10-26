@@ -92,7 +92,6 @@ const styles = {
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#ffffff',
     padding: '20px',
     height: '100vh',
   },

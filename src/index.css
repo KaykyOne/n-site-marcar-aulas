@@ -1,13 +1,36 @@
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
+/* index.css */
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
-}
+/* Reset básico para evitar problemas de estilo entre navegadores */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+  
+  /* Definindo uma cor de fundo padrão */
+  body {
+    font-family: Arial, sans-serif; /* Fonte padrão */
+    line-height: 1.6; /* Altura da linha */
+    background-color: #f4f4f4; /* Cor de fundo */
+    color: #333; /* Cor do texto */
+  }
+  
+  /* Estilos para o container principal */
+  .App {
+    max-width: 800px; /* Largura máxima do container */
+    margin: 0 auto; /* Centraliza o container */
+    padding: 20px; /* Espaçamento interno */
+  }
+  
+  /* Links */
+  a {
+    color: #3498db; /* Cor dos links */
+    text-decoration: none; /* Remove sublinhado */
+  }
+  
+  a:hover {
+    text-decoration: underline; /* Sublinhado ao passar o mouse */
+  }
+  
+  /* Estilos adicionais podem ser adicionados aqui */
+  
