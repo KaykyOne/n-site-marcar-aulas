@@ -54,7 +54,7 @@ const SelectTypeView = () => {
 
     const confirmSelection = () => {
         setModalVisible(false);
-        navigate('/select-instructor', { state: { cpf, type: selectedType } });
+        navigate('/selecionarInstrutor', { state: { cpf, type: selectedType } });
     };
 
     const renderCategoriaItem = (item, index) => (

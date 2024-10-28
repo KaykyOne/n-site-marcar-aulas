@@ -72,7 +72,7 @@ const HomeView = () => {
       <button style={styles.buttonBack} onClick={() => navigate(-1)}>
         Voltar
       </button>
-      {loading && <LoadingIndicator />}
+      <LoadingIndicator visible={loading}/>
       {isModalVisible && (
         <div style={styles.modalContent}>
           <p>{modalMessage}</p>
