@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import LoadingIndicator from './LoadingIndicator';
 import { HomePageModel } from '../pageModel/HomePageModel';
@@ -7,12 +7,14 @@ import 'react-toastify/dist/ReactToastify.css';
 
 const HomeView = () => {
   const location = useLocation();
-  const { nome, cpf } = location.state || {}; // Recebe os parâmetros da navegação
+  const { nome, cpf } = location.state || {}; // Recebe os dados
   const [loading, setLoading] = useState(false);
   const [modalMessage, setModalMessage] = useState('');
   const [isModalVisible, setModalVisible] = useState(false);
   const homePageModel = new HomePageModel();
   const navigate = useNavigate();
+
+  const hasVerified = useRef(false); // Para manter o estado entre renderizações
 
   const toggleModal = (message) => {
     setModalMessage(message);
@@ -25,6 +27,9 @@ const HomeView = () => {
 
   useEffect(() => {
     const verificarAulasPendentes = async () => {
+      if (hasVerified.current) return; // Impede múltiplas verificações
+      hasVerified.current = true; // Marca como verificado
+
       setLoading(true);
       try {
         await homePageModel.marcarAulasConcluidas(cpf);
@@ -34,6 +39,7 @@ const HomeView = () => {
         setLoading(false);
       }
     };
+
     verificarAulasPendentes();
   }, [cpf, homePageModel]);
 
@@ -57,10 +63,10 @@ const HomeView = () => {
   return (
     <div style={styles.container}>
       <h1 style={{ ...styles.welcomeText, fontSize: '1.5em' }}>Bem-vindo, {nome}!</h1>
-      <button style={styles.fullWidthButton} onClick={() => alterPage('SelectType')}>
+      <button style={styles.fullWidthButton} onClick={() => alterPage('selecionarTipo')}>
         Marcar Aula
       </button>
-      <button style={styles.fullWidthButton2} onClick={() => alterPage('ListAulas')}>
+      <button style={styles.fullWidthButton2} onClick={() => alterPage('listarAulas', cpf)}>
         Aulas
       </button>
       <button style={styles.buttonBack} onClick={() => navigate(-1)}>

@@ -6,7 +6,7 @@ import { LoginPageModel } from '../pageModel/LoginPageModel';
 import logoAutoEscola from "../imgs/logoAutoEscolaIdeal.png";
 import { useNavigate } from 'react-router-dom';
 
-function Login({ navigation }) {
+function Login() {
     const [cpfNormal, setCpf] = useState('');
     const [loading, setLoading] = useState(false);
     const [timer, setTimer] = useState(0);
