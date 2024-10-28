@@ -3,8 +3,8 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { SelectTypeViewModel } from '../pageModel/SelectTypePageModel';
 import LoadingIndicator from './LoadingIndicator';
 import { ToastContainer, toast } from 'react-toastify';
-import Modal from 'react-modal';
 import 'react-toastify/dist/ReactToastify.css';
+import Modal from '../components/Modal';
 
 const SelectTypeView = () => {
     const location = useLocation();
@@ -78,13 +78,12 @@ const SelectTypeView = () => {
                 <div style={{ ...styles.circle, ...styles.lightgray }} />
             </div>
 
-            {/* Modal de confirmação */}
-            <Modal isOpen={modalVisible} onRequestClose={() => setModalVisible(false)} style={styles.modalContent}>
-                <p style={styles.modalMessage}>Você tem certeza que deseja selecionar a categoria {selectedType}?</p>
-                <div style={styles.modalButtons}>
-                    <button style={styles.modalButton} onClick={confirmSelection}>Confirmar</button>
-                    <button style={styles.modalButton} onClick={() => setModalVisible(false)}>Cancelar</button>
-                </div>
+            <Modal
+                isOpen={modalVisible}
+                onConfirm={confirmSelection}
+                onCancel={() => setModalVisible(false)} // Função anônima
+            >
+                <p>Você tem certeza que deseja selecionar o tipo: {selectedType}</p>
             </Modal>
 
             <ToastContainer />
@@ -144,36 +143,11 @@ const styles = {
         justifyContent: 'center',
         margin: 10,
     },
-    modalContent: {
-        backgroundColor: 'white',
-        padding: 20,
-        borderRadius: 10,
-        textAlign: 'center',
-        width: 200,
-        margin: 'auto',
-    },
-    modalMessage: {
-        fontSize: 18,
-        marginBottom: 20,
-    },
-    modalButtons: {
-        display: 'flex',
-        justifyContent: 'space-between',
-    },
     contador: {
         display: 'flex',
         flexDirection: 'row', // Alinha as bolinhas em linha
         justifyContent: 'center',
         margin: 10,
-    },
-    modalButton: {
-        flex: 1,
-        backgroundColor: 'blue',
-        color: 'white',
-        padding: 15,
-        borderRadius: 5,
-        margin: '0 5px',
-        cursor: 'pointer',
     },
 };
 
