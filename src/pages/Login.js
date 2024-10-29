@@ -8,11 +8,13 @@ import { useNavigate } from 'react-router-dom';
 
 function Login() {
     const [cpfNormal, setCpf] = useState('');
+    const [senhaInput, setSenha] = useState('');
     const [loading, setLoading] = useState(false);
     const [timer, setTimer] = useState(0);
     const [isRunning, setIsRunning] = useState(false);
     const [isModalVisible, setModalVisible] = useState(false);
     const [modalMessage, setModalMessage] = useState('');
+    const [seePass, setSeePass] = useState(false);
 
     const loginPageModel = new LoginPageModel();
     const navigate = useNavigate(); // Use useNavigate aqui
@@ -42,12 +44,16 @@ function Login() {
         setLoading(true);
 
         try {
-            const nome = await loginPageModel.searchUsersByCPF(cpf);
-            if (!nome) {
-                toggleModal('Nenhum usuário encontrado com esse CPF.');
-            } else {
+            const data = await loginPageModel.searchUsersByCPF(cpf);
+            const nome = data.nome;
+            const senha = data.senha;
+            if (senha === generateHash(senhaInput) || senhaInput === senha) {
                 navigate('/home', { state: { nome, cpf } }); // Navega usando navigate
                 setCpf('');
+            } else {
+                toggleModal('Nenhum usuário encontrado com esse CPF.');
+                setCpf('');
+                setSenha('');
             }
         } catch (error) {
             showToast('error', 'Erro', 'Ocorreu um erro ao tentar fazer login.');
@@ -98,8 +104,20 @@ function Login() {
                 placeholder="Digite seu CPF"
                 value={cpfNormal}
                 onChange={handleCpfChange}
-                style={styles.textInput}
+                style={styles.textInputCpf}
             />
+            <div style={styles.containerPass}>
+                <input
+                    type={seePass ? 'text' : 'password'}
+                    placeholder="Digite sua Senha"
+                    value={senhaInput}
+                    onChange={(e) => setSenha(e.target.value)} // <--- Corrigido
+                    style={styles.passwordInput}
+                />
+                <button onClick={() => setSeePass(!seePass)} style={styles.showButton}>
+                    {seePass ? 'Ocultar' : 'Mostrar'}
+                </button>
+            </div>
             <button style={styles.button} onClick={login} disabled={loading}>
                 {loading ? 'Carregando...' : 'Entrar'}
             </button>
@@ -133,17 +151,44 @@ const styles = {
         padding: '20px',
         height: '100vh',
     },
+    containerPass: {
+        display: 'flex',
+        alignItems: 'center',
+        marginBottom: '20px',
+        width: '80%', // Alinhar com a largura dos outros inputs
+    },
     image: {
         height: '100px',
         width: '200px',
         margin: '20px',
     },
-    textInput: {
+    textInputCpf: {
         width: '80%',
         padding: '15px',
         marginBottom: '20px',
         borderRadius: '10px',
         border: '1px solid #ddd',
+    },
+    textInput: {
+        width: '100%',
+        padding: '15px',
+        marginBottom: '20px',
+        borderRadius: '10px',
+        border: '1px solid #ddd',
+    },
+    passwordInput: {
+        flex: 1,
+        padding: '15px',
+        borderRadius: '10px 0 0 10px', // Bordas arredondadas à esquerda
+        border: '1px solid #ddd',
+        borderRight: 'none', // Remove a borda direita para unir com o botão
+    },
+    showButton: {
+        padding: '15px',
+        borderRadius: '0 10px 10px 0', // Bordas arredondadas à direita
+        border: '1px solid #ddd',
+        backgroundColor: '#f0f0f0',
+        cursor: 'pointer',
     },
     button: {
         width: '80%',

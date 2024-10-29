@@ -68,7 +68,7 @@ const SelectInstructor = () => {
             <div style={styles.flatListContainer}>
                 {instrutores.map(renderInstrutorItem)}
             </div>
-            <button style={styles.buttonBack} onClick={() => navigate(-1)}>
+            <button style={styles.buttonBack} onClick={() => navigate('/selecionarTipo', { state: { cpf } })}>
                 Voltar
             </button>
             <div style={styles.contador}>

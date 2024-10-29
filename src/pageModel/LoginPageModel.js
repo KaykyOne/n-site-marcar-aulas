@@ -6,7 +6,7 @@ export class LoginPageModel {
   async searchUsersByCPF(cpf) {
     const { data, error } = await supabase
       .from('usuarios')
-      .select('nome')
+      .select('nome, senha')
       .eq('cpf', cpf)
       .single(); // Adiciona .single() para retornar apenas um resultado
     
@@ -15,6 +15,6 @@ export class LoginPageModel {
       return null; // Retorna null em caso de erro
     }
 
-    return data ? data.nome : null; // Retorna apenas o campo 'nome'
+    return data ? data : null; // Retorna apenas o campo 'nome'
   }
 }

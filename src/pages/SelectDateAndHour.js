@@ -7,7 +7,7 @@ import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Modal from '../components/Modal';
 import { useNavigate, useLocation } from 'react-router-dom';
-import LoadingIndicator from './LoadingIndicator'; // Certifique-se de ter um componente de carregamento
+import LoadingIndicator from './LoadingIndicator';
 import { SelectDateAndHourPageModel } from '../pageModel/SelectDateAndHourPageModel';
 
 export default function SelectDateAndHour() {
@@ -22,7 +22,7 @@ export default function SelectDateAndHour() {
   const [date, setDate] = useState(new Date());
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedHour, setSelectedHour] = useState(null);
-  const [currentDate, setCurrentDate] = useState(null);
+  const [currentDate, setCurrentDate] = useState(new Date());
 
   const selectDateAndHourPageModel = new SelectDateAndHourPageModel();
 
@@ -50,7 +50,7 @@ export default function SelectDateAndHour() {
           moment(date).format('YYYY-MM-DD')
         );
         const { currentTime, currentDate } = await selectDateAndHourPageModel.getCurrentTimeAndDateFromServer();
-        setHoras(horasDisponiveis); // Agora horasDisponiveis é definido corretamente
+        setHoras(horasDisponiveis);
         setCurrentTime(currentTime);
         setCurrentDate(currentDate);
       } catch (error) {
@@ -62,15 +62,11 @@ export default function SelectDateAndHour() {
     fetchHoursAndCurrentTime();
   }, [date]);
 
-
   const handleDateChange = (selectedDate) => {
     if (moment(selectedDate) >= moment(currentDate) && moment(selectedDate) <= moment().add(7, 'days')) {
       setDate(selectedDate);
-    } else {
-      return;
     }
-  }
-
+  };
 
   const handleHourClick = (hora) => {
     if (hora < currentTime && moment(date).isSame(moment(), 'day')) {
@@ -83,15 +79,22 @@ export default function SelectDateAndHour() {
 
   const confirmSelection = () => {
     setModalVisible(false);
-    toast.success('Aula marcada com sucesso!');
-    // Adicione a navegação para a próxima página ou confirmação aqui
+    navigate('/confirmar', {
+      state: {
+        cpf,
+        type,
+        nameInstructor,
+        data: date,
+        hora: selectedHour
+      }
+    });
   };
 
   return (
     <div style={styles.container}>
       <h3 style={styles.tipText}>Selecione a data para escolher um novo dia ou use as setas!</h3>
       <div style={styles.rowContainer}>
-        <button onClick={() => handleDateChange(moment(date).subtract(1, 'day').toDate())}>
+        <button style={styles.buttonDate} onClick={() => handleDateChange(moment(date).subtract(1, 'day').toDate())}>
           <AiOutlineLeft size={30} />
         </button>
         <DatePicker
@@ -101,7 +104,7 @@ export default function SelectDateAndHour() {
           maxDate={moment().add(7, 'days').toDate()}
           dateFormat="dd/MM/yyyy"
         />
-        <button onClick={() => handleDateChange(moment(date).add(1, 'day').toDate())}>
+        <button style={styles.buttonDate} onClick={() => handleDateChange(moment(date).add(1, 'day').toDate())}>
           <AiOutlineRight size={30} />
         </button>
       </div>
@@ -112,7 +115,7 @@ export default function SelectDateAndHour() {
       <div style={styles.listContainer}>
         {holidays.includes(moment(date).format('YYYY-MM-DD')) ||
           moment(date).day() === 0 ||
-          moment(date).day() === 6 ? ( // 0 = Domingo, 6 = Sábado
+          moment(date).day() === 6 ? (
           <p style={styles.messageText}>Dia não letivo</p>
         ) : (
           horas.map((hora, index) => (
@@ -123,21 +126,19 @@ export default function SelectDateAndHour() {
         )}
       </div>
 
-
-      <button style={styles.buttonBack} onClick={() => navigate(-1)}>
+      <button style={styles.buttonBack} onClick={() => navigate('/selecionarInstrutor', { state: { cpf, type } })}>
         Voltar
       </button>
 
-      {/* Modal de confirmação */}
       <Modal
         isOpen={modalVisible}
         onConfirm={confirmSelection}
-        onCancel={() => setModalVisible(false)} // Função anônima
+        onCancel={() => setModalVisible(false)}
+        customStyles={customStyles.modal} // Personalização do modal
       >
         <p>Você tem certeza que deseja selecionar essa data: {date.toLocaleDateString()} e {selectedHour}</p>
       </Modal>
 
-      {/* Notificações */}
       <ToastContainer />
     </div>
   );
@@ -154,18 +155,51 @@ const styles = {
     padding: 20,
     minHeight: '100vh',
   },
-  rowContainer: { display: 'flex', alignItems: 'center', justifyContent: 'center' },
-  button: { margin: '5px', padding: '10px 20px', backgroundColor: 'blue', color: '#fff', border: 'none', borderRadius: '5px' },
-  buttonBack: { marginTop: '20px', backgroundColor: 'gray', padding: '10px', color: '#fff', borderRadius: '5px' },
-  modalContent: { textAlign: 'center' },
-  modalMessage: { marginBottom: '15px' },
-  modalButton: { margin: '10px', padding: '10px 20px', backgroundColor: 'blue', color: '#fff', border: 'none', borderRadius: '5px' },
-  tipText: { textAlign: 'center', color: 'green' },
-  errorText: { color: 'red' },
-  listContainer: { display: 'flex', flexWrap: 'wrap', justifyContent: 'center' },
+  rowContainer: { 
+    display: 'flex', 
+    alignItems: 'center', 
+    justifyContent: 'center' 
+  },
+  button: { 
+    cursor: 'pointer', 
+    margin: '5px', 
+    padding: '10px 20px', 
+    backgroundColor: 'blue', 
+    color: '#fff', 
+    border: 'none', 
+    borderRadius: '5px' 
+  },
+  buttonDate: { 
+    cursor: 'pointer', 
+    margin: '5px', 
+    padding: '10px 20px', 
+    backgroundColor: 'transparent', 
+    color: 'blue', 
+    border: 'none', 
+    borderRadius: '5px' 
+  },
+  buttonBack: { 
+    cursor: 'pointer', 
+    marginTop: '20px', 
+    backgroundColor: 'gray', 
+    padding: '10px', 
+    color: '#fff', 
+    borderRadius: '5px' 
+  },
+  tipText: { 
+    textAlign: 'center', 
+    color: 'green' 
+  },
+  errorText: { 
+    color: 'red' 
+  },
+  listContainer: { 
+    display: 'flex', 
+    flexWrap: 'wrap', 
+    justifyContent: 'center' 
+  },
 };
 
-// Estilos customizados para o modal
 const customStyles = {
   modal: {
     content: {

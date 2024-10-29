@@ -110,7 +110,7 @@ function ListAulas() {
             ) : (
                 <div style={styles.flatListContainer}>{aulas.map(renderAulaItem)}</div>
             )}
-            <button style={styles.buttonBack} onClick={() => navigate(-1)}>Voltar</button>
+            <button style={styles.buttonBack} onClick={() => navigate(`/home`, { state: { cpf } })}>Voltar</button>
 
             {modalVisible && (
                 <div style={styles.modalContent}>
@@ -134,6 +134,9 @@ const styles = {
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
+        justifyContent: 'center',
+        padding: '20px',
+        height: '100vh',
     },
     title: {
         fontSize: '28px',

@@ -4,6 +4,7 @@ import LoadingIndicator from './LoadingIndicator';
 import { HomePageModel } from '../pageModel/HomePageModel';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import Navbar from '../components/Navbar';
 
 const HomeView = () => {
   const location = useLocation();
@@ -63,13 +64,13 @@ const HomeView = () => {
   return (
     <div style={styles.container}>
       <h1 style={{ ...styles.welcomeText, fontSize: '1.5em' }}>Bem-vindo, {nome}!</h1>
-      <button style={styles.fullWidthButton} onClick={() => alterPage('selecionarTipo')}>
+      <button style={styles.fullWidthButton} onClick={() => alterPage('selecionarTipo', cpf)}>
         Marcar Aula
       </button>
       <button style={styles.fullWidthButton2} onClick={() => alterPage('listarAulas', cpf)}>
         Aulas
       </button>
-      <button style={styles.buttonBack} onClick={() => navigate(-1)}>
+      <button style={styles.buttonBack} onClick={() =>  navigate('/')}>
         Voltar
       </button>
       <LoadingIndicator visible={loading}/>
@@ -82,6 +83,7 @@ const HomeView = () => {
         </div>
       )}
       <ToastContainer position="top-center" />
+      <Navbar />
     </div>
   );
 };

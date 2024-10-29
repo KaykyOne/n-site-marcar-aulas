@@ -70,7 +70,7 @@ const SelectTypeView = () => {
             <div style={styles.flatListContainer}>
                 {categorias.map(renderCategoriaItem)}
             </div>
-            <button style={styles.buttonBack} onClick={() => navigate(-1)}>Voltar</button>
+            <button style={styles.buttonBack} onClick={() => navigate('/home', { state: { cpf } })}>Voltar</button>
             <div style={styles.contador}>
                 <div style={{ ...styles.circle, ...styles.blue }} />
                 <div style={{ ...styles.circle, ...styles.lightgray }} />

@@ -131,7 +131,7 @@ export class ListAulasPageModel {
                                      parseInt(hora.split(':')[1]) >= parseInt(currentTime.split(':')[1]))))) {
         // Realiza a exclusão
         const { data: deleteData, error } = await supabase.from('aulas').delete().eq('aula_id', id);
-  
+        console.log(deleteData);                              
         if (error) throw error; // Repassa o erro para quem chamou o método
         return deleteData ? true : false; // Retorna true se a exclusão for bem-sucedida
       } else {
@@ -139,7 +139,7 @@ export class ListAulasPageModel {
         return false;
       }
     } catch (error) {
-      console.error(error); // Log do erro
+      console.error('erro nesse carai: ', error); // Log do erro
       return false; // Retorna false em caso de erro
     }
   }
