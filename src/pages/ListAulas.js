@@ -164,6 +164,7 @@ const styles = {
         padding: '10px',
         borderRadius: '5px',
         margin: '5px',
+        cursor: 'pointer',
     },
     confirmButton: {
         backgroundColor: '#4CAF50',
@@ -171,6 +172,7 @@ const styles = {
         padding: '10px',
         borderRadius: '5px',
         margin: '5px',
+        cursor: 'pointer',
     },
     buttonBack: {
         backgroundColor: '#007BFF',

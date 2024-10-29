@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import CryptoJS from 'crypto-js';
 import { LoginPageModel } from '../pageModel/LoginPageModel';
 import logoAutoEscola from "../imgs/logoAutoEscolaIdeal.png";
 import { useNavigate } from 'react-router-dom';
+import Cripto from '../controller/Cripto';
 
 function Login() {
     const [cpfNormal, setCpf] = useState('');
@@ -28,27 +28,21 @@ function Login() {
         toast[type](`${text1}: ${text2}`);
     };
 
-    const generateHash = (input) => {
-        const combinedInput = input + process.env.REACT_APP_SECRET_KEY; // Use REACT_APP_ para variáveis de ambiente
-        const hash = CryptoJS.SHA256(combinedInput).toString(CryptoJS.enc.Hex);
-        return hash;
-    };
-
     const login = async () => {
         if (!cpfNormal) {
             showToast('error', 'Erro', 'Por favor, insira o CPF.');
             return;
         }
 
-        const cpf = generateHash(cpfNormal);
+        const cpf = Cripto(cpfNormal);
         setLoading(true);
 
         try {
             const data = await loginPageModel.searchUsersByCPF(cpf);
             const nome = data.nome;
             const senha = data.senha;
-            if (senha === generateHash(senhaInput) || senhaInput === senha) {
-                navigate('/home', { state: { nome, cpf } }); // Navega usando navigate
+            if (senha === Cripto(senhaInput) || senhaInput === senha) {
+                navigate('/home', { state: { nome, cpf, senha } }); // Navega usando navigate
                 setCpf('');
             } else {
                 toggleModal('Nenhum usuário encontrado com esse CPF.');

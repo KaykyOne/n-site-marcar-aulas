@@ -10,6 +10,7 @@ import Erro from './pages/Erro';
 import Perfil from './pages/Perfil';
 
 
+
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
 function App() {

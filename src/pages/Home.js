@@ -4,11 +4,10 @@ import LoadingIndicator from './LoadingIndicator';
 import { HomePageModel } from '../pageModel/HomePageModel';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import Navbar from '../components/Navbar';
 
 const HomeView = () => {
   const location = useLocation();
-  const { nome, cpf } = location.state || {}; // Recebe os dados
+  const { nome, cpf, senha } = location.state || {}; // Recebe os dados
   const [loading, setLoading] = useState(false);
   const [modalMessage, setModalMessage] = useState('');
   const [isModalVisible, setModalVisible] = useState(false);
@@ -44,13 +43,13 @@ const HomeView = () => {
     verificarAulasPendentes();
   }, [cpf, homePageModel]);
 
-  const alterPage = async (page) => {
+  const alterPage = async (page, nome = '', senha = '') => {
     setLoading(true);
     try {
       const test = await homePageModel.testUser(cpf);
       if (test) {
         await new Promise((resolve) => setTimeout(resolve, 500));
-        navigate(`/${page}`, { state: { cpf } });
+        navigate(`/${page}`, { state: { cpf, nome, senha } }); // Passa nome corretamente
       } else {
         toggleModal('Você está bloqueado temporariamente, vá até o atendimento!');
       }
@@ -59,19 +58,23 @@ const HomeView = () => {
     } finally {
       setLoading(false);
     }
-  };
+};
+
 
   return (
     <div style={styles.container}>
       <h1 style={{ ...styles.welcomeText, fontSize: '1.5em' }}>Bem-vindo, {nome}!</h1>
-      <button style={styles.fullWidthButton} onClick={() => alterPage('selecionarTipo', cpf)}>
+      <button style={styles.fullWidthButton} onClick={() => alterPage('selecionarTipo')}>
         Marcar Aula
       </button>
-      <button style={styles.fullWidthButton2} onClick={() => alterPage('listarAulas', cpf)}>
+      <button style={styles.fullWidthButton2} onClick={() => alterPage('listarAulas')}>
         Aulas
       </button>
       <button style={styles.buttonBack} onClick={() =>  navigate('/')}>
         Voltar
+      </button>
+      <button style={styles.buttonBack} onClick={() =>  alterPage('perfil', nome, senha)}>
+        Alterar Senha
       </button>
       <LoadingIndicator visible={loading}/>
       {isModalVisible && (
@@ -83,7 +86,6 @@ const HomeView = () => {
         </div>
       )}
       <ToastContainer position="top-center" />
-      <Navbar />
     </div>
   );
 };
