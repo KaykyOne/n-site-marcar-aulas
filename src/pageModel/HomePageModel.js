@@ -26,7 +26,7 @@ export class HomePageModel {
       // Busca aulas pendentes do aluno
       const { data: aulasPendentes, error: aulasError } = await supabase
         .from('aulas')
-        .select('aula_id, data')
+        .select('aula_id, data, hora')
         .eq('aluno_id', alunoId)
         .eq('situacao', 'Pendente');
 
@@ -46,6 +46,7 @@ export class HomePageModel {
       const adjustedCurrentDate = new Date(currentDate.toLocaleString("en-US", { timeZone: "America/Sao_Paulo" }));
 
       console.log('Data atual ajustada:', adjustedCurrentDate);
+      console.log('Hora atual:', currentTime);
       console.log('Aulas pendentes:', aulasPendentes);
 
       await this.checkAndUpdateLog(alunoId, adjustedCurrentDate, currentTime);
@@ -53,9 +54,8 @@ export class HomePageModel {
       // Filtra aulas que estão com data anterior ou igual à data atual ajustada
       const aulasParaConcluir = aulasPendentes.filter((aula) => {
         const aulaDateTime = new Date(aula.data); // Certifique-se que aula.data é uma string que representa uma data e hora corretamente formatada
-      
         // Verifica se a data da aula é anterior à data atual ajustada
-        if (aulaDateTime <= adjustedCurrentDate) {
+        if (aulaDateTime <= adjustedCurrentDate && aula.hora <= currentTime) {
           return true;
         }
     

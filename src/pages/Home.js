@@ -4,6 +4,7 @@ import LoadingIndicator from './LoadingIndicator';
 import { HomePageModel } from '../pageModel/HomePageModel';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import Button from '../components/Button'; // Importe o componente Button
 
 const HomeView = () => {
   const location = useLocation();
@@ -13,8 +14,7 @@ const HomeView = () => {
   const [isModalVisible, setModalVisible] = useState(false);
   const homePageModel = new HomePageModel();
   const navigate = useNavigate();
-
-  const hasVerified = useRef(false); // Para manter o estado entre renderizações
+  const hasVerified = useRef(false);
 
   const toggleModal = (message) => {
     setModalMessage(message);
@@ -27,8 +27,8 @@ const HomeView = () => {
 
   useEffect(() => {
     const verificarAulasPendentes = async () => {
-      if (hasVerified.current) return; // Impede múltiplas verificações
-      hasVerified.current = true; // Marca como verificado
+      if (hasVerified.current) return;
+      hasVerified.current = true;
 
       setLoading(true);
       try {
@@ -49,7 +49,7 @@ const HomeView = () => {
       const test = await homePageModel.testUser(cpf);
       if (test) {
         await new Promise((resolve) => setTimeout(resolve, 500));
-        navigate(`/${page}`, { state: { cpf, nome, senha } }); // Passa nome corretamente
+        navigate(`/${page}`, { state: { cpf, nome, senha } });
       } else {
         toggleModal('Você está bloqueado temporariamente, vá até o atendimento!');
       }
@@ -58,31 +58,30 @@ const HomeView = () => {
     } finally {
       setLoading(false);
     }
-};
-
+  };
 
   return (
     <div style={styles.container}>
       <h1 style={{ ...styles.welcomeText, fontSize: '1.5em' }}>Bem-vindo, {nome}!</h1>
-      <button style={styles.fullWidthButton} onClick={() => alterPage('selecionarTipo')}>
+      <Button onClick={() => alterPage('selecionarTipo', nome)} back="#0056b3" cor="#FFF">
         Marcar Aula
-      </button>
-      <button style={styles.fullWidthButton2} onClick={() => alterPage('listarAulas')}>
+      </Button>
+      <Button onClick={() => alterPage('listarAulas', nome)} back="#FFC601" cor="#333">
         Aulas
-      </button>
-      <button style={styles.buttonBack} onClick={() =>  navigate('/')}>
+      </Button>
+      <Button onClick={() => navigate('/')} back="#0074D9" cor="#FFF" styleAct={{ width: '40%' }}>
         Voltar
-      </button>
-      <button style={styles.buttonBack} onClick={() =>  alterPage('perfil', nome, senha)}>
+      </Button>
+      <Button onClick={() => alterPage('perfil', nome, senha)} back="#0074D9" cor="#FFF" styleAct={{ width: '40%' }}>
         Alterar Senha
-      </button>
-      <LoadingIndicator visible={loading}/>
+      </Button>
+      <LoadingIndicator visible={loading} />
       {isModalVisible && (
         <div style={styles.modalContent}>
           <p>{modalMessage}</p>
-          <button onClick={() => setModalVisible(false)} style={styles.modalButton}>
+          <Button onClick={() => setModalVisible(false)} back="#0056b3" cor="#FFF">
             Fechar
-          </button>
+          </Button>
         </div>
       )}
       <ToastContainer position="top-center" />
@@ -102,37 +101,7 @@ const styles = {
   welcomeText: {
     fontWeight: 'bold',
     marginBottom: '20px',
-    color: '#333',
-  },
-  fullWidthButton: {
-    width: '100%',
-    backgroundColor: 'blue',
-    borderRadius: '8px',
-    color: '#fff',
-    fontWeight: 'bold',
-    padding: '15px',
-    cursor: 'pointer',
-    marginBottom: '10px',
-  },
-  fullWidthButton2: {
-    width: '100%',
-    backgroundColor: '#FFC601',
-    borderRadius: '8px',
-    color: 'black',
-    fontWeight: 'bold',
-    padding: '15px',
-    cursor: 'pointer',
-    marginBottom: '10px',
-  },
-  buttonBack: {
-    width: '40%',
-    backgroundColor: 'gray',
-    borderRadius: '8px',
-    color: '#fff',
-    fontWeight: 'bold',
-    padding: '10px',
-    cursor: 'pointer',
-    marginTop: '20px',
+    color: '#003366', // Azul escuro para contraste
   },
   modalContent: {
     position: 'fixed',
@@ -141,18 +110,11 @@ const styles = {
     transform: 'translate(-50%, -50%)',
     backgroundColor: '#fff',
     padding: '20px',
-    borderRadius: '10px',
-    boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.2)',
+    borderRadius: '15px',
+    boxShadow: '0 6px 12px rgba(0, 0, 0, 0.15)', // Sombra mais visível
     textAlign: 'center',
   },
-  modalButton: {
-    backgroundColor: 'blue',
-    color: '#fff',
-    padding: '10px 20px',
-    marginTop: '10px',
-    cursor: 'pointer',
-    borderRadius: '5px',
-  },
 };
+
 
 export default HomeView;

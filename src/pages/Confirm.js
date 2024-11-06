@@ -6,11 +6,12 @@ import LoadingIndicator from './LoadingIndicator';
 import Modal from '../components/Modal';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import Button from '../components/Button'; // Importe o Button
 
 const Confirm = () => { 
   const location = useLocation();
   const navigate = useNavigate();
-  const { nameInstructor, data, cpf, type, hora } = location.state || {};
+  const { nameInstructor, data, cpf, type, hora, nome } = location.state || {};
   const [date] = useState(data);
   const [holidays] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -60,7 +61,7 @@ const Confirm = () => {
 
       const result = await confirmPageModel.createClass(nameInstructor, date, cpf, type, hora);
       if (result) {
-        navigate('/Fim', { state: { nameInstructor, data, cpf, type, hora } });
+        navigate('/Fim', { state: { nameInstructor, data, cpf, type, hora, nome } });
       } else {
         navigate('/Erro', { state: { message: 'Não foi possível marcar a aula' } });
       }
@@ -89,20 +90,20 @@ const Confirm = () => {
 
       <LoadingIndicator visible={loading} />
 
-      <button
+      <Button
         style={styles.button}
         onClick={loading ? null : handleConfirm}
       >
         {loading ? 'Processando...' : 'Finalizar'}
-      </button>
+      </Button>
 
-      <button
-        style={{ ...styles.button, ...styles.buttonBack }}
-        onClick={() => navigate('/selecionarDataEHora', { state: { cpf, type, nameInstructor} })}
+      <Button
+        styleAct={styles.buttonBack}
+        onClick={() => navigate('/selecionarDataEHora', { state: { cpf, type, nameInstructor, nome} })}
+        back="gray" cor="#FFF"
       >
         Voltar
-      </button>
-
+      </Button>
       <ToastContainer />
     </div>
   );

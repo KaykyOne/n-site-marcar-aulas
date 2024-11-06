@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { PerfilPageModel } from '../pageModel/PerfilPageModel';
+import InputField from '../components/Input';
 
 export default function Perfil() {
     const { state: { cpf, nome } = {} } = useLocation();
@@ -13,8 +14,8 @@ export default function Perfil() {
     const perfilPageModel = new PerfilPageModel();
 
     const handleChangePassword = async () => {
-        if (newPassword.length < 6) {
-            toast.error('A nova senha deve ter pelo menos 6 caracteres.');
+        if (newPassword.length < 6 || newPassword.length > 12) {
+            toast.error('A nova senha deve ter pelo menos 6 caracteres e no máximo 12.');
             return;
         }
 
@@ -26,7 +27,10 @@ export default function Perfil() {
                 return;
             }
             toast.success('Senha alterada com sucesso!');
-            navigate('/home', { state: { cpf, nome } });
+            setInterval(() => {
+                navigate('/home', { state: { cpf, nome } });
+            }, 3000);
+
         } catch (error) {
             toast.error('Erro ao alterar a senha');
         } finally {
@@ -37,17 +41,20 @@ export default function Perfil() {
     return (
         <div style={styles.container}>
             <h1>Olá, {nome}</h1>
-            <h2>Alterar Senha</h2>
+            <h3>Altere sua Senha!</h3>
+            <h5>Lembrando, a senha deve ter no minimo 6 e no máximo 12 caracteres!</h5>
             <InputField
                 placeholder="Senha Atual"
                 value={currentPassword}
                 onChange={(e) => setCurrentPassword(e.target.value)}
+                typ={'password'}
             />
             <InputField
                 placeholder="Nova Senha"
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
-            />
+                typ={'password'}
+            />       
             <button 
                 onClick={handleChangePassword} 
                 style={styles.button} 
@@ -57,7 +64,7 @@ export default function Perfil() {
             </button>
 
             <button 
-                onClick={() => navigate('/home', { state: { cpf } })}
+                onClick={() => navigate('/home', { state: { cpf, nome } })}
                 style={styles.buttonBack} 
                 disabled={loading}>
                 Voltar
@@ -67,15 +74,6 @@ export default function Perfil() {
     );
 }
 
-const InputField = ({ placeholder, value, onChange }) => (
-    <input
-        type="password"
-        placeholder={placeholder}
-        value={value}
-        onChange={onChange}
-        style={styles.input}
-    />
-);
 
 const styles = {
     container: {
@@ -88,31 +86,30 @@ const styles = {
         textAlign: 'center',
     },
     button: {
-        backgroundColor: 'blue',
+        width: '80%',
+        backgroundColor: '#0056b3', // Azul corporativo
         color: '#fff',
-        fontWeight: 'bold',
-        padding: '10px 20px',
-        borderRadius: '5px',
-        marginTop: '20px',
+        borderRadius: '10px',
+        padding: '12px',
         cursor: 'pointer',
+        marginTop: '15px',
         border: 'none',
+        fontWeight: 'bold',
+        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+        transition: 'background 0.3s',
     },
     buttonBack: {
-        backgroundColor: 'gray',
-        color: '#fff',
-        fontWeight: 'bold',
-        padding: '10px 20px',
-        borderRadius: '5px',
-        marginTop: '20px',
-        cursor: 'pointer',
-        border: 'none',
-    },
-    input: {
         width: '80%',
-        padding: '10px',
-        borderRadius: '5px',
-        marginBottom: '15px',
-        border: '1px solid #ccc',
-        fontSize: '1em',
+        backgroundColor: 'gray', // Azul corporativo
+        color: '#fff',
+        borderRadius: '10px',
+        padding: '12px',
+        cursor: 'pointer',
+        marginTop: '15px',
+        border: 'none',
+        fontWeight: 'bold',
+        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+        transition: 'background 0.3s',
     },
+
 };

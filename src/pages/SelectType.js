@@ -5,11 +5,12 @@ import LoadingIndicator from './LoadingIndicator';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Modal from '../components/Modal';
+import Button from '../components/Button'; // Importe o componente Button
 
 const SelectTypeView = () => {
     const location = useLocation();
     const navigate = useNavigate();
-    const { cpf } = location.state || {};
+    const { cpf, nome } = location.state || {};
     const [categorias, setCategorias] = useState([]);
     const [loading, setLoading] = useState(false);
     const [modalVisible, setModalVisible] = useState(false);
@@ -54,13 +55,13 @@ const SelectTypeView = () => {
 
     const confirmSelection = () => {
         setModalVisible(false);
-        navigate('/selecionarInstrutor', { state: { cpf, type: selectedType } });
+        navigate('/selecionarInstrutor', { state: { cpf, type: selectedType, nome } });
     };
 
     const renderCategoriaItem = (item, index) => (
-        <button key={index} style={styles.button} onClick={() => handleButtonClick(item)}>
+        <Button key={index} onClick={() => handleButtonClick(item)} back="#0056b3" cor="#FFF" styleAct={styles.button}>
             {item}
-        </button>
+        </Button>
     );
 
     return (
@@ -70,7 +71,9 @@ const SelectTypeView = () => {
             <div style={styles.flatListContainer}>
                 {categorias.map(renderCategoriaItem)}
             </div>
-            <button style={styles.buttonBack} onClick={() => navigate('/home', { state: { cpf } })}>Voltar</button>
+            <Button onClick={() => navigate('/home', { state: { cpf, nome } })} back="gray" cor="#FFF" styleAct={styles.buttonBack}>
+                Voltar
+            </Button>
             <div style={styles.contador}>
                 <div style={{ ...styles.circle, ...styles.blue }} />
                 <div style={{ ...styles.circle, ...styles.lightgray }} />
@@ -81,7 +84,7 @@ const SelectTypeView = () => {
             <Modal
                 isOpen={modalVisible}
                 onConfirm={confirmSelection}
-                onCancel={() => setModalVisible(false)} // Função anônima
+                onCancel={() => setModalVisible(false)}
             >
                 <p>Você tem certeza que deseja selecionar o tipo: {selectedType}</p>
             </Modal>
@@ -123,20 +126,12 @@ const styles = {
     },
     buttonBack: {
         width: '40%',
-        backgroundColor: 'gray',
         borderRadius: 8,
-        color: '#fff',
-        padding: 10,
-        marginTop: 20,
-        cursor: 'pointer',
+        marginTop: '10px',
     },
     button: {
-        backgroundColor: 'blue',
-        borderRadius: 10,
-        color: '#fff',
-        padding: '10px 20px',
-        margin: 5,
-        cursor: 'pointer',
+        margin: '10px',
+        padding: '20px',
     },
     flatListContainer: {
         display: 'flex',
@@ -145,7 +140,7 @@ const styles = {
     },
     contador: {
         display: 'flex',
-        flexDirection: 'row', // Alinha as bolinhas em linha
+        flexDirection: 'row',
         justifyContent: 'center',
         margin: 10,
     },

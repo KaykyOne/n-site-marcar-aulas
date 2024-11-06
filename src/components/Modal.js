@@ -43,6 +43,7 @@ const styles = {
         display: 'flex',
         justifyContent: 'space-between',
         marginTop: '20px',
+
     },
     modalButton: {
         backgroundColor: 'blue',
@@ -51,5 +52,6 @@ const styles = {
         borderRadius: '5px',
         border: 'none',
         cursor: 'pointer',
+        margin:'10px',
     },
 };

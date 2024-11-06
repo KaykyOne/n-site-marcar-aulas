@@ -4,14 +4,14 @@ import { useNavigate, useLocation } from 'react-router-dom';
 const EndView = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { cpf } = location.state || {}; // Obtém o parâmetro 'cpf' da navegação anterior
+  const { cpf, nome } = location.state || {}; // Obtém o parâmetro 'cpf' da navegação anterior
 
   const handleSecondButton = () => {
     navigate('/');
   };
 
   const secondClassButton = () => {
-    navigate('/selecionarTipo', { state: { cpf } });
+    navigate('/selecionarTipo', { state: { cpf, nome } });
   };
 
   return (

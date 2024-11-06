@@ -8,7 +8,7 @@ import 'react-toastify/dist/ReactToastify.css';
 
 function ListAulas() {
     const location = useLocation();
-    const { cpf } = location.state || {}; // Recebe os dados
+    const { cpf, nome } = location.state || {}; // Recebe os dados
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [aulas, setAulas] = useState([]);
@@ -56,9 +56,9 @@ function ListAulas() {
         console.log(currentDateTime);
 
         if (action === 'Excluir') {
-                setSelectedAula(item);
-                setModalAction('Excluir');
-                setModalVisible(true);
+            setSelectedAula(item);
+            setModalAction('Excluir');
+            setModalVisible(true);
         } else if (action === 'Confirmar') {
             if (isBefore(aulaDateTime, currentDateTime)) {
                 setSelectedAula(item);
@@ -75,7 +75,7 @@ function ListAulas() {
             try {
                 if (modalAction === 'Excluir') {
                     let res = await listAulasPageModel.deleteAula(selectedAula.aula_id, selectedAula.data, selectedAula.hora);
-                    showToast(res ? 'success': 'error', res ? 'Sucesso' : 'Erro', res ? 'Aula excluída com sucesso!' : 'Erro ao excluir a aula!');
+                    showToast(res ? 'success' : 'error', res ? 'Sucesso' : 'Erro', res ? 'Aula excluída com sucesso!' : 'Erro ao excluir a aula!');
                 } else if (modalAction === 'Confirmar') {
                     await listAulasPageModel.alterAula("Concluída", selectedAula.aula_id, "Concluída", cpf);
                     showToast('success', 'Sucesso', 'Aula confirmada com sucesso!');
@@ -105,12 +105,16 @@ function ListAulas() {
         <div style={styles.container}>
             <h1 style={styles.title}>Aulas</h1>
             {loading && <LoadingIndicator />}
-            {error ? (
-                <div style={styles.errorContainer}><p style={styles.errorText}>Erro: {error}</p></div>
+            {error || aulas.length === 0 ? (
+                <div style={styles.errorContainer}>
+                    <p style={styles.errorText}>
+                        {error ? `Erro: ${error}` : 'Nenhuma aula marcada!'}
+                    </p>
+                </div>
             ) : (
                 <div style={styles.flatListContainer}>{aulas.map(renderAulaItem)}</div>
             )}
-            <button style={styles.buttonBack} onClick={() => navigate(`/home`, { state: { cpf } })}>Voltar</button>
+            <button style={styles.buttonBack} onClick={() => navigate(`/home`, { state: { cpf, nome } })}>Voltar</button>
 
             {modalVisible && (
                 <div style={styles.modalContent}>
@@ -135,13 +139,13 @@ const styles = {
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        padding: '20px',
         height: '100vh',
     },
     title: {
-        fontSize: '28px',
-        color: '#333',
-        textAlign: 'center',
+        fontSize: '1.5em',  // Ajustado para manter o tamanho de título semelhante ao Home
+        fontWeight: 'bold',
+        marginBottom: '20px',
+        color: '#003366', // Azul escuro para manter a consistência com Home
     },
     flatListContainer: {
         width: '100%',
@@ -151,9 +155,10 @@ const styles = {
     },
     itemContainer: {
         backgroundColor: '#D9D9D9',
-        borderRadius: '10px',
+        borderRadius: '12px',  // Arredondando mais para alinhar com o Home
         padding: '20px',
         margin: '10px 0',
+        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',  // Sombra leve
     },
     buttonContainer: {
         marginTop: '10px',
@@ -161,26 +166,37 @@ const styles = {
     deleteButton: {
         backgroundColor: '#FF4C4C',
         color: '#fff',
-        padding: '10px',
-        borderRadius: '5px',
+        padding: '10px 20px',
+        borderRadius: '8px',  // Arredondamento consistente
         margin: '5px',
         cursor: 'pointer',
+        border: 'none',
+        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)', // Sombra leve
+        transition: 'background 0.3s',
     },
     confirmButton: {
         backgroundColor: '#4CAF50',
         color: '#fff',
-        padding: '10px',
-        borderRadius: '5px',
+        padding: '10px 20px',
+        borderRadius: '8px', // Arredondamento consistente
         margin: '5px',
         cursor: 'pointer',
+        border: 'none',
+        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)', // Sombra leve
+        transition: 'background 0.3s',
     },
     buttonBack: {
-        backgroundColor: '#007BFF',
+        width: '40%', // Tamanho ajustado para similar ao botão na Home
+        backgroundColor: '#0074D9', // Azul médio (igual ao botão 'Voltar' em Home)
+        borderRadius: '12px',
         color: '#fff',
-        padding: '10px 20px',
-        borderRadius: '8px',
-        marginTop: '20px',
+        fontWeight: 'bold',
+        padding: '15px',
         cursor: 'pointer',
+        marginTop: '20px',
+        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+        border: 'none',
+        transition: 'background 0.3s',
     },
     modalContent: {
         position: 'fixed',
@@ -189,7 +205,8 @@ const styles = {
         transform: 'translate(-50%, -50%)',
         backgroundColor: '#fff',
         padding: '20px',
-        borderRadius: '8px',
+        borderRadius: '15px',  // Ajustado para borda arredondada similar
+        boxShadow: '0 6px 12px rgba(0, 0, 0, 0.15)', // Sombra mais visível
         textAlign: 'center',
     },
     modalButtons: {
@@ -197,13 +214,18 @@ const styles = {
         justifyContent: 'center',
     },
     modalButton: {
-        backgroundColor: '#007BFF',
+        backgroundColor: '#0056b3', // Azul escuro como na Home
         color: '#fff',
         padding: '10px 20px',
-        borderRadius: '5px',
-        margin: '10px',
+        marginTop: '10px',
+        cursor: 'pointer',
+        borderRadius: '8px',
+        border: 'none',
+        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',  // Sombra leve
+        transition: 'background 0.3s',
     },
 };
+
 
 export default ListAulas;
 

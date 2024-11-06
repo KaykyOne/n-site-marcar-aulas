@@ -5,6 +5,8 @@ import { LoginPageModel } from '../pageModel/LoginPageModel';
 import logoAutoEscola from "../imgs/logoAutoEscolaIdeal.png";
 import { useNavigate } from 'react-router-dom';
 import Cripto from '../controller/Cripto';
+import InputField from '../components/Input';
+import Button from '../components/Button'; // Importe o Button
 
 function Login() {
     const [cpfNormal, setCpf] = useState('');
@@ -25,7 +27,11 @@ function Login() {
     };
 
     const showToast = (type, text1, text2) => {
-        toast[type](`${text1}: ${text2}`);
+        if (!toast.isActive('unique-id')) {
+            toast[type](`${text1}: ${text2}`, {
+                toastId: 'unique-id'
+            });
+        }
     };
 
     const login = async () => {
@@ -42,7 +48,7 @@ function Login() {
             const nome = data.nome;
             const senha = data.senha;
             if (senha === Cripto(senhaInput) || senhaInput === senha) {
-                navigate('/home', { state: { nome, cpf, senha } }); // Navega usando navigate
+                navigate('/home', { state: { nome, cpf, senha } });
                 setCpf('');
             } else {
                 toggleModal('Nenhum usuário encontrado com esse CPF.');
@@ -65,7 +71,13 @@ function Login() {
 
     const handleCpfChange = (event) => {
         const text = event.target.value;
-        setCpf(text);
+        if(/^\d+$/.test(text)){
+            setCpf(text);
+        }else{
+            showToast('error', 'Erro', 'O CPF deve conter Apenas numeros!');
+            setCpf('');
+        }
+
         if (!isRunning) {
             startTimer();
         } else {
@@ -93,28 +105,34 @@ function Login() {
                 alt="Logo Auto Escola Ideal"
                 style={styles.image}
             />
-            <input
-                type="text"
+            <InputField
+                typ="text"
                 placeholder="Digite seu CPF"
                 value={cpfNormal}
                 onChange={handleCpfChange}
-                style={styles.textInputCpf}
             />
             <div style={styles.containerPass}>
-                <input
-                    type={seePass ? 'text' : 'password'}
+                <InputField
+                    typ={seePass ? 'text' : 'password'}
                     placeholder="Digite sua Senha"
                     value={senhaInput}
-                    onChange={(e) => setSenha(e.target.value)} // <--- Corrigido
-                    style={styles.passwordInput}
+                    onChange={(e) => setSenha(e.target.value)}
+                    styleAct={styles.passwordInput}
                 />
                 <button onClick={() => setSeePass(!seePass)} style={styles.showButton}>
                     {seePass ? 'Ocultar' : 'Mostrar'}
                 </button>
             </div>
-            <button style={styles.button} onClick={login} disabled={loading}>
+            {/* Substitua o botão padrão pelo componente Button */}
+            <Button
+                onClick={login}
+                cor="#FFF"
+                back="#0056b3" // Azul corporativo
+                styleAct={styles.button}
+                disabled={loading}
+            >
                 {loading ? 'Carregando...' : 'Entrar'}
-            </button>
+            </Button>
             <p style={styles.textLink} onClick={() => navigate('/support')}>
                 Não consegue Entrar? Clique aqui!!
             </p>
@@ -141,7 +159,7 @@ const styles = {
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: '#f5f5f5',
+        backgroundColor: '#f0f8ff',
         padding: '20px',
         height: '100vh',
     },
@@ -149,74 +167,57 @@ const styles = {
         display: 'flex',
         alignItems: 'center',
         marginBottom: '20px',
-        width: '80%', // Alinhar com a largura dos outros inputs
+        width: '80%',
     },
     image: {
         height: '100px',
-        width: '200px',
-        margin: '20px',
-    },
-    textInputCpf: {
-        width: '80%',
-        padding: '15px',
+        width: 'auto',
         marginBottom: '20px',
-        borderRadius: '10px',
-        border: '1px solid #ddd',
-    },
-    textInput: {
-        width: '100%',
-        padding: '15px',
-        marginBottom: '20px',
-        borderRadius: '10px',
-        border: '1px solid #ddd',
     },
     passwordInput: {
         flex: 1,
-        padding: '15px',
-        borderRadius: '10px 0 0 10px', // Bordas arredondadas à esquerda
-        border: '1px solid #ddd',
-        borderRight: 'none', // Remove a borda direita para unir com o botão
+        padding: '12px',
+        borderRadius: '8px 0 0 8px',
+        border: '1px solid #ccc',
+        borderRight: 'none',
+        boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
     },
     showButton: {
-        padding: '15px',
-        borderRadius: '0 10px 10px 0', // Bordas arredondadas à direita
-        border: '1px solid #ddd',
-        backgroundColor: '#f0f0f0',
+        padding: '12px',
+        borderRadius: '0 8px 8px 0',
+        border: '1px solid #ccc',
+        backgroundColor: '#FFC601',
         cursor: 'pointer',
-    },
-    button: {
-        width: '80%',
-        backgroundColor: 'blue',
-        color: '#fff',
-        borderRadius: '10px',
-        padding: '15px',
-        cursor: 'pointer',
-        marginTop: '10px',
+        color: '#333',
+        boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
     },
     textLink: {
         marginTop: '20px',
-        color: 'blue',
+        color: '#0056b3',
         textDecoration: 'underline',
         cursor: 'pointer',
+        fontSize: '0.9em',
     },
     modalContent: {
         position: 'fixed',
         top: '50%',
         left: '50%',
         transform: 'translate(-50%, -50%)',
-        backgroundColor: 'white',
+        backgroundColor: '#fff',
         padding: '20px',
-        borderRadius: '10px',
+        borderRadius: '12px',
         textAlign: 'center',
-        boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.2)',
+        boxShadow: '0 6px 12px rgba(0, 0, 0, 0.15)',
     },
     modalButton: {
-        backgroundColor: 'blue',
+        backgroundColor: '#0056b3',
         color: '#fff',
         padding: '10px 20px',
         marginTop: '10px',
         cursor: 'pointer',
-        borderRadius: '5px',
+        borderRadius: '8px',
+        border: 'none',
+        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
     },
 };
 

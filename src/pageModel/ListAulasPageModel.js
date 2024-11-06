@@ -128,21 +128,31 @@ export class ListAulasPageModel {
       if (currentDate < data || 
           (currentDate === data && (parseInt(hora.split(':')[0]) - parseInt(currentTime.split(':')[0]) > 3 ||
                                      (parseInt(hora.split(':')[0]) === parseInt(currentTime.split(':')[0]) && 
-                                     parseInt(hora.split(':')[1]) >= parseInt(currentTime.split(':')[1]))))) {
+                                      parseInt(hora.split(':')[1]) >= parseInt(currentTime.split(':')[1]))))) {
         // Realiza a exclusão
-        const { data: deleteData, error } = await supabase.from('aulas').delete().eq('aula_id', id);
-        console.log(deleteData);                              
-        if (error) throw error; // Repassa o erro para quem chamou o método
-        return deleteData ? true : false; // Retorna true se a exclusão for bem-sucedida
+        const { data: deleteData, error, count } = await supabase
+          .from('aulas')
+          .delete()
+          .eq('aula_id', id)
+          .select();  // 'select()' pode ser usado para tentar capturar os dados retornados
+  
+        // Verifique se houve um erro
+        if (error) {
+          throw error;
+        }
+        // Verifique o número de registros excluídos
+        return deleteData ? true : false;  // Retorna true se a exclusão afetou algum registro
       } else {
         console.log('Não foi possível excluir a aula: precisa ser excluída com 3 horas de antecedência ou mais.');
         return false;
       }
     } catch (error) {
-      console.error('erro nesse carai: ', error); // Log do erro
+      console.error('Erro no processo de exclusão: ', error); // Log do erro
       return false; // Retorna false em caso de erro
     }
   }
+  
+  
   
 
   async getCurrentTimeAndDateFromServer() {

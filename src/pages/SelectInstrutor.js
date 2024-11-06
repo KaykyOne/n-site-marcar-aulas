@@ -5,10 +5,11 @@ import { toast, ToastContainer } from 'react-toastify';
 import LoadingIndicator from './LoadingIndicator';
 import 'react-toastify/dist/ReactToastify.css';
 import Modal from '../components/Modal';
+import Button from '../components/Button'; // Importe o componente Button
 
 const SelectInstructor = () => {
     const location = useLocation();
-    const { cpf, type } = location.state || {};
+    const { cpf, type, nome } = location.state || {};
     const [instrutores, setInstrutores] = useState([]);
     const [loading, setLoading] = useState(false);
     const [modalVisible, setModalVisible] = useState(false);
@@ -45,18 +46,18 @@ const SelectInstructor = () => {
 
     const handleButtonClick = (value) => {
         setSelectedInstructor(value);
-        setModalVisible(true); // Exibe o modal de confirmação
+        setModalVisible(true);
     };
 
     const confirmSelection = () => {
-        setModalVisible(false); // Fecha o modal
-        navigate('/selecionarDataEHora', { state: { cpf, type, nameInstructor: selectedInstructor } });
+        setModalVisible(false);
+        navigate('/selecionarDataEHora', { state: { cpf, type, nameInstructor: selectedInstructor, nome } });
     };
 
     const renderInstrutorItem = (item, index) => (
-        <button key={index} style={styles.button} onClick={() => handleButtonClick(item)}>
+        <Button key={index} onClick={() => handleButtonClick(item)} back="#0056b3" cor="#FFF" styleAct={styles.button}>
             {item}
-        </button>
+        </Button>
     );
 
     return (
@@ -68,9 +69,9 @@ const SelectInstructor = () => {
             <div style={styles.flatListContainer}>
                 {instrutores.map(renderInstrutorItem)}
             </div>
-            <button style={styles.buttonBack} onClick={() => navigate('/selecionarTipo', { state: { cpf } })}>
+            <Button onClick={() => navigate('/selecionarTipo', { state: { cpf, nome } })} back="gray" cor="#FFF" styleAct={styles.buttonBack}>
                 Voltar
-            </button>
+            </Button>
             <div style={styles.contador}>
                 <div style={{ ...styles.circle, backgroundColor: 'blue' }} />
                 <div style={{ ...styles.circle, backgroundColor: 'blue' }} />
@@ -82,13 +83,12 @@ const SelectInstructor = () => {
             <Modal
                 isOpen={modalVisible}
                 onConfirm={confirmSelection}
-                onCancel={() => setModalVisible(false)} // Função anônima
+                onCancel={() => setModalVisible(false)}
             >
                 <p>Você tem certeza que deseja selecionar o instrutor: {selectedInstructor}</p>
             </Modal>
 
             <ToastContainer />
-
         </div>
     );
 };
@@ -127,63 +127,16 @@ const styles = {
         display: 'flex',
         flexDirection: 'column',
         width: '100%',
+        alignItems: 'center',
     },
     buttonBack: {
         width: '40%',
-        backgroundColor: 'gray',
         borderRadius: 8,
-        color: '#fff',
-        padding: 10,
         marginTop: 20,
-        cursor: 'pointer',
     },
     button: {
-        backgroundColor: 'blue',
-        borderRadius: 10,
-        color: '#fff',
-        padding: '10px 20px',
-        margin: 5,
-        cursor: 'pointer',
-    },
-    modal: {
-        overlay: {
-            backgroundColor: 'rgba(0, 0, 0, 0.5)',
-        },
-        content: {
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-            padding: '20px',
-            borderRadius: '10px',
-            backgroundColor: 'white',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-        },
-    },
-    modalContent: {
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-    },
-    modalMessage: {
-        fontSize: 18,
-        marginBottom: 20,
-    },
-    modalButtons: {
-        display: 'flex',
-        justifyContent: 'space-between',
-        width: '100%',
-    },
-    modalButton: {
-        flex: 1,
-        backgroundColor: 'blue',
-        padding: 15,
-        borderRadius: 5,
-        margin: '0 5px',
-        color: 'white',
-        border: 'none',
-        cursor: 'pointer',
+        width: '80%',
+        marginTop: '15px',
     },
 };
 

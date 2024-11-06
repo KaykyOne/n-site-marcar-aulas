@@ -9,11 +9,12 @@ import Modal from '../components/Modal';
 import { useNavigate, useLocation } from 'react-router-dom';
 import LoadingIndicator from './LoadingIndicator';
 import { SelectDateAndHourPageModel } from '../pageModel/SelectDateAndHourPageModel';
+import Button from '../components/Button';
 
 export default function SelectDateAndHour() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { cpf, type, nameInstructor } = location.state || {};
+  const { cpf, type, nameInstructor, nome } = location.state || {};
   const [loading, setLoading] = useState(false);
   const [holidays, setHolidays] = useState([]);
   const [horas, setHoras] = useState([]);
@@ -23,6 +24,10 @@ export default function SelectDateAndHour() {
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedHour, setSelectedHour] = useState(null);
   const [currentDate, setCurrentDate] = useState(new Date());
+  const [dayName, setDayName] = useState('');
+  const [hover, setHover] = useState(false);  // Adicionado para hover no botão
+
+  const namesForDays = new Array("Domingo", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado");
 
   const selectDateAndHourPageModel = new SelectDateAndHourPageModel();
 
@@ -53,6 +58,8 @@ export default function SelectDateAndHour() {
         setHoras(horasDisponiveis);
         setCurrentTime(currentTime);
         setCurrentDate(currentDate);
+        let parsedDate = new Date(date);
+        setDayName(namesForDays[parsedDate.getDay()]);
       } catch (error) {
         setError(error.message);
       } finally {
@@ -85,7 +92,8 @@ export default function SelectDateAndHour() {
         type,
         nameInstructor,
         data: date,
-        hora: selectedHour
+        hora: selectedHour,
+        nome
       }
     });
   };
@@ -94,17 +102,30 @@ export default function SelectDateAndHour() {
     <div style={styles.container}>
       <h3 style={styles.tipText}>Selecione a data para escolher um novo dia ou use as setas!</h3>
       <div style={styles.rowContainer}>
-        <button style={styles.buttonDate} onClick={() => handleDateChange(moment(date).subtract(1, 'day').toDate())}>
+        <button
+          style={hover ? { ...styles.buttonDate, ...styles.buttonDateHover } : styles.buttonDate}
+          onMouseEnter={() => setHover(true)}
+          onMouseLeave={() => setHover(false)}
+          onClick={() => handleDateChange(moment(date).subtract(1, 'day').toDate())}
+        >
           <AiOutlineLeft size={30} />
         </button>
-        <DatePicker
-          selected={date}
-          onChange={handleDateChange}
-          minDate={new Date()}
-          maxDate={moment().add(7, 'days').toDate()}
-          dateFormat="dd/MM/yyyy"
-        />
-        <button style={styles.buttonDate} onClick={() => handleDateChange(moment(date).add(1, 'day').toDate())}>
+        <div style={styles.containerCalendar}>
+          <DatePicker
+            selected={date}
+            onChange={handleDateChange}
+            minDate={new Date()}
+            maxDate={moment().add(7, 'days').toDate()}
+            dateFormat="dd/MM/yyyy"
+          />
+          <h4 style={styles.nameDayText}>{dayName}</h4>
+        </div>
+        <button
+          style={hover ? { ...styles.buttonDate, ...styles.buttonDateHover } : styles.buttonDate}
+          onMouseEnter={() => setHover(true)}
+          onMouseLeave={() => setHover(false)}
+          onClick={() => handleDateChange(moment(date).add(1, 'day').toDate())}
+        >
           <AiOutlineRight size={30} />
         </button>
       </div>
@@ -115,8 +136,8 @@ export default function SelectDateAndHour() {
       <div style={styles.listContainer}>
         {holidays.includes(moment(date).format('YYYY-MM-DD')) ||
           moment(date).day() === 0 ||
-          moment(date).day() === 6 ? (
-          <p style={styles.messageText}>Dia não letivo</p>
+          moment(date).day() === 6 || horas.length === 0 ? (
+          <p style={styles.messageText}>Dia não letivo ou sem horas disponíveis</p>
         ) : (
           horas.map((hora, index) => (
             <button key={index} style={styles.button} onClick={() => handleHourClick(hora)}>
@@ -126,9 +147,10 @@ export default function SelectDateAndHour() {
         )}
       </div>
 
-      <button style={styles.buttonBack} onClick={() => navigate('/selecionarInstrutor', { state: { cpf, type } })}>
+      <Button onClick={() => navigate('/selecionarInstrutor', { state: { cpf, type, nome } })} back="gray" cor="#FFF" styleAct={styles.buttonBack}>
         Voltar
-      </button>
+      </Button>
+
 
       <Modal
         isOpen={modalVisible}
@@ -154,65 +176,79 @@ const styles = {
     backgroundColor: '#f5f5f5',
     padding: 20,
     minHeight: '100vh',
+    overflowX: 'hidden', // Evita que o conteúdo saia da tela horizontalmente
   },
-  rowContainer: { 
-    display: 'flex', 
-    alignItems: 'center', 
-    justifyContent: 'center' 
+  nameDayText: {
+    textAlign: 'center',
   },
-  button: { 
-    cursor: 'pointer', 
-    margin: '5px', 
-    padding: '10px 20px', 
-    backgroundColor: 'blue', 
-    color: '#fff', 
-    border: 'none', 
-    borderRadius: '5px' 
+  containerCalendar: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    margin: 10,
   },
-  buttonDate: { 
-    cursor: 'pointer', 
-    margin: '5px', 
-    padding: '10px 20px', 
-    backgroundColor: 'transparent', 
-    color: 'blue', 
-    border: 'none', 
-    borderRadius: '5px' 
+  rowContainer: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center'
   },
-  buttonBack: { 
-    cursor: 'pointer', 
-    marginTop: '20px', 
-    backgroundColor: 'gray', 
-    padding: '10px', 
-    color: '#fff', 
-    borderRadius: '5px' 
+  button: {
+    cursor: 'pointer',
+    padding: '10px 20px',
+    backgroundColor: '#0056b3',
+    color: '#fff',
+    border: 'none',
+    borderRadius: '8px',
+    width: 'auto', // Ajuste de largura para não ocupar 100% da tela
+    minWidth: '90px', // Define uma largura mínima para cada botão
+    transition: 'all 0.3s ease',
   },
-  tipText: { 
-    textAlign: 'center', 
-    color: 'green' 
+  buttonDate: {
+    cursor: 'pointer',
+    margin: '5px',
+    padding: '10px 20px',
+    backgroundColor: 'transparent',
+    color: 'blue',  // Cor azul para combinar com o tema
+    border: 'none',
+    display: 'flex',
+    alignItems: 'center',  // Centraliza o conteúdo do botão (ícone)
+    justifyContent: 'center',  // Garante que o ícone fique no centro
   },
-  errorText: { 
-    color: 'red' 
+  buttonBack: {
+    width: '40%',
+    borderRadius: 8,
+    marginTop: 20,
   },
-  listContainer: { 
-    display: 'flex', 
-    flexWrap: 'wrap', 
-    justifyContent: 'center' 
+  tipText: {
+    textAlign: 'center',
+    color: 'green',
+    marginBottom: '20px'
+  },
+  errorText: {
+    color: 'red'
+  },
+  listContainer: {
+    display: 'flex',
+    flexWrap: 'wrap', // Faz com que os botões se ajustem em várias linhas se não houver espaço
+    justifyContent: 'center', // Centraliza os botões
+    alignItems: 'center', // Alinha os botões no centro verticalmente
+    marginTop: '20px',
+    gap: '10px', // Espaço entre os botões
+    overflowX: 'auto', // Adiciona rolagem horizontal se necessário
+    maxWidth: '100%', // Impede que ultrapassem o limite da tela
   },
 };
 
+// Estilos do modal
 const customStyles = {
   modal: {
     content: {
-      top: '50%',
-      left: '50%',
-      right: 'auto',
-      bottom: 'auto',
-      marginRight: '-50%',
-      transform: 'translate(-50%, -50%)',
-      padding: '20px',
-      borderRadius: '10px',
       maxWidth: '400px',
-      width: '90%',
+      margin: 'auto',
+      padding: '20px',
+      borderRadius: '8px',
+      textAlign: 'center',
+      backgroundColor: '#fff',
     },
   },
 };
+
