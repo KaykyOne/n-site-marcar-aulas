@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import LoadingIndicator from './LoadingIndicator';
 import { HomePageModel } from '../pageModel/HomePageModel';
@@ -12,9 +12,11 @@ const HomeView = () => {
   const [loading, setLoading] = useState(false);
   const [modalMessage, setModalMessage] = useState('');
   const [isModalVisible, setModalVisible] = useState(false);
-  const homePageModel = new HomePageModel();
   const navigate = useNavigate();
   const hasVerified = useRef(false);
+
+  // Use useMemo para garantir que o HomePageModel não seja recriado em cada renderização
+  const homePageModel = useMemo(() => new HomePageModel(), []);
 
   const toggleModal = (message) => {
     setModalMessage(message);
@@ -115,6 +117,5 @@ const styles = {
     textAlign: 'center',
   },
 };
-
 
 export default HomeView;
