@@ -7,7 +7,7 @@ const Erro = () => {
   const { error } = location.state || {}; // Obtem o parâmetro 'error' passado na navegação
 
   const handleFirstButton = () => {
-    navigate('/login');
+    navigate('/');
   };
 
   return (

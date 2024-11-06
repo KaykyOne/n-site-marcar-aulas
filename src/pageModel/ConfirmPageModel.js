@@ -63,7 +63,7 @@ export class ConfirmPageModel {
         return null;
       } else {
         console.log('Dados da aula inseridos com sucesso:');
-        return aulaData ? true : false; // Retorna os dados da aula inserida
+        return true; // Retorna os dados da aula inserida
       }
     } catch (error) {
       console.error('Erro inesperado ao inserir aula:', error.message);

@@ -36,7 +36,6 @@ const styles = {
     justifyContent: 'center',
     padding: '20px',
     minHeight: '100vh',
-    backgroundColor: '#F8F8F8',
   },
   title: {
     fontSize: '24px',
