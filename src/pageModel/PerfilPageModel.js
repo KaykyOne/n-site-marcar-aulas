@@ -12,8 +12,6 @@ export class PerfilPageModel {
         .eq('cpf', cpf)
         .single(); // Retorna apenas um resultado
 
-    console.log(cpf); // Log para verificar o CPF
-
     if (error || !data) {
         console.error('Erro ao buscar usuário:', error);
         return false; // Retorna false se ocorrer um erro

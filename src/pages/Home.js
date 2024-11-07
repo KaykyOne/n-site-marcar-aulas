@@ -24,6 +24,7 @@ const HomeView = () => {
   };
 
   const showToast = (type, text1, text2) => {
+    toast.dismiss();
     toast[type](`${text1}: ${text2}`);
   };
 

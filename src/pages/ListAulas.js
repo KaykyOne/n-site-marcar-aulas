@@ -5,6 +5,7 @@ import { ListAulasPageModel } from '../pageModel/ListAulasPageModel';
 import { format, isAfter, differenceInHours, parseISO, isBefore } from 'date-fns';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import Modal from '../components/Modal';
 
 function ListAulas() {
     const location = useLocation();
@@ -21,6 +22,7 @@ function ListAulas() {
     const [modalAction, setModalAction] = useState(null);
 
     const showToast = (type, text1, text2) => {
+        toast.dismiss();
         toast[type](`${text1}: ${text2}`);
     };
 
@@ -50,23 +52,20 @@ function ListAulas() {
 
     const handleAction = (action, item) => {
         const { data, hora } = item;
-        const aulaDateTime = parseISO(`${data}T${hora}:00`);
-        const currentDateTime = new Date();
-        console.log(aulaDateTime);
-        console.log(currentDateTime);
-
         if (action === 'Excluir') {
             setSelectedAula(item);
             setModalAction('Excluir');
             setModalVisible(true);
         } else if (action === 'Confirmar') {
-            if (isBefore(aulaDateTime, currentDateTime)) {
+            if(currentDate > data || (currentDate === data && hora < currentTime)){
                 setSelectedAula(item);
                 setModalAction('Confirmar');
                 setModalVisible(true);
-            } else {
-                showToast('error', 'Erro', 'Você só pode confirmar aulas passadas.');
+            }else{
+                showToast('error', 'Erro', 'Muito cedo para concluir a aula!');
             }
+
+
         }
     };
 
@@ -116,15 +115,14 @@ function ListAulas() {
             )}
             <button style={styles.buttonBack} onClick={() => navigate(`/home`, { state: { cpf, nome } })}>Voltar</button>
 
-            {modalVisible && (
-                <div style={styles.modalContent}>
-                    <p>{modalAction === 'Excluir' ? `Deseja excluir a aula ${selectedAula?.tipo}?` : `Deseja confirmar a aula ${selectedAula?.tipo}?`}</p>
-                    <div style={styles.modalButtons}>
-                        <button style={styles.modalButton} onClick={confirmAction}>Confirmar</button>
-                        <button style={styles.modalButton} onClick={() => setModalVisible(false)}>Cancelar</button>
-                    </div>
-                </div>
-            )}
+            <Modal
+                isOpen={modalVisible}
+                onConfirm={confirmAction}
+                onCancel={() => setModalVisible(false)}
+
+            >
+                <p>{modalAction === 'Excluir' ? `Deseja excluir a aula ${selectedAula?.tipo}?` : `Deseja confirmar a aula de tipo: ${selectedAula?.tipo}?`}</p>
+            </Modal>
             <ToastContainer position="top-center" />
         </div>
     );

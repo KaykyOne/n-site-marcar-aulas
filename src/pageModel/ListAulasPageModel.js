@@ -64,13 +64,14 @@ export class ListAulasPageModel {
       if (aulaError) {
         console.log(aulaError.message);
       }
+
   
-      const aulaDateTime = new Date(`${aulaData.data}T${aulaData.hora}`);
-      const currentDateTime = new Date(`${currentDate}T${currentTime}`);
-  
+      const adjustedCurrentDate = new Date(currentDate.toLocaleString("en-US", { timeZone: "America/Sao_Paulo" }));
+
       // Verifica se a aula já passou ou se está dentro do horário permitido
-      if (currentDateTime < aulaDateTime) {
-        throw new Error('A aula ainda não pode ser concluída. O horário ainda não foi alcançado.');
+      if (aulaData.data < adjustedCurrentDate || (aulaData.hora == currentTime && aulaData.data <= adjustedCurrentDate)) {
+        console.log('erro ao concluir aula, muito cedo!');
+        return false;
       }
   
       // Atualiza o campo 'situacao' da aula
@@ -92,7 +93,8 @@ export class ListAulasPageModel {
         .single();
   
       if (userError) {
-        throw new Error(userError.message);
+        console.log(`erro ao concluir aula: ${userError.message}`);
+        return false;
       }
   
       // Incrementa o valor apropriado
@@ -108,13 +110,14 @@ export class ListAulasPageModel {
         .eq('cpf', cpf);
   
       if (updateUserError) {
-        throw new Error(updateUserError.message);
+        console.log(`erro ao concluir aula: ${updateUserError.message}`);
+        return false;
       }
   
       return updateUserData;
     } catch (error) {
-      console.log(error);
-      throw error; // Repassa o erro para quem chamou o método
+      console.log(`erro ao concluir aula: ${error.message}`);
+      return false;
     }
   }
 

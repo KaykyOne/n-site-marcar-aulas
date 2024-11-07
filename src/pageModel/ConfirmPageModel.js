@@ -165,9 +165,6 @@ export class ConfirmPageModel {
     }
   }
 
-  
-  
-
   async countClass(id, situacao) {
     try {
       const { count, error } = await supabase

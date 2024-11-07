@@ -45,6 +45,7 @@ const SelectTypeView = () => {
     }, [cpf]);
 
     const showToast = (title, message) => {
+        toast.dismiss();
         toast.error(`${title}: ${message}`, { position: 'top-center' });
     };
 

@@ -1,9 +1,10 @@
 import React from 'react';
 
-export default function InputField({ placeholder, value, onChange, typ, styleAct }) {
+export default function InputField({ placeholder, inputMode, value, onChange, typ, styleAct }) {
     return (
         <input
-            type={typ}
+            type={typ || 'text'}
+            inputMode={inputMode || 'text'}
             placeholder={placeholder}
             value={value}
             onChange={onChange}

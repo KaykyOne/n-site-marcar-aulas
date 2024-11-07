@@ -13,9 +13,14 @@ export default function Perfil() {
     const navigate = useNavigate();
     const perfilPageModel = new PerfilPageModel();
 
+    const showToast = (type, text1, text2) => {
+        toast.dismiss();  // Remove todos os toasts anteriores
+        toast[type](`${text1}: ${text2}`);
+    };
+
     const handleChangePassword = async () => {
         if (newPassword.length < 6 || newPassword.length > 12) {
-            toast.error('A nova senha deve ter pelo menos 6 caracteres e no máximo 12.');
+            showToast('error', 'Erro', 'A nova senha deve ter pelo menos 6 caracteres e no máximo 12.');
             return;
         }
 
@@ -23,16 +28,16 @@ export default function Perfil() {
         try {
             const senhaAlterada = await perfilPageModel.alterarSenha(cpf, currentPassword, newPassword);
             if (!senhaAlterada) {
-                toast.error('Senha atual incorreta');
+                showToast('error', 'Erro', 'Senha atual incorret');
                 return;
             }
-            toast.success('Senha alterada com sucesso!');
+            showToast('success', 'Sucesso', 'Senha Alterada!');
             setInterval(() => {
                 navigate('/home', { state: { cpf, nome } });
             }, 3000);
 
         } catch (error) {
-            toast.error('Erro ao alterar a senha');
+            showToast('error', 'Erro', `Erro ao alterar Senha: ${error}`);
         } finally {
             setLoading(false);
         }
@@ -54,18 +59,18 @@ export default function Perfil() {
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
                 typ={'password'}
-            />       
-            <button 
-                onClick={handleChangePassword} 
-                style={styles.button} 
+            />
+            <button
+                onClick={handleChangePassword}
+                style={styles.button}
                 disabled={loading}
             >
                 {loading ? 'Alterando...' : 'Alterar Senha'}
             </button>
 
-            <button 
+            <button
                 onClick={() => navigate('/home', { state: { cpf, nome } })}
-                style={styles.buttonBack} 
+                style={styles.buttonBack}
                 disabled={loading}>
                 Voltar
             </button>

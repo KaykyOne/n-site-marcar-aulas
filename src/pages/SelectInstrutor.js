@@ -41,6 +41,7 @@ const SelectInstructor = () => {
     }, [type]);
 
     const showToast = (title, message) => {
+        toast.dismiss();
         toast.error(`${title}: ${message}`, { position: 'top-center' });
     };
 

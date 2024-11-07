@@ -27,11 +27,8 @@ function Login() {
     };
 
     const showToast = (type, text1, text2) => {
-        if (!toast.isActive('unique-id')) {
-            toast[type](`${text1}: ${text2}`, {
-                toastId: 'unique-id'
-            });
-        }
+        toast.dismiss();  // Remove todos os toasts anteriores
+        toast[type](`${text1}: ${text2}`);
     };
 
     const login = async () => {
@@ -50,6 +47,7 @@ function Login() {
             if (senha === Cripto(senhaInput) || senhaInput === senha) {
                 navigate('/home', { state: { nome, cpf, senha } });
                 setCpf('');
+                setSenha('');
             } else {
                 toggleModal('Nenhum usuário encontrado com esse CPF.');
                 setCpf('');
@@ -57,7 +55,7 @@ function Login() {
             }
         } catch (error) {
             showToast('error', 'Erro', 'Ocorreu um erro ao tentar fazer login.');
-            console.error(error);
+            console.error(error.message);
             setCpf('');
         } finally {
             setLoading(false);
@@ -108,6 +106,7 @@ function Login() {
             <InputField
                 typ="text"
                 placeholder="Digite seu CPF"
+                inputMode="numeric"
                 value={cpfNormal}
                 onChange={handleCpfChange}
             />
@@ -116,6 +115,7 @@ function Login() {
                     typ={seePass ? 'text' : 'password'}
                     placeholder="Digite sua Senha"
                     value={senhaInput}
+                    inputMode="numeric" 
                     onChange={(e) => setSenha(e.target.value)}
                     styleAct={styles.passwordInput}
                 />

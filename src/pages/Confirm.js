@@ -6,7 +6,8 @@ import LoadingIndicator from './LoadingIndicator';
 import Modal from '../components/Modal';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import Button from '../components/Button'; // Importe o Button
+import Button from '../components/Button'; 
+import { format } from 'date-fns';
 
 const Confirm = () => { 
   const location = useLocation();
@@ -37,10 +38,10 @@ const Confirm = () => {
         setLoading(false);
         return;
       }
-
+      const formattedDate = format(date, 'yyyy-MM-dd');
       const user = await confirmPageModel.getUsuarioByCpf(cpf);
       const totalClassCount = await confirmPageModel.countClass(user.usuario_id, 'Pendente');
-      const totalClassHoje = await confirmPageModel.countClassHoje(user.usuario_id, date);
+      const totalClassHoje = await confirmPageModel.countClassHoje(user.usuario_id, formattedDate);
       const config = await confirmPageModel.getConfig();
       const aulas = config['aulas'];
       const maximoNormalDia = config['maximoNormalDia'];
