@@ -115,7 +115,6 @@ function Login() {
                     typ={seePass ? 'text' : 'password'}
                     placeholder="Digite sua Senha"
                     value={senhaInput}
-                    inputMode="numeric" 
                     onChange={(e) => setSenha(e.target.value)}
                     styleAct={styles.passwordInput}
                 />
@@ -133,9 +132,6 @@ function Login() {
             >
                 {loading ? 'Carregando...' : 'Entrar'}
             </Button>
-            <p style={styles.textLink} onClick={() => navigate('/support')}>
-                Não consegue Entrar? Clique aqui!!
-            </p>
 
             {/* Modal de mensagem */}
             {isModalVisible && (

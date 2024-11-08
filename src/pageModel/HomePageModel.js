@@ -8,77 +8,77 @@ export class HomePageModel {
 
   // Método para buscar e concluir aulas pendentes passadas e do dia atual
   async marcarAulasConcluidas(cpf) {
-    // try {
-    //   // Busca o ID do aluno pelo CPF
-    //   const { data: alunoData, error: alunoError } = await supabase
-    //     .from('usuarios')
-    //     .select('usuario_id')
-    //     .eq('cpf', cpf)
-    //     .single();
+    try {
+      // Busca o ID do aluno pelo CPF
+      const { data: alunoData, error: alunoError } = await supabase
+        .from('usuarios')
+        .select('usuario_id')
+        .eq('cpf', cpf)
+        .single();
 
-    //   if (alunoError || !alunoData) {
-    //     console.error('Erro ao buscar aluno:', alunoError?.message);
-    //     return;
-    //   }
+      if (alunoError || !alunoData) {
+        console.error('Erro ao buscar aluno:', alunoError?.message);
+        return;
+      }
 
-    //   const alunoId = alunoData.usuario_id;
+      const alunoId = alunoData.usuario_id;
 
-    //   // Busca aulas pendentes do aluno
-    //   const { data: aulasPendentes, error: aulasError } = await supabase
-    //     .from('aulas')
-    //     .select('aula_id, data, hora')
-    //     .eq('aluno_id', alunoId)
-    //     .eq('situacao', 'Pendente');
+      // Busca aulas pendentes do aluno
+      const { data: aulasPendentes, error: aulasError } = await supabase
+        .from('aulas')
+        .select('aula_id, data, hora')
+        .eq('aluno_id', alunoId)
+        .eq('situacao', 'Pendente');
 
-    //   if (aulasError || !aulasPendentes) {
-    //     console.error('Erro ao buscar aulas pendentes:', aulasError?.message);
-    //     return;
-    //   }
+      if (aulasError || !aulasPendentes) {
+        console.error('Erro ao buscar aulas pendentes:', aulasError?.message);
+        return;
+      }
+      console.log(aulasPendentes);
+      // Pega a data e hora atuais
+      const { currentDate, currentTime } = await this.getCurrentTimeAndDateFromServer();
 
-    //   // Pega a data e hora atuais
-    //   const { currentDate, currentTime } = await this.getCurrentTimeAndDateFromServer();
+      if (!currentDate || !currentTime) {
+        throw new Error('Não foi possível obter a data atual.');
+      }
 
-    //   if (!currentDate || !currentTime) {
-    //     throw new Error('Não foi possível obter a data atual.');
-    //   }
+      // Ajuste a data atual para levar em conta a diferença de fuso horário
+      const adjustedCurrentDate = new Date(currentDate.toLocaleString("en-US", { timeZone: "America/Sao_Paulo" }));
 
-    //   // Ajuste a data atual para levar em conta a diferença de fuso horário
-    //   const adjustedCurrentDate = new Date(currentDate.toLocaleString("en-US", { timeZone: "America/Sao_Paulo" }));
+      await this.checkAndUpdateLog(alunoId, adjustedCurrentDate, currentTime);
 
-    //   await this.checkAndUpdateLog(alunoId, adjustedCurrentDate, currentTime);
-
-    //   // Filtra aulas que estão com data anterior ou igual à data atual ajustada
-    //   const aulasParaConcluir = aulasPendentes.filter((aula) => {
-    //     const aulaDateTime = new Date(aula.data); // Certifique-se que aula.data é uma string que representa uma data e hora corretamente formatada
-    //     // Verifica se a data da aula é anterior à data atual ajustada
-    //     if (aulaDateTime < adjustedCurrentDate || (aula.hora == currentTime && aulaDateTime <= adjustedCurrentDate)) {
-    //       return true;
-    //     }
+      // Filtra aulas que estão com data anterior ou igual à data atual ajustada
+      const aulasParaConcluir = aulasPendentes.filter((aula) => {
+        const aulaDateTime = new Date(aula.data); // Certifique-se que aula.data é uma string que representa uma data e hora corretamente formatada
+        // Verifica se a data da aula é anterior à data atual ajustada
+        if (aulaDateTime < adjustedCurrentDate || (aula.hora <= currentTime && aulaDateTime <= adjustedCurrentDate)) {
+          return true;
+        }
     
-    //     return false;
-    //   });
+        return false;
+      });
 
-    //   if (aulasParaConcluir.length === 0) {
-    //     console.log('Nenhuma aula precisa ser atualizada.');
-    //     return;
-    //   }
+      if (aulasParaConcluir.length === 0) {
+        console.log('Nenhuma aula precisa ser atualizada.');
+        return;
+      }
 
-    //   // Atualiza aulas para "Concluída"
-    //   for (const aula of aulasParaConcluir) {
-    //     const { error: updateError } = await supabase
-    //       .from('aulas')
-    //       .update({ situacao: 'Concluída' })
-    //       .eq('aula_id', aula.aula_id);
+      // Atualiza aulas para "Concluída"
+      for (const aula of aulasParaConcluir) {
+        const { error: updateError } = await supabase
+          .from('aulas')
+          .update({ situacao: 'Concluída' })
+          .eq('aula_id', aula.aula_id);
 
-    //     if (updateError) {
-    //       console.error('Erro ao marcar aula como concluída:', updateError.message);
-    //     } else {
-    //       console.log(`Aula marcada como concluída.`);
-    //     }
-    //   }
-    // } catch (error) {
-    //   console.error('Erro ao marcar aulas como concluídas:', error.message);
-    // }
+        if (updateError) {
+          console.error('Erro ao marcar aula como concluída:', updateError.message);
+        } else {
+          console.log(`Aula marcada como concluída.`);
+        }
+      }
+    } catch (error) {
+      console.error('Erro ao marcar aulas como concluídas:', error.message);
+    }
   }
 
   // Método principal para testar usuário e marcar aulas pendentes como concluídas
