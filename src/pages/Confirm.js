@@ -46,6 +46,7 @@ const Confirm = () => {
       const aulas = config['aulas'];
       const maximoNormalDia = config['maximoNormalDia'];
       const isOutraCidade = user.outra_cidade;
+      console.log(isOutraCidade);
 
       if (totalClassCount >= aulas) {
         toggleModal('Número máximo de 4 aulas atingido. Conclua suas aulas para poder marcar mais!');
@@ -55,10 +56,10 @@ const Confirm = () => {
       if ((isOutraCidade || type === 'D' || type === 'E') && totalClassHoje >= 2) {
         toggleModal('Você já atingiu o número máximo de 2 aulas para este dia.');
         return;
-      } else if (totalClassHoje >= maximoNormalDia) {
+      } else if (!(isOutraCidade || type === 'D' || type === 'E') && totalClassHoje >= maximoNormalDia) {
         toggleModal('Você já marcou uma aula para este dia. Marque em outro dia.');
         return;
-      }
+      }  
 
       const result = await confirmPageModel.createClass(nameInstructor, date, cpf, type, hora);
       if (result) {
