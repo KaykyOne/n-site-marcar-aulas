@@ -36,8 +36,8 @@ function ListAulas() {
             setCurrentDate(currentDate);
 
             const data = await listAulasPageModel.searchAulas(cpf);
-            setAulas(data || []);
-            if (!data) setError('Nenhuma aula encontrada.');
+            setAulas(data.aulas || []);
+            if (!data.aulas || !data.count) setError('Nenhuma aula encontrada.');
         } catch (error) {
             setError(error.message);
             showToast('error', 'Erro', error.message);
@@ -103,6 +103,7 @@ function ListAulas() {
     return (
         <div style={styles.container}>
             <h1 style={styles.title}>Aulas</h1>
+
             {loading && <LoadingIndicator />}
             {error || aulas.length === 0 ? (
                 <div style={styles.errorContainer}>

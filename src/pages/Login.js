@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import Cripto from '../controller/Cripto';
 import InputField from '../components/Input';
 import Button from '../components/Button'; // Importe o Button
+import ModalLogin from '../components/ModalLogin';
 
 function Login() {
     const [cpfNormal, setCpf] = useState('');
@@ -17,6 +18,7 @@ function Login() {
     const [isModalVisible, setModalVisible] = useState(false);
     const [modalMessage, setModalMessage] = useState('');
     const [seePass, setSeePass] = useState(false);
+    const [modalMan, setModalMan] = useState(false);
 
     const loginPageModel = new LoginPageModel();
     const navigate = useNavigate(); // Use useNavigate aqui
@@ -69,9 +71,9 @@ function Login() {
 
     const handleCpfChange = (event) => {
         const text = event.target.value;
-        if(/^\d+$/.test(text)){
+        if (/^\d+$/.test(text)) {
             setCpf(text);
-        }else{
+        } else {
             showToast('error', 'Erro', 'O CPF deve conter Apenas numeros!');
             setCpf('');
         }
@@ -83,7 +85,17 @@ function Login() {
         }
     };
 
+    const verificarManutencao = async () => {
+        const man = await loginPageModel.verificarManutencao();
+        if (man.valor === 'FALSE') {
+            return;
+        } else {
+            setModalMan(true);
+        }
+    };
+
     useEffect(() => {
+        verificarManutencao();
         let interval;
         if (isRunning && timer > 0) {
             interval = setInterval(() => {
@@ -132,6 +144,11 @@ function Login() {
             >
                 {loading ? 'Carregando...' : 'Entrar'}
             </Button>
+
+            <ModalLogin
+                visible={modalMan}
+                setModalVisible={setModalMan}
+            />
 
             {/* Modal de mensagem */}
             {isModalVisible && (

@@ -17,4 +17,19 @@ export class LoginPageModel {
 
     return data ? data : null; // Retorna apenas o campo 'nome'
   }
+
+  async verificarManutencao() {
+    const { data, error } = await supabase
+      .from('configuracoes')
+      .select('valor')
+      .eq('chave', 'manutencao')
+      .single();
+
+      if (error) {
+        console.error('Erro ao buscar usuário:', error);
+        return null; // Retorna null em caso de erro
+      }
+  
+      return data ? data : null; // Retorna apenas o campo 'nome'
+  }
 }

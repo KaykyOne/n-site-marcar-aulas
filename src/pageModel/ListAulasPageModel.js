@@ -7,7 +7,7 @@ export class ListAulasPageModel {
   constructor() {
     this.serverTimeService = new ServerTimeService(); // Instancia a classe
   }
-  
+
   async searchAulas(cpf) {
     try {
       // Busca o ID do usuário com base no CPF e verifica se a situação é 'Pendente'
@@ -17,10 +17,10 @@ export class ListAulasPageModel {
         .eq('cpf', cpf)
         .single();
 
-        if (alunoError) {
-          console.error(alunoError);  // Log do erro para facilitar o diagnóstico
-          return null;
-        }
+      if (alunoError) {
+        console.error(alunoError);  // Log do erro para facilitar o diagnóstico
+        return null;
+      }
 
       const alunoId = alunoData?.usuario_id;
 
@@ -42,30 +42,42 @@ export class ListAulasPageModel {
         return null; // Retorna null em caso de erro
       }
 
+      const { data: count, error: errorCount } = await supabase
+        .from('aulas')
+        .select('*', { count: 'exact' })
+        .eq('aluno_id', alunoId)
+        .eq('situacao', 'Concluída');
+
+      if (errorCount) {
+        console.error('Erro ao contar gerais aulas:', errorCount.message);
+        return null; // Retorna null em caso de erro
+      }
+
       this.aulas = data || []; // Armazena os dados no ViewModel
-      return this.aulas;
+      return { aulas: this.aulas, count };
+
     } catch (error) {
       return null;
     }
   }
 
-  async alterAula(campo, id, tipy, cpf) { 
+  async alterAula(campo, id, tipy, cpf) {
     try {
       // Obtém a data e hora atuais do servidor
       const { currentDate, currentTime } = await this.getCurrentTimeAndDateFromServer();
-  
+
       // Busca a aula pelo ID
       const { data: aulaData, error: aulaError } = await supabase
         .from('aulas')
         .select('data, hora')
         .eq('aula_id', id)
         .single();
-  
+
       if (aulaError) {
         console.log(aulaError.message);
       }
 
-  
+
       const adjustedCurrentDate = new Date(currentDate.toLocaleString("en-US", { timeZone: "America/Sao_Paulo" }));
 
       // Verifica se a aula já passou ou se está dentro do horário permitido
@@ -73,47 +85,47 @@ export class ListAulasPageModel {
         console.log('erro ao concluir aula, muito cedo!');
         return false;
       }
-  
+
       // Atualiza o campo 'situacao' da aula
       const { data: updateAulaData, error: updateAulaError } = await supabase
         .from('aulas')
         .update({ situacao: campo })
         .eq('aula_id', id);
-  
-        if (updateAulaError) {
-          console.error('Erro ao atualizar a aula:', updateAulaError.message);
-          throw new Error(updateAulaError.message);
-        }
-  
+
+      if (updateAulaError) {
+        console.error('Erro ao atualizar a aula:', updateAulaError.message);
+        throw new Error(updateAulaError.message);
+      }
+
       // Busca o valor atual dos contadores
       const { data: userData, error: userError } = await supabase
         .from('usuarios')
         .select('num_aulas')
         .eq('cpf', cpf)
         .single();
-  
+
       if (userError) {
         console.log(`erro ao concluir aula: ${userError.message}`);
         return false;
       }
-  
+
       // Incrementa o valor apropriado
       const newValues = {};
       if (tipy === 'Concluída') {
         newValues.num_aulas = (userData.num_aulas || 0) + 1;
-      } 
-  
+      }
+
       // Atualiza os contadores no banco de dados
       const { data: updateUserData, error: updateUserError } = await supabase
         .from('usuarios')
         .update(newValues)
         .eq('cpf', cpf);
-  
+
       if (updateUserError) {
         console.log(`erro ao concluir aula: ${updateUserError.message}`);
         return false;
       }
-  
+
       return updateUserData;
     } catch (error) {
       console.log(`erro ao concluir aula: ${error.message}`);
@@ -127,20 +139,20 @@ export class ListAulasPageModel {
       console.log('Erro ao buscar data e hora do server!');
       return false;
     }
-  
+
     try {
       // Verifica se a data da aula é maior que a data atual
-      if (currentDate < data || 
-          (currentDate === data && (parseInt(hora.split(':')[0]) - parseInt(currentTime.split(':')[0]) > 3 ||
-                                     (parseInt(hora.split(':')[0]) === parseInt(currentTime.split(':')[0]) && 
-                                      parseInt(hora.split(':')[1]) >= parseInt(currentTime.split(':')[1]))))) {
+      if (currentDate < data ||
+        (currentDate === data && (parseInt(hora.split(':')[0]) - parseInt(currentTime.split(':')[0]) > 3 ||
+          (parseInt(hora.split(':')[0]) === parseInt(currentTime.split(':')[0]) &&
+            parseInt(hora.split(':')[1]) >= parseInt(currentTime.split(':')[1]))))) {
         // Realiza a exclusão
         const { data: deleteData, error, count } = await supabase
           .from('aulas')
           .delete()
           .eq('aula_id', id)
           .select();  // 'select()' pode ser usado para tentar capturar os dados retornados
-  
+
         // Verifique se houve um erro
         if (error) {
           throw error;
@@ -155,11 +167,12 @@ export class ListAulasPageModel {
       console.error('Erro no processo de exclusão: ', error); // Log do erro
       return false; // Retorna false em caso de erro
     }
-  }  
-   
+  }
+
   async getCurrentTimeAndDateFromServer() {
     const { currentDate, currentTime } =
       await this.serverTimeService.getCurrentTimeAndDateFromServer();
     return { currentDate, currentTime }; // Retorna um objeto com data e hora
   }
+
 }
