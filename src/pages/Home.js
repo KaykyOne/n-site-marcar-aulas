@@ -78,6 +78,17 @@ const HomeView = () => {
       <Button onClick={() => alterPage('perfil', nome, senha)} back="#0074D9" cor="#FFF" styleAct={{ width: '40%' }}>
         Alterar Senha
       </Button>
+      <a
+        style={styles.txtTermo}
+        onClick={() =>
+          toggleModal(
+            'Termos de Utilização\n\nO aluno é responsável por:\n- Marcar suas aulas no sistema.\n- Desmarcar as aulas com antecedência mínima de 24 horas.\n- Comparecer no horário agendado. Ausências podem levar a penalidades.\n\nAo continuar utilizando o sistema, você aceita esses termos.'
+          )
+        }
+      >
+        Termos de Utilização — Clique aqui para conferir
+      </a>
+
       <LoadingIndicator visible={loading} />
       {isModalVisible && (
         <div style={styles.modalContent}>
@@ -100,6 +111,11 @@ const styles = {
     justifyContent: 'center',
     padding: '20px',
     height: '100vh',
+  },
+  txtTermo: {
+    fontSize: '10px',
+    margin: '20px',
+    cursor: 'pointer',
   },
   welcomeText: {
     fontWeight: 'bold',

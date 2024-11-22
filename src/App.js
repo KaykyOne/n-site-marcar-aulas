@@ -9,8 +9,6 @@ import End from './pages/End';
 import Erro from './pages/Erro';
 import Perfil from './pages/Perfil';
 
-
-
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
 function App() {
@@ -36,7 +34,7 @@ function App() {
           <Route path="/fim" element={<End />} />
           {/* Página Selecionar tipo da Aula (Erro) */}
           <Route path="/erro" element={<Erro />} />
-          {/* Página Selecionar tipo da Aula (Erro) */}
+          {/* Página Perfil */}
           <Route path="/perfil" element={<Perfil />} />
         </Routes>
       </BrowserRouter>

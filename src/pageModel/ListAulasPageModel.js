@@ -30,12 +30,14 @@ export class ListAulasPageModel {
         );
       }
 
+      const { currentDate } = await this.getCurrentTimeAndDateFromServer();
+
       // Busca as aulas associadas ao ID do aluno
       const { data, error } = await supabase
         .from('aulas')
         .select('aula_id, data, hora, tipo') // Incluindo aula_id
         .eq('aluno_id', alunoId)
-        .eq('situacao', 'Pendente')
+        .gte('data', currentDate)
         .order('data', { ascending: true });
 
       if (error) {
@@ -143,11 +145,11 @@ export class ListAulasPageModel {
     try {
       // Verifica se a data da aula é maior que a data atual
       if (currentDate < data ||
-        (currentDate === data && (parseInt(hora.split(':')[0]) - parseInt(currentTime.split(':')[0]) > 3 ||
+        (currentDate === data && (parseInt(hora.split(':')[0]) - parseInt(currentTime.split(':')[0]) > 24 ||
           (parseInt(hora.split(':')[0]) === parseInt(currentTime.split(':')[0]) &&
             parseInt(hora.split(':')[1]) >= parseInt(currentTime.split(':')[1]))))) {
         // Realiza a exclusão
-        const { data: deleteData, error, count } = await supabase
+        const { data: deleteData, error } = await supabase
           .from('aulas')
           .delete()
           .eq('aula_id', id)

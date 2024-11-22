@@ -74,7 +74,7 @@ function ListAulas() {
             try {
                 if (modalAction === 'Excluir') {
                     let res = await listAulasPageModel.deleteAula(selectedAula.aula_id, selectedAula.data, selectedAula.hora);
-                    showToast(res ? 'success' : 'error', res ? 'Sucesso' : 'Erro', res ? 'Aula excluída com sucesso!' : 'Erro ao excluir a aula!');
+                    showToast(res ? 'success' : 'error', res ? 'Sucesso' : 'Erro', res ? 'Aula excluída com sucesso!' : 'A aula não  pode ser excluida, isso deve ser feito com 24 horas de antecedência!');
                 } else if (modalAction === 'Confirmar') {
                     await listAulasPageModel.alterAula("Concluída", selectedAula.aula_id, "Concluída", cpf);
                     showToast('success', 'Sucesso', 'Aula confirmada com sucesso!');
