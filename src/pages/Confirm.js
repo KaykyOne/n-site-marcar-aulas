@@ -49,15 +49,15 @@ const Confirm = () => {
       console.log(isOutraCidade);
 
       if (totalClassCount >= aulas) {
-        toggleModal('Número máximo de 4 aulas atingido. Conclua suas aulas para poder marcar mais!');
+        toggleModal('Número máximo de aulas atingido. Conclua suas aulas para poder marcar mais!');
         return;
       }
 
       if ((isOutraCidade || type === 'D' || type === 'E') && totalClassHoje >= 2) {
-        toggleModal('Você já atingiu o número máximo de 2 aulas para este dia.');
+        toggleModal('Você já atingiu o número máximo de aulas para este dia.');
         return;
       } else if (!(isOutraCidade || type === 'D' || type === 'E') && totalClassHoje >= maximoNormalDia) {
-        toggleModal('Você já marcou uma aula para este dia. Marque em outro dia.');
+        toggleModal('Você já atingiu o número máximo de aulas para este dia.');
         return;
       }  
 
