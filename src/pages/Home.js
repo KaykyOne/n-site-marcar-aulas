@@ -82,7 +82,7 @@ const HomeView = () => {
         style={styles.txtTermo}
         onClick={() =>
           toggleModal(
-            'Termos de Utilização\n\nO aluno é responsável por:\n- Marcar suas aulas no sistema.\n- Desmarcar as aulas com antecedência mínima de 24 horas.\n- Comparecer no horário agendado. Ausências podem levar a penalidades.\n\nAo continuar utilizando o sistema, você aceita esses termos.'
+            'Termos de Utilização\n\nO aluno é responsável por:\n- Marcar suas aulas no sistema.\n- Desmarcar as aulas com antecedência mínima de 12 horas.\n- Comparecer no horário agendado. Ausências podem levar a penalidades.\n\nAo continuar utilizando o sistema, você aceita esses termos.'
           )
         }
       >

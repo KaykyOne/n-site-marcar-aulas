@@ -1,6 +1,6 @@
 import supabase from '../controller/supabase';
 import ServerTimeService from '../controller/ServerTimeService';
-import { isAfter, differenceInHours, parseISO } from 'date-fns';
+import { parse, isValid, differenceInHours, differenceInMinutes } from 'date-fns';
 
 export class ListAulasPageModel {
   aulas = [];
@@ -141,35 +141,56 @@ export class ListAulasPageModel {
       console.log('Erro ao buscar data e hora do server!');
       return false;
     }
-
+  
     try {
-      // Verifica se a data da aula é maior que a data atual
-      if (currentDate < data ||
-        (currentDate === data && (parseInt(hora.split(':')[0]) - parseInt(currentTime.split(':')[0]) > 24 ||
-          (parseInt(hora.split(':')[0]) === parseInt(currentTime.split(':')[0]) &&
-            parseInt(hora.split(':')[1]) >= parseInt(currentTime.split(':')[1]))))) {
+      // Normaliza o formato de currentTime removendo frações de segundo
+      const normalizedTime = currentTime.split('.')[0]; // Remove tudo após o ponto
+  
+      console.log('Entrada do servidor:', { currentDate, currentTime, normalizedTime });
+      console.log('Entrada da aula:', { data, hora });
+  
+      // Concatena e tenta parsear
+      const currentDateTime = parse(`${currentDate} ${normalizedTime}`, 'yyyy-MM-dd HH:mm:ss', new Date());
+      const aulaDateTime = parse(`${data} ${hora}`, 'yyyy-MM-dd HH:mm:ss', new Date());
+  
+      // Valida os objetos Date gerados
+      if (!isValid(currentDateTime) || !isValid(aulaDateTime)) {
+        console.error('Erro: formato de data ou hora inválido!');
+        return false;
+      }
+  
+      console.log('Data e hora atuais:', currentDateTime);
+      console.log('Data e hora da aula:', aulaDateTime);
+  
+      // Calcula a diferença em horas
+      const differenceHours = differenceInHours(aulaDateTime, currentDateTime);
+      const differenceMinutes = differenceInMinutes(aulaDateTime, currentDateTime) % 60;
+  
+      // Verifica se a aula é no mínimo 12 horas depois
+      if (differenceHours > 12 || (differenceHours === 12 && differenceMinutes >= 0)) {
         // Realiza a exclusão
         const { data: deleteData, error } = await supabase
           .from('aulas')
           .delete()
           .eq('aula_id', id)
-          .select();  // 'select()' pode ser usado para tentar capturar os dados retornados
-
-        // Verifique se houve um erro
+          .select();
+  
+        // Verifica se houve um erro
         if (error) {
           throw error;
         }
-        // Verifique o número de registros excluídos
-        return deleteData ? true : false;  // Retorna true se a exclusão afetou algum registro
+  
+        return deleteData ? true : false; // Retorna true se a exclusão afetou algum registro
       } else {
-        console.log('Não foi possível excluir a aula: precisa ser excluída com 3 horas de antecedência ou mais.');
+        console.log('Não foi possível excluir a aula: precisa ser excluída com 12 horas de antecedência ou mais.');
         return false;
       }
     } catch (error) {
-      console.error('Erro no processo de exclusão: ', error); // Log do erro
+      console.error('Erro no processo de exclusão: ', error);
       return false; // Retorna false em caso de erro
     }
   }
+  
 
   async getCurrentTimeAndDateFromServer() {
     const { currentDate, currentTime } =
