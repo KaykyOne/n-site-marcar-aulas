@@ -20,6 +20,7 @@ function ListAulas() {
     const [modalVisible, setModalVisible] = useState(false);
     const [selectedAula, setSelectedAula] = useState(null);
     const [modalAction, setModalAction] = useState(null);
+    const [maxAulas, setMaxAulas] = useState(null);
 
     const showToast = (type, text1, text2) => {
         toast.dismiss();
@@ -34,6 +35,8 @@ function ListAulas() {
             const { currentTime, currentDate } = await listAulasPageModel.getCurrentTimeAndDateFromServer();
             setCurrentTime(currentTime);
             setCurrentDate(currentDate);
+            const configuracao = await listAulasPageModel.searchMaxAulas();
+            setMaxAulas(configuracao);
 
             const data = await listAulasPageModel.searchAulas(cpf);
             setAulas(data.aulas || []);
@@ -57,11 +60,11 @@ function ListAulas() {
             setModalAction('Excluir');
             setModalVisible(true);
         } else if (action === 'Confirmar') {
-            if(currentDate > data || (currentDate === data && hora < currentTime)){
+            if (currentDate > data || (currentDate === data && hora < currentTime)) {
                 setSelectedAula(item);
                 setModalAction('Confirmar');
                 setModalVisible(true);
-            }else{
+            } else {
                 showToast('error', 'Erro', 'Muito cedo para concluir a aula!');
             }
 
@@ -103,6 +106,7 @@ function ListAulas() {
     return (
         <div style={styles.container}>
             <h1 style={styles.title}>Aulas</h1>
+            <h2 style={styles.sub_title}>Número máximo de aulas que podem ser marcadas: {maxAulas}</h2>
 
             {loading && <LoadingIndicator />}
             {error || aulas.length === 0 ? (
@@ -133,12 +137,11 @@ const styles = {
     container: {
         padding: '20px',
         backgroundColor: '#f5f5f5',
-        minHeight: '100vh',
+        minHeight: '100vh', // Permite crescimento para conteúdo
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        justifyContent: 'center',
-        height: '100vh',
+        justifyContent: 'flex-start', // Evita corte no centro
     },
     title: {
         fontSize: '1.5em',  // Ajustado para manter o tamanho de título semelhante ao Home
@@ -146,8 +149,20 @@ const styles = {
         marginBottom: '20px',
         color: '#003366', // Azul escuro para manter a consistência com Home
     },
+    sub_title: {
+        fontSize: '1em',  // Ajustado para manter o tamanho de título semelhante ao Home
+        fontWeight: 'bold',
+        marginBottom: '10px',
+        color: '#003366', // Azul escuro para manter a consistência com Home
+        justifyContent: 'center',
+        textAlign: 'center'
+    },
     flatListContainer: {
         width: '100%',
+        maxHeight: '70vh', // Limita a altura máxima
+        overflowY: 'auto', // Habilita a rolagem vertical
+        padding: '10px', // Adiciona espaçamento interno
+        boxSizing: 'border-box', // Garante que padding não ultrapasse o tamanho definido
     },
     errorContainer: {
         color: 'red',
