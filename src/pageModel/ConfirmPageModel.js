@@ -1,4 +1,4 @@
-import supabase from '../controller/supabase'; 
+import supabase from '../controller/supabase';
 import ServerTimeService from '../controller/ServerTimeService';
 
 export class ConfirmPageModel {
@@ -48,28 +48,29 @@ export class ConfirmPageModel {
   }
 
   async insertClass(alunoId, instrutorId, data, type, hora) {
+    const horaFormatada = hora.includes(':') ? hora : new Date(hora).toISOString().substr(11, 5);
     try {
       const { data: aulaData, error } = await supabase.from('aulas').insert([{
         aluno_id: alunoId,
         instrutor_id: instrutorId,
         situacao: 'Pendente',
         data: data,
-        hora: hora,
+        hora: horaFormatada,
         tipo: type,
       }]);
-
       if (error) {
         console.error('Erro ao inserir aula:', error.message);
         return null;
       } else {
         console.log('Dados da aula inseridos com sucesso:');
-        return true; // Retorna os dados da aula inserida
+        return true;
       }
     } catch (error) {
       console.error('Erro inesperado ao inserir aula:', error.message);
       return null;
     }
   }
+
 
   async createClass(nameInstructor, data, cpf, type, hora) {
     try {
@@ -145,18 +146,18 @@ export class ConfirmPageModel {
         .from('configuracoes')
         .select('chave, valor')
         .in('chave', ['aulas', 'maximoNormalDia']);
-  
+
       // Lidar com erros na consulta
       if (error || !data) {
         throw new Error(`Erro ao buscar configuracoes: ${error.message}`);
       }
-  
+
       // Transforma o array em um objeto chave-valor
       const configObj = data.reduce((acc, config) => {
         acc[config.chave] = config.valor;
         return acc;
       }, {});
-  
+
       // Retornar o objeto com as configurações
       return configObj;
     } catch (err) {

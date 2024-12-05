@@ -35,14 +35,26 @@ export class ListAulasPageModel {
       // Busca as aulas associadas ao ID do aluno
       const { data, error } = await supabase
         .from('aulas')
-        .select('aula_id, data, hora, tipo') // Incluindo aula_id
+        .select(`
+        aula_id,
+        data,
+        hora,
+        tipo,
+        instrutor_id,
+        instrutores (
+          nome_instrutor
+        )
+      `)
         .eq('aluno_id', alunoId)
         .gte('data', currentDate)
         .order('data', { ascending: true });
 
       if (error) {
+        console.error("Erro ao buscar aulas:", error);
         return null; // Retorna null em caso de erro
       }
+
+      console.log(data);
 
       const { data: count, error: errorCount } = await supabase
         .from('aulas')

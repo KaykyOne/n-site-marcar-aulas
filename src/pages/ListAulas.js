@@ -92,10 +92,11 @@ function ListAulas() {
     };
 
     const renderAulaItem = (item) => (
-        <div style={styles.itemContainer}>
+        <div style={styles.itemContainer} key={item.aula_id}>
             <p style={styles.itemTitle}>Data: {format(parseISO(item.data), 'dd/MM/yyyy')}</p>
             <p style={styles.itemText}>Tipo: {item.tipo}</p>
             <p style={styles.itemText}>Hora: {item.hora}</p>
+            <p style={styles.itemText}>Instrutor: {item.instrutores?.nome_instrutor || 'Não especificado'}</p>
             <div style={styles.buttonContainer}>
                 <button style={styles.deleteButton} onClick={() => handleAction('Excluir', item)}>Excluir</button>
                 <button style={styles.confirmButton} onClick={() => handleAction('Confirmar', item)}>Confirmar</button>

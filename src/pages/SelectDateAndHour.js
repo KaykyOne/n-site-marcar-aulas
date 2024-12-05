@@ -70,6 +70,10 @@ export default function SelectDateAndHour() {
   }, [date]);
 
   const handleDateChange = (selectedDate) => {
+    console.log('Data Selecionada:', selectedDate);
+    console.log('Formato YYYY-MM-DD:', moment(selectedDate).format('YYYY-MM-DD'));
+    console.log('Horário Local:', selectedDate.toString());
+    console.log('Horário UTC:', selectedDate.toUTCString());
     if (moment(selectedDate) >= moment(currentDate) && moment(selectedDate) <= moment().add(7, 'days')) {
       setDate(selectedDate);
     }
