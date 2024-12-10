@@ -103,7 +103,7 @@ export class HomePageModel {
       console.log(numAulas);
 
       // Verifica as condições
-      if (numAulas >= 20) {
+      if (numAulas >= 19) {
         return false;
       } else {
         return true; // Retorna true se as condições não forem satisfeitas
