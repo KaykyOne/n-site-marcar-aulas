@@ -46,7 +46,14 @@ function Login() {
             const data = await loginPageModel.searchUsersByCPF(cpf);
             const nome = data.nome;
             const senha = data.senha;
+            const atividade = data.atividade;
             if (senha === Cripto(senhaInput) || senhaInput === senha) {
+                if (!atividade) {
+                    toggleModal('Usuário inativo ou com acesso restrito!');
+                    setCpf('');
+                    setSenha('');
+                    return;
+                }
                 navigate('/home', { state: { nome, cpf, senha } });
                 setCpf('');
                 setSenha('');
@@ -56,7 +63,7 @@ function Login() {
                 setSenha('');
             }
         } catch (error) {
-            showToast('error', 'Erro', 'Ocorreu um erro ao tentar fazer login.');
+            showToast('error', 'Erro', `Ocorreu um erro ao tentar fazer login.: ${error.message}` );
             console.error(error.message);
             setCpf('');
         } finally {

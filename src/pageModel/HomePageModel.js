@@ -34,7 +34,7 @@ export class HomePageModel {
         console.error('Erro ao buscar aulas pendentes:', aulasError?.message);
         return;
       }
-      console.log(aulasPendentes);
+      //console.log(aulasPendentes);
       // Pega a data e hora atuais
       const { currentDate, currentTime } = await this.getCurrentTimeAndDateFromServer();
 
@@ -90,7 +90,7 @@ export class HomePageModel {
       // Busca o `num_aulas` pelo CPF
       const { data: search, error: userError } = await supabase
         .from('usuarios')
-        .select('num_aulas')
+        .select('num_aulas, atividade')
         .eq('cpf', cpf)
         .single(); // `single()` garante que vai pegar apenas um registro
 
@@ -99,11 +99,10 @@ export class HomePageModel {
         return null; // Retorna null em caso de erro ao buscar o usuário
       }
 
-      const { num_aulas: numAulas } = search; // Extrai as variáveis de `search`
-      console.log(numAulas);
-
+      const { num_aulas: numAulas, atividade: atv } = search; // Extrai as variáveis de `search`
+      
       // Verifica as condições
-      if (numAulas >= 19) {
+      if (numAulas >= 19 || atv != true) {
         return false;
       } else {
         return true; // Retorna true se as condições não forem satisfeitas

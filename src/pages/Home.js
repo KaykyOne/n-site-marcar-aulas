@@ -30,7 +30,7 @@ const HomeView = () => {
 
   useEffect(() => {
     const verificarAulasPendentes = async () => {
-      if (hasVerified.current) return;
+      if (hasVerified.current) return;  
       hasVerified.current = true;
 
       setLoading(true);
@@ -54,7 +54,7 @@ const HomeView = () => {
         await new Promise((resolve) => setTimeout(resolve, 500));
         navigate(`/${page}`, { state: { cpf, nome, senha } });
       } else {
-        toggleModal('Você está bloqueado temporariamente, vá até o atendimento!');
+        toggleModal('Ops! Sua conta está bloqueada. Por favor, entre em contato com o nosso atendimento para resolver isso rapidinho!');
       }
     } catch (error) {
       showToast('error', 'Erro', error.message);
