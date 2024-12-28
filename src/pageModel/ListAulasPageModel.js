@@ -75,6 +75,49 @@ export class ListAulasPageModel {
     }
   }
 
+  async searchAulasInstrutor(codigo, dia) {
+    try {
+      // Busca as aulas associadas ao ID do aluno
+      const { data, error } = await supabase
+        .from('aulas')
+        .select(`
+        aula_id,
+        data,
+        hora,
+        tipo,
+        aluno_id,
+        usuarios (
+          nome
+        )
+      `)
+        .eq('instrutor_id', codigo)
+        .gte('data', dia)
+        .order('data', { ascending: true });
+
+      if (error) {
+        console.error("Erro ao buscar aulas:", error);
+        return null; // Retorna null em caso de erro
+      }
+
+      const { data: count, error: errorCount } = await supabase
+        .from('aulas')
+        .select('*', { count: 'exact' })
+        .eq('instrutor_id', codigo)
+        .eq('situacao', 'Concluída');
+
+      if (errorCount) {
+        console.error('Erro ao contar gerais aulas:', errorCount.message);
+        return null; // Retorna null em caso de erro
+      }
+
+      this.aulas = data || []; // Armazena os dados no ViewModel
+      return { aulas: this.aulas, count };
+
+    } catch (error) {
+      return null;
+    }
+  }
+
   async alterAula(campo, id, tipy, cpf) {
     try {
       // Obtém a data e hora atuais do servidor
@@ -179,7 +222,7 @@ export class ListAulasPageModel {
       const differenceMinutes = differenceInMinutes(aulaDateTime, currentDateTime) % 60;
 
       // Verifica se a aula é no mínimo 12 horas depois
-      if (differenceHours > 12 || (differenceHours === 12 && differenceMinutes >= 0)) {
+      if (differenceHours > 3 || (differenceHours === 3 && differenceMinutes >= 0)) {
         // Realiza a exclusão
         const { data: deleteData, error } = await supabase
           .from('aulas')

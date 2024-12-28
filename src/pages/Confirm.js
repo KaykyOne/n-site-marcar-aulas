@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import moment from 'moment';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { ConfirmPageModel } from '../pageModel/ConfirmPageModel';
@@ -12,7 +12,7 @@ import { format } from 'date-fns';
 const Confirm = () => { 
   const location = useLocation();
   const navigate = useNavigate();
-  const { nameInstructor, data, cpf, type, hora, nome } = location.state || {};
+  const { nameInstructor, data, cpf, type, hora, nome, tipo = 'normal', codigo = 0 } = location.state || {};
   const [date] = useState(data);
   const [holidays] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -29,6 +29,10 @@ const Confirm = () => {
     setModalVisible(!isModalVisible);
   };
 
+  useEffect(() => {
+    console.log(cpf);
+  }, [cpf]);
+  
   const handleConfirm = async () => {
     try {
       setLoading(true);
@@ -53,7 +57,7 @@ const Confirm = () => {
         return;
       }
 
-      if ((isOutraCidade || type === 'D' || type === 'E') && totalClassHoje >= 2) {
+      if (((isOutraCidade || type === 'D' || type === 'E') || tipo === 'especial') && totalClassHoje >= 2) {
         toggleModal('Você já atingiu o número máximo de aulas para este dia.');
         return;
       } else if (!(isOutraCidade || type === 'D' || type === 'E') && totalClassHoje >= maximoNormalDia) {
@@ -63,7 +67,11 @@ const Confirm = () => {
 
       const result = await confirmPageModel.createClass(nameInstructor, date, cpf, type, hora);
       if (result) {
-        navigate('/Fim', { state: { nameInstructor, data, cpf, type, hora, nome } });
+        if(codigo !== 0 && tipo !== 'normal'){
+          navigate('/Fim', { state: { cpf: 0, nome: 'nada', codigo: codigo, tipo: 'adm', nomeInstrutor: nameInstructor  } });
+        }else{
+          navigate('/Fim', { state: { nameInstructor, data, cpf, type, hora, nome } });
+        }
       } else {
         navigate('/Erro', { state: { message: 'Não foi possível marcar a aula' } });
       }

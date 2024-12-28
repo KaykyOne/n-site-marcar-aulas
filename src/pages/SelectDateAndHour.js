@@ -14,7 +14,7 @@ import Button from '../components/Button';
 export default function SelectDateAndHour() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { cpf, type, nameInstructor, nome } = location.state || {};
+  const { cpf, type, nameInstructor, nome, tipo = 'normal', codigo = 0 } = location.state || {};
   const [loading, setLoading] = useState(false);
   const [holidays, setHolidays] = useState([]);
   const [horas, setHoras] = useState([]);
@@ -97,10 +97,21 @@ export default function SelectDateAndHour() {
         nameInstructor,
         data: date,
         hora: selectedHour,
-        nome
+        nome, 
+        tipo, 
+        codigo,
       }
     });
   };
+
+  const handleBack = () => {
+    if (codigo != 0 && tipo === 'adm') {
+      navigate('/selecionarInstrutor', { state: { cpf, type, nome } });
+    } else {
+      navigate('/selectAluno', { state: { nome:nameInstructor, codigo:codigo } });
+    }
+  };
+  
 
   return (
     <div style={styles.container}>
@@ -151,7 +162,7 @@ export default function SelectDateAndHour() {
         )}
       </div>
 
-      <Button onClick={() => navigate('/selecionarInstrutor', { state: { cpf, type, nome } })} back="gray" cor="#FFF" styleAct={styles.buttonBack}>
+      <Button onClick={handleBack} back="gray" cor="#FFF" styleAct={styles.buttonBack}>
         Voltar
       </Button>
 

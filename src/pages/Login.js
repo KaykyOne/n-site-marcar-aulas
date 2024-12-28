@@ -47,6 +47,8 @@ function Login() {
             const nome = data.nome;
             const senha = data.senha;
             const atividade = data.atividade;
+            const tipo = data.tipo_usuario;
+            const usuarioId = data.usuario_id;
             if (senha === Cripto(senhaInput) || senhaInput === senha) {
                 if (!atividade) {
                     toggleModal('Usuário inativo ou com acesso restrito!');
@@ -54,9 +56,17 @@ function Login() {
                     setSenha('');
                     return;
                 }
-                navigate('/home', { state: { nome, cpf, senha } });
-                setCpf('');
-                setSenha('');
+                if(tipo === 'aluno'){
+                    navigate('/home', { state: { nome, cpf, senha } });
+                    setCpf('');
+                    setSenha('');
+                }else if(tipo === 'instrutor'){
+                    const codigoInstrutor = await loginPageModel.searchCodigoInstrutor(usuarioId);
+                    navigate('/homeinstrutor', { state: { nome, codigo:codigoInstrutor.instrutor_id } });
+                    setCpf('');
+                    setSenha('');
+                }
+
             } else {
                 toggleModal('Nenhum usuário encontrado com esse CPF.');
                 setCpf('');
@@ -94,7 +104,7 @@ function Login() {
 
     const verificarManutencao = async () => {
         const man = await loginPageModel.verificarManutencao();
-        if (man.valor === 'FALSE') {
+        if (man.valor === 'TRUE') {
             return;
         } else {
             setModalMan(true);
