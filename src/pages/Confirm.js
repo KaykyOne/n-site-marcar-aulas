@@ -6,10 +6,10 @@ import LoadingIndicator from './LoadingIndicator';
 import Modal from '../components/Modal';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import Button from '../components/Button'; 
+import Button from '../components/Button';
 import { format } from 'date-fns';
 
-const Confirm = () => { 
+const Confirm = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { nameInstructor, data, cpf, type, hora, nome, tipo = 'normal', codigo = 0 } = location.state || {};
@@ -25,14 +25,17 @@ const Confirm = () => {
   const isWeekend = (date) => moment(date).day() === 0 || moment(date).day() === 6;
 
   const toggleModal = (message) => {
+    setLoading(false);
     setModalMessage(message);
     setModalVisible(!isModalVisible);
   };
 
-  useEffect(() => {
-    console.log(cpf);
-  }, [cpf]);
-  
+
+  // useEffect(() => {
+  //   console.log(cpf, type, nameInstructor, nome, tipo, codigo);
+  // }, []);
+
+
   const handleConfirm = async () => {
     try {
       setLoading(true);
@@ -47,29 +50,37 @@ const Confirm = () => {
       const totalClassCount = await confirmPageModel.countClass(user.usuario_id, 'Pendente');
       const totalClassHoje = await confirmPageModel.countClassHoje(user.usuario_id, formattedDate);
       const config = await confirmPageModel.getConfig();
-      const aulas = config['aulas'];
+      let aulas = Number(config['aulas']);
       const maximoNormalDia = config['maximoNormalDia'];
       const isOutraCidade = user.outra_cidade;
-      console.log(isOutraCidade);
+
+      if (tipo === 'adm') {
+        aulas = aulas + 2;
+      }
 
       if (totalClassCount >= aulas) {
         toggleModal('Número máximo de aulas atingido. Conclua suas aulas para poder marcar mais!');
         return;
       }
 
-      if (((isOutraCidade || type === 'D' || type === 'E') || tipo === 'especial') && totalClassHoje >= 2) {
+      if (tipo === 'adm') {
+        if (totalClassHoje >= 2) {
+          toggleModal('Aluno atingiu o maximo de 2 aulas nesse dia!');
+          return;
+        }
+      } else if ((isOutraCidade || type === 'D' || type === 'E') && totalClassHoje >= 2) {
         toggleModal('Você já atingiu o número máximo de aulas para este dia.');
         return;
-      } else if (!(isOutraCidade || type === 'D' || type === 'E') && totalClassHoje >= maximoNormalDia) {
+      } else if (!isOutraCidade && type !== 'D' && type !== 'E' && totalClassHoje >= maximoNormalDia) {
         toggleModal('Você já atingiu o número máximo de aulas para este dia.');
         return;
-      }  
+      }
 
       const result = await confirmPageModel.createClass(nameInstructor, date, cpf, type, hora);
       if (result) {
-        if(codigo !== 0 && tipo !== 'normal'){
-          navigate('/Fim', { state: { cpf: 0, nome: 'nada', codigo: codigo, tipo: 'adm', nomeInstrutor: nameInstructor  } });
-        }else{
+        if (codigo !== 0 && tipo !== 'normal') {
+          navigate('/Fim', { state: { cpf: 0, nome: 'nada', codigo: codigo, tipo: 'adm', nomeInstrutor: nameInstructor } });
+        } else {
           navigate('/Fim', { state: { nameInstructor, data, cpf, type, hora, nome } });
         }
       } else {
@@ -103,13 +114,15 @@ const Confirm = () => {
       <Button
         style={styles.button}
         onClick={loading ? null : handleConfirm}
+        disabled={loading}
       >
         {loading ? 'Processando...' : 'Finalizar'}
       </Button>
 
       <Button
         styleAct={styles.buttonBack}
-        onClick={() => navigate('/selecionarDataEHora', { state: { cpf, type, nameInstructor, nome} })}
+        disabled={loading}
+        onClick={() => navigate('/selecionarDataEHora', { state: { cpf, type, nameInstructor, nome, tipo, codigo } })}
         back="gray" cor="#FFF"
       >
         Voltar

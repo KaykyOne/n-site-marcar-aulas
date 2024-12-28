@@ -22,7 +22,8 @@ export default function ListAulasInstrutorView() {
     const [modalVisible, setModalVisible] = useState(false);
     const [selectedAula, setSelectedAula] = useState(null);
     const [modalAction, setModalAction] = useState(null);
-    const [date, setDate] = useState(new Date());
+    const [date, setDate] = useState(null);
+
 
     const showToast = (type, text1, text2) => {
         toast.dismiss();
@@ -31,6 +32,7 @@ export default function ListAulasInstrutorView() {
 
     const handleDateChange = async (selectedDate) => {
         const formattedDate = moment(selectedDate).format('YYYY-MM-DD'); // Formata para o padrão YYYY-MM-DD
+        console.log(date);
 
         if (moment(selectedDate).isBetween(moment(currentDate), moment().add(7, 'days'), undefined, '[]')) {
             setDate(selectedDate);
@@ -40,18 +42,11 @@ export default function ListAulasInstrutorView() {
         }
     };
 
-
-
     const fetchAulas = async () => {
         setLoading(true);
         setError(null);
-
         try {
-            const { currentTime, currentDate } = await listAulasPageModel.getCurrentTimeAndDateFromServer();
-            setCurrentTime(currentTime);
-            setCurrentDate(currentDate);
-
-            const data = await listAulasPageModel.searchAulasInstrutor(codigo, currentDate);
+            const data = await listAulasPageModel.searchAulasInstrutor(codigo, moment(date).format('YYYY-MM-DD') || currentDate);
             setAulas(data.aulas || []);
             if (!data.aulas || !data.count) setError('Nenhuma aula encontrada.');
         } catch (error) {
@@ -63,7 +58,14 @@ export default function ListAulasInstrutorView() {
     };
 
     useEffect(() => {
-        if (codigo) fetchAulas();
+        const fetchInitialData = async () => {
+            const { currentTime, currentDate } = await listAulasPageModel.getCurrentTimeAndDateFromServer();
+            setCurrentTime(currentTime);
+            setCurrentDate(currentDate);
+            setDate(currentDate);
+
+        };
+        fetchInitialData();
     }, [codigo]);
 
     const handleAction = (action, item) => {

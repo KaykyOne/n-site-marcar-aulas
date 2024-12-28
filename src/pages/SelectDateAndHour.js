@@ -33,6 +33,12 @@ export default function SelectDateAndHour() {
 
   // Função para buscar feriados
   useEffect(() => {
+    // console.log(cpf);
+    // console.log(type);
+    // console.log(nameInstructor);
+    // console.log(nome);
+    // console.log(tipo);
+    // console.log(codigo);
     async function fetchHolidays() {
       try {
         const response = await fetch('https://brasilapi.com.br/api/feriados/v1/2024');
@@ -70,10 +76,10 @@ export default function SelectDateAndHour() {
   }, [date]);
 
   const handleDateChange = (selectedDate) => {
-    console.log('Data Selecionada:', selectedDate);
-    console.log('Formato YYYY-MM-DD:', moment(selectedDate).format('YYYY-MM-DD'));
-    console.log('Horário Local:', selectedDate.toString());
-    console.log('Horário UTC:', selectedDate.toUTCString());
+    // console.log('Data Selecionada:', selectedDate);
+    // console.log('Formato YYYY-MM-DD:', moment(selectedDate).format('YYYY-MM-DD'));
+    // console.log('Horário Local:', selectedDate.toString());
+    // console.log('Horário UTC:', selectedDate.toUTCString());
     if (moment(selectedDate) >= moment(currentDate) && moment(selectedDate) <= moment().add(7, 'days')) {
       setDate(selectedDate);
     }
@@ -106,9 +112,9 @@ export default function SelectDateAndHour() {
 
   const handleBack = () => {
     if (codigo != 0 && tipo === 'adm') {
-      navigate('/selecionarInstrutor', { state: { cpf, type, nome } });
-    } else {
       navigate('/selectAluno', { state: { nome:nameInstructor, codigo:codigo } });
+    } else {
+      navigate('/selecionarInstrutor', { state: { cpf, type, nome } });
     }
   };
   

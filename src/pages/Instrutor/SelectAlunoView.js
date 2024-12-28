@@ -45,7 +45,7 @@ export default function SelectAlunoView() {
           type: selectedOption,
           nameInstructor: nome,
           nome: alunoNome, // Usando alunoNome corretamente
-          tipo: 'especial',
+          tipo: 'adm',
           codigo: codigo,
         },
       });
@@ -101,6 +101,9 @@ export default function SelectAlunoView() {
   };
 
   useEffect(() => {
+    // console.log(nome);
+    // console.log(codigo);
+
     const fetchCategorias = async () => {
       if (!codigo) {
         showToast('error', 'O código é necessário.', 'Erro');

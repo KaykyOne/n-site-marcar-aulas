@@ -30,7 +30,6 @@ function ListAulas() {
     const fetchAulas = async () => {
         setLoading(true);
         setError(null);
-
         try {
             const { currentTime, currentDate } = await listAulasPageModel.getCurrentTimeAndDateFromServer();
             setCurrentTime(currentTime);

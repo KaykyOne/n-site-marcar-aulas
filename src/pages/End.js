@@ -16,7 +16,6 @@ const EndView = () => {
     }else{
       navigate('/selecionarTipo', { state: { cpf, nome } });
     }
-
   };
 
   return (

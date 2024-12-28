@@ -54,7 +54,7 @@ export class ListAulasPageModel {
         return null; // Retorna null em caso de erro
       }
 
-      console.log(data);
+      // console.log(data);
 
       const { data: count, error: errorCount } = await supabase
         .from('aulas')
@@ -91,7 +91,7 @@ export class ListAulasPageModel {
         )
       `)
         .eq('instrutor_id', codigo)
-        .gte('data', dia)
+        .eq('data', dia)
         .order('data', { ascending: true });
 
       if (error) {
@@ -201,8 +201,8 @@ export class ListAulasPageModel {
       // Normaliza o formato de currentTime removendo frações de segundo
       const normalizedTime = currentTime.split('.')[0]; // Remove tudo após o ponto
 
-      console.log('Entrada do servidor:', { currentDate, currentTime, normalizedTime });
-      console.log('Entrada da aula:', { data, hora });
+      // console.log('Entrada do servidor:', { currentDate, currentTime, normalizedTime });
+      // console.log('Entrada da aula:', { data, hora });
 
       // Concatena e tenta parsear
       const currentDateTime = parse(`${currentDate} ${normalizedTime}`, 'yyyy-MM-dd HH:mm:ss', new Date());
@@ -214,8 +214,8 @@ export class ListAulasPageModel {
         return false;
       }
 
-      console.log('Data e hora atuais:', currentDateTime);
-      console.log('Data e hora da aula:', aulaDateTime);
+      // console.log('Data e hora atuais:', currentDateTime);
+      // console.log('Data e hora da aula:', aulaDateTime);
 
       // Calcula a diferença em horas
       const differenceHours = differenceInHours(aulaDateTime, currentDateTime);
@@ -252,13 +252,12 @@ export class ListAulasPageModel {
       .select("valor")
       .eq('chave', 'aulas')
       .single();
-    console.log(max);
+    // console.log(max);
     if (error) {
       return error.message;
     }
     return max.valor
   }
-
 
   async getCurrentTimeAndDateFromServer() {
     const { currentDate, currentTime } =
