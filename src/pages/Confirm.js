@@ -39,13 +39,14 @@ const Confirm = () => {
   const handleConfirm = async () => {
     try {
       setLoading(true);
+      const formattedDate = format(date, 'yyyy-MM-dd');
 
-      if (isHoliday(date) || isWeekend(date)) {
+      if (isHoliday(date) || isWeekend(date) || formattedDate == '2025-01-01') {
         toggleModal('Data Indisponível: A data selecionada é um feriado, sábado ou domingo.');
         setLoading(false);
         return;
       }
-      const formattedDate = format(date, 'yyyy-MM-dd');
+
       const user = await confirmPageModel.getUsuarioByCpf(cpf);
       const totalClassCount = await confirmPageModel.countClass(user.usuario_id, 'Pendente');
       const totalClassHoje = await confirmPageModel.countClassHoje(user.usuario_id, formattedDate);
@@ -53,6 +54,14 @@ const Confirm = () => {
       let aulas = Number(config['aulas']);
       const maximoNormalDia = config['maximoNormalDia'];
       const isOutraCidade = user.outra_cidade;
+
+      const numeroMaximoDeAulasDeUmTipoDeVeiculo = await confirmPageModel.getMaxVeiculo(type, formattedDate, hora);
+      console.log(numeroMaximoDeAulasDeUmTipoDeVeiculo);
+
+      if(numeroMaximoDeAulasDeUmTipoDeVeiculo){
+        toggleModal(`O número máximo de aulas do tipo '${type}' já foi atingido neste horário. Por favor, escolha outro horário!`);
+        return;
+      }
 
       if (tipo === 'adm') {
         aulas = aulas + 2;

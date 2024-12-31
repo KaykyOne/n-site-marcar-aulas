@@ -104,7 +104,7 @@ function Login() {
 
     const verificarManutencao = async () => {
         const man = await loginPageModel.verificarManutencao();
-        if (man.valor === 'TRUE') {
+        if (man.valor === 'FALSE') {
             return;
         } else {
             setModalMan(true);

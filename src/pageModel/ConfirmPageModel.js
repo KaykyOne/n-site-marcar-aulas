@@ -186,6 +186,42 @@ export class ConfirmPageModel {
     }
   }
 
+  async getMaxVeiculo(tipo, data, hora) {
+    try {
+      // Buscar valor máximo de veículos permitido
+      const { data: configuracaoMax, error: errorMax } = await supabase
+        .from('configuracoes')
+        .select('valor')
+        .eq('chave', tipo.toUpperCase())
+        .single();
+  
+      if (errorMax || !configuracaoMax || isNaN(configuracaoMax.valor)) {
+        console.error('Erro ao buscar configuração de MAXVeiculos:', errorMax?.message || 'Valor inválido');
+        return null; // Indica erro ao buscar configuração
+      }
+      console.log(configuracaoMax);
+      // Contar número de aulas com os mesmos critérios
+      const { count, error } = await supabase
+        .from('aulas')
+        .select('*', { count: 'exact' })
+        .eq('tipo', tipo)
+        .eq('data', data)
+        .eq('hora', hora);
+  
+      if (error) {
+        console.error('Erro ao contar aulas:', error.message);
+        return null; // Indica erro ao contar aulas
+      }
+      console.log(count);
+      
+      // Retorna se o limite foi excedido
+      return count >= parseInt(configuracaoMax.valor);
+    } catch (error) {
+      console.error('Erro inesperado ao pegar o maxVeiculos gerais:', error.message);
+      return null; // Retorna null em caso de erro inesperado
+    }
+  }
+  
   async countClassHoje(id, data) {
     try {
       const { count, error } = await supabase

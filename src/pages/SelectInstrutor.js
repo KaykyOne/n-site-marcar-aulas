@@ -67,9 +67,18 @@ const SelectInstructor = () => {
             <h1 style={styles.textInStart}>
                 Clique no instrutor que deseja marcar a aula!
             </h1>
-            <div style={styles.flatListContainer}>
-                {instrutores.map(renderInstrutorItem)}
-            </div>
+            {instrutores.length === 0 ? (
+                <div style={styles.errorContainer}>
+                    <p style={styles.errorText}>
+                        {'Nenhum instrutor encontrado, entre em contato com o suporte!'}
+                    </p>
+                </div>
+            ) : (
+                <div style={styles.flatListContainer}>
+                    {instrutores.map(renderInstrutorItem)}
+                </div>
+            )}
+
             <Button onClick={() => navigate('/selecionarTipo', { state: { cpf, nome } })} back="gray" cor="#FFF" styleAct={styles.buttonBack}>
                 Voltar
             </Button>
@@ -134,6 +143,12 @@ const styles = {
         width: '40%',
         borderRadius: 8,
         marginTop: 20,
+    },
+    errorContainer: {
+        color: 'red',
+    },
+    errorText: {
+        color: 'red'
     },
     button: {
         width: '80%',

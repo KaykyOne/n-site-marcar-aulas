@@ -136,12 +136,16 @@ function ListAulas() {
 const styles = {
     container: {
         padding: '20px',
+        marginTop: '100px',
         backgroundColor: '#f5f5f5',
         minHeight: '100vh', // Permite crescimento para conteúdo
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'flex-start', // Evita corte no centro
+    },
+    errorText: {
+        color: 'red'
     },
     title: {
         fontSize: '1.5em',  // Ajustado para manter o tamanho de título semelhante ao Home

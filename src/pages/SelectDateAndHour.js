@@ -75,6 +75,11 @@ export default function SelectDateAndHour() {
     fetchHoursAndCurrentTime();
   }, [date]);
 
+  const showToast = (type, text1, text2) => {
+    toast.dismiss();  // Remove todos os toasts anteriores
+    toast[type](`${text1}: ${text2}`);
+  };
+
   const handleDateChange = (selectedDate) => {
     // console.log('Data Selecionada:', selectedDate);
     // console.log('Formato YYYY-MM-DD:', moment(selectedDate).format('YYYY-MM-DD'));
@@ -87,7 +92,7 @@ export default function SelectDateAndHour() {
 
   const handleHourClick = (hora) => {
     if (hora < currentTime && moment(date).isSame(moment(), 'day')) {
-      toast.error('Hora anterior à atual.');
+      showToast('error', 'Hora anterior à atual.', 'Escolha outro horário!');
     } else {
       setSelectedHour(hora);
       setModalVisible(true);
@@ -103,8 +108,8 @@ export default function SelectDateAndHour() {
         nameInstructor,
         data: date,
         hora: selectedHour,
-        nome, 
-        tipo, 
+        nome,
+        tipo,
         codigo,
       }
     });
@@ -112,12 +117,12 @@ export default function SelectDateAndHour() {
 
   const handleBack = () => {
     if (codigo != 0 && tipo === 'adm') {
-      navigate('/selectAluno', { state: { nome:nameInstructor, codigo:codigo } });
+      navigate('/selectAluno', { state: { nome: nameInstructor, codigo: codigo } });
     } else {
       navigate('/selecionarInstrutor', { state: { cpf, type, nome } });
     }
   };
-  
+
 
   return (
     <div style={styles.container}>

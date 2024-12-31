@@ -15,7 +15,7 @@ export class SelectInstructorPageModel {
       .single();
 
     if (usuarioError || !usuarioData) {
-      alert('Erro ao buscar dados do usuário: ' + (usuarioError?.message || 'Usuário não encontrado'));
+      console.log('Erro ao buscar dados do usuário: ' + (usuarioError?.message || 'Usuário não encontrado'));
       console.error(usuarioError);
       return [];
     }
@@ -27,7 +27,7 @@ export class SelectInstructorPageModel {
       .eq('usuario_id', usuarioData.usuario_id);
 
     if (usuarioInstrutorError || !usuarioInstrutorData.length) {
-      alert('Erro ao buscar dados de instrutores para o usuário: ' + (usuarioInstrutorError?.message || 'Nenhum instrutor encontrado'));
+      console.log('Erro ao buscar dados de instrutores para o usuário: ' + (usuarioInstrutorError?.message || 'Nenhum instrutor encontrado'));
       console.error(usuarioInstrutorError);
       return [];
     }
@@ -43,7 +43,7 @@ export class SelectInstructorPageModel {
       .or(`tipo_instrutor.ilike.%${type}%,tipo_instrutor.ilike.%${type}`);
 
     if (instrutoresError) {
-      alert('Erro ao buscar instrutores: ' + instrutoresError.message);
+      console.log('Erro ao buscar instrutores: ' + instrutoresError.message);
       console.error(instrutoresError);
       return [];
     }

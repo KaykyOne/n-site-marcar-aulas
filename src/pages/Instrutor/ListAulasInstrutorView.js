@@ -154,6 +154,7 @@ export default function ListAulasInstrutorView() {
 const styles = {
     container: {
         padding: '20px',
+        marginTop: '100px',
         backgroundColor: '#f5f5f5',
         minHeight: '100vh', // Permite crescimento para conteúdo
         display: 'flex',
