@@ -40,7 +40,8 @@ export class SelectInstructorPageModel {
       .from('instrutores')
       .select('nome_instrutor')
       .in('instrutor_id', instrutores_id)
-      .or(`tipo_instrutor.ilike.%${type}%,tipo_instrutor.ilike.%${type}`);
+      .ilike('tipo_instrutor', `%${type}%`)
+      .eq('atividade_instrutor', true);
 
     if (instrutoresError) {
       console.log('Erro ao buscar instrutores: ' + instrutoresError.message);
