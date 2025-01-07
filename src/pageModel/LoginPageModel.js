@@ -1,7 +1,12 @@
 import supabase from '../controller/supabase';
+import ServerTimeService from '../controller/ServerTimeService';
 
 export class LoginPageModel {
   users = [];
+
+  constructor() {
+    this.serverTimeService = new ServerTimeService(); // Instancia a classe
+  }
 
   async searchUsersByCPF(cpf) {
     const { data, error } = await supabase
@@ -46,5 +51,11 @@ export class LoginPageModel {
       }
   
       return data ? data : null; // Retorna apenas o campo 'nome'
+  }
+
+  async getCurrentTimeAndDateFromServer() {
+    const { currentDate, currentTime } =
+      await this.serverTimeService.getCurrentTimeAndDateFromServer();
+    return { currentDate, currentTime }; // Retorna um objeto com data e hora
   }
 }

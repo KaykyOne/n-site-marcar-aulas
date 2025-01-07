@@ -196,55 +196,58 @@ export class ListAulasPageModel {
       console.log('Erro ao buscar data e hora do server!');
       return false;
     }
-
+  
     try {
       // Normaliza o formato de currentTime removendo frações de segundo
       const normalizedTime = currentTime.split('.')[0]; // Remove tudo após o ponto
-
-      // console.log('Entrada do servidor:', { currentDate, currentTime, normalizedTime });
-      // console.log('Entrada da aula:', { data, hora });
-
+  
       // Concatena e tenta parsear
       const currentDateTime = parse(`${currentDate} ${normalizedTime}`, 'yyyy-MM-dd HH:mm:ss', new Date());
       const aulaDateTime = parse(`${data} ${hora}`, 'yyyy-MM-dd HH:mm:ss', new Date());
-
+  
       // Valida os objetos Date gerados
       if (!isValid(currentDateTime) || !isValid(aulaDateTime)) {
         console.error('Erro: formato de data ou hora inválido!');
         return false;
       }
-
-      // console.log('Data e hora atuais:', currentDateTime);
-      // console.log('Data e hora da aula:', aulaDateTime);
-
+  
       // Calcula a diferença em horas
       const differenceHours = differenceInHours(aulaDateTime, currentDateTime);
       const differenceMinutes = differenceInMinutes(aulaDateTime, currentDateTime) % 60;
-
-      // Verifica se a aula é no mínimo 12 horas depois
-      if (differenceHours > 3 || (differenceHours === 3 && differenceMinutes >= 0)) {
-        // Realiza a exclusão
-        const { data: deleteData, error } = await supabase
-          .from('aulas')
-          .delete()
-          .eq('aula_id', id)
-          .select();
-
-        // Verifica se houve um erro
-        if (error) {
-          throw error;
+  
+      // Verifica se a aula é às 7:00 e exige 24 horas de antecedência
+      if (hora === '07:00:00') {
+        if (differenceHours < 24 || (differenceHours === 24 && differenceMinutes > 0)) {
+          console.log('Não foi possível excluir a aula das 7:00: precisa ser excluída com 24 horas de antecedência.');
+          return false;
         }
-
-        return deleteData ? true : false; // Retorna true se a exclusão afetou algum registro
       } else {
-        console.log('Não foi possível excluir a aula: precisa ser excluída com 12 horas de antecedência ou mais.');
-        return false;
+        // Verifica se outras aulas têm no mínimo 12 horas de antecedência
+        if (differenceHours < 12 || (differenceHours === 12 && differenceMinutes < 0)) {
+          console.log('Não foi possível excluir a aula: precisa ser excluída com 3 horas de antecedência ou mais.');
+          return false;
+        }
       }
+  
+      // Realiza a exclusão
+      const { data: deleteData, error } = await supabase
+        .from('aulas')
+        .delete()
+        .eq('aula_id', id)
+        .select();
+  
+      // Verifica se houve um erro
+      if (error) {
+        throw error;
+      }
+  
+      return deleteData ? true : false; // Retorna true se a exclusão afetou algum registro
     } catch (error) {
       console.error('Erro no processo de exclusão: ', error);
       return false; // Retorna false em caso de erro
     }
   }
+  
 
   async searchMaxAulas() {
     let { data: max, error } = await supabase

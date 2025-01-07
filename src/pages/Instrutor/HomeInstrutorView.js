@@ -18,10 +18,10 @@ const HomeInstrutorView = () => {
     setModalVisible(!isModalVisible);
   };
 
-  const showToast = (type, text1, text2) => {
-    toast.dismiss();
-    toast[type](`${text1}: ${text2}`);
-  };
+  // const showToast = (type, text1, text2) => {
+  //   toast.dismiss();
+  //   toast[type](`${text1}: ${text2}`);
+  // };
 
   const alterPage = async (page, codigo = 0, nome = "", senha = "") => {
     setLoading(true);

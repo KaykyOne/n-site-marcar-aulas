@@ -2,16 +2,16 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import LoadingIndicator from '../LoadingIndicator';
 import { ListAulasPageModel } from '../../pageModel/ListAulasPageModel';
-import { format, parseISO } from 'date-fns';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import DatePicker from 'react-datepicker';
 import Modal from '../../components/Modal';
 import moment from 'moment';
+import 'react-datepicker/dist/react-datepicker.css';
 
 export default function ListAulasInstrutorView() {
     const location = useLocation();
-    const { codigo, nome } = location.state || {}; // Recebe os dados
+    const { codigo, nome } = location.state || {};
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [aulas, setAulas] = useState([]);
@@ -24,21 +24,30 @@ export default function ListAulasInstrutorView() {
     const [modalAction, setModalAction] = useState(null);
     const [date, setDate] = useState(null);
 
-
     const showToast = (type, text1, text2) => {
         toast.dismiss();
         toast[type](`${text1}: ${text2}`);
     };
 
     const handleDateChange = async (selectedDate) => {
-        const formattedDate = moment(selectedDate).format('YYYY-MM-DD'); // Formata para o padrão YYYY-MM-DD
-        console.log(date);
-
-        if (moment(selectedDate).isBetween(moment(currentDate), moment().add(7, 'days'), undefined, '[]')) {
+        const formattedDate = moment(selectedDate).format('YYYY-MM-DD');
+        if (
+            moment(selectedDate).isBetween(
+                moment(currentDate),
+                moment(currentDate).add(7, 'days'),
+                'day',
+                '[]'
+            )
+        ) {
             setDate(selectedDate);
-
-            const data = await listAulasPageModel.searchAulasInstrutor(codigo, formattedDate); // Passa a data formatada
-            setAulas(data.aulas || []);
+            try {
+                const data = await listAulasPageModel.searchAulasInstrutor(codigo, formattedDate);
+                setAulas(data.aulas || []);
+            } catch (err) {
+                setError('Erro ao buscar aulas para a data selecionada.');
+            }
+        } else {
+            showToast('error', 'Erro', 'Data fora do intervalo permitido!');
         }
     };
 
@@ -46,9 +55,12 @@ export default function ListAulasInstrutorView() {
         setLoading(true);
         setError(null);
         try {
-            const data = await listAulasPageModel.searchAulasInstrutor(codigo, moment(date).format('YYYY-MM-DD') || currentDate);
+            const formattedDate = moment(date || currentDate).format('YYYY-MM-DD');
+            const data = await listAulasPageModel.searchAulasInstrutor(codigo, formattedDate);
             setAulas(data.aulas || []);
-            if (!data.aulas || !data.count) setError('Nenhuma aula encontrada.');
+            if (!data.aulas || !data.count) {
+                setError('Nenhuma aula encontrada.');
+            }
         } catch (error) {
             setError(error.message);
             showToast('error', 'Erro ao buscar Aulas', error.message);
@@ -59,31 +71,40 @@ export default function ListAulasInstrutorView() {
 
     useEffect(() => {
         const fetchInitialData = async () => {
-            const { currentTime, currentDate } = await listAulasPageModel.getCurrentTimeAndDateFromServer();
-            setCurrentTime(currentTime);
-            setCurrentDate(currentDate);
-            setDate(currentDate);
-
+            setLoading(true);
+            try {
+                const { currentTime, currentDate } = await listAulasPageModel.getCurrentTimeAndDateFromServer();
+                const parsedTime = moment(currentTime, 'HH:mm:ss');
+                const parsedDate = moment(currentDate, 'YYYY-MM-DD');
+                setCurrentTime(parsedTime);
+                setCurrentDate(parsedDate);
+                if (!date) {
+                    setDate(parsedDate.toDate());
+                }
+            } catch (err) {
+                setError('Erro ao carregar dados iniciais.');
+            } finally {
+                setLoading(false);
+            }
         };
         fetchInitialData();
     }, [codigo]);
 
     const handleAction = (action, item) => {
-        const { data, hora } = item;
+        const itemDate = moment(item.data, 'YYYY-MM-DD');
+        const itemTime = moment(item.hora, 'HH:mm:ss');
         if (action === 'Excluir') {
             setSelectedAula(item);
             setModalAction('Excluir');
             setModalVisible(true);
         } else if (action === 'Confirmar') {
-            if (currentDate > data || (currentDate === data && hora < currentTime)) {
+            if (itemDate.isBefore(currentDate) || (itemDate.isSame(currentDate) && itemTime.isBefore(currentTime))) {
                 setSelectedAula(item);
                 setModalAction('Confirmar');
                 setModalVisible(true);
             } else {
                 showToast('error', 'Erro', 'Muito cedo para concluir a aula!');
             }
-
-
         }
     };
 
@@ -91,8 +112,8 @@ export default function ListAulasInstrutorView() {
         if (selectedAula && selectedAula.aula_id) {
             try {
                 if (modalAction === 'Excluir') {
-                    let res = await listAulasPageModel.deleteAula(selectedAula.aula_id, selectedAula.data, selectedAula.hora);
-                    showToast(res ? 'success' : 'error', res ? 'Sucesso' : 'Erro', res ? 'Aula excluída com sucesso!' : 'A aula não  pode ser excluida, isso deve ser feito com 12 horas de antecedência!');
+                    const res = await listAulasPageModel.deleteAula(selectedAula.aula_id, selectedAula.data, selectedAula.hora);
+                    showToast(res ? 'success' : 'error', res ? 'Sucesso' : 'Erro', res ? 'Aula excluída com sucesso!' : 'Não foi possível excluir a aula.');
                 }
                 fetchAulas();
                 setModalVisible(false);
@@ -105,10 +126,10 @@ export default function ListAulasInstrutorView() {
 
     const renderAulaItem = (item) => (
         <div style={styles.itemContainer} key={item.aula_id}>
-            <p style={styles.itemTitle}>Data: {format(parseISO(item.data), 'dd/MM/yyyy')}</p>
+            <p style={styles.itemTitle}>Data: {moment(item.data).format('DD/MM/YYYY')}</p>
             <p style={styles.itemText}>Tipo: {item.tipo}</p>
             <p style={styles.itemText}>Hora: {item.hora}</p>
-            <p style={styles.itemText}>Instrutor: {item.usuarios?.nome || 'Não especificado'}</p>
+            <p style={styles.itemText}>Aluno: {item.usuarios?.nome || 'Não especificado'}</p>
             <div style={styles.buttonContainer}>
                 <button style={styles.deleteButton} onClick={() => handleAction('Excluir', item)}>Excluir</button>
             </div>
@@ -121,28 +142,23 @@ export default function ListAulasInstrutorView() {
             <DatePicker
                 selected={date}
                 onChange={handleDateChange}
-                minDate={new Date()}
-                maxDate={moment().add(7, 'days').toDate()}
+                minDate={currentDate ? currentDate.toDate() : null}
+                maxDate={currentDate ? moment(currentDate).add(7, 'days').toDate() : null}
                 dateFormat="dd/MM/yyyy"
             />
-
             {loading && <LoadingIndicator />}
             {error || aulas.length === 0 ? (
                 <div style={styles.errorContainer}>
-                    <p style={styles.errorText}>
-                        {error ? `Erro: ${error}` : 'Nenhuma aula marcada!'}
-                    </p>
+                    <p style={styles.errorText}>{error || 'Nenhuma aula marcada!'}</p>
                 </div>
             ) : (
                 <div style={styles.flatListContainer}>{aulas.map(renderAulaItem)}</div>
             )}
             <button style={styles.buttonBack} onClick={() => navigate(`/homeinstrutor`, { state: { codigo, nome } })}>Voltar</button>
-
             <Modal
                 isOpen={modalVisible}
                 onConfirm={confirmAction}
                 onCancel={() => setModalVisible(false)}
-
             >
                 <p>{modalAction === 'Excluir' ? `Deseja excluir a aula ${selectedAula?.tipo}?` : `Deseja confirmar a aula de tipo: ${selectedAula?.tipo}?`}</p>
             </Modal>

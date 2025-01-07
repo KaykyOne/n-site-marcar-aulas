@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import moment from 'moment';
+import 'moment/locale/pt-br'; // Para exibir os dias da semana e meses em português
 import { AiOutlineLeft, AiOutlineRight } from 'react-icons/ai';
 import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
@@ -15,84 +16,93 @@ export default function SelectDateAndHour() {
   const location = useLocation();
   const navigate = useNavigate();
   const { cpf, type, nameInstructor, nome, tipo = 'normal', codigo = 0 } = location.state || {};
+  const [initialLoading, setInitialLoading] = useState(true);
   const [loading, setLoading] = useState(false);
   const [holidays, setHolidays] = useState([]);
   const [horas, setHoras] = useState([]);
   const [error, setError] = useState(null);
   const [currentTime, setCurrentTime] = useState(null);
-  const [date, setDate] = useState(new Date());
+  const [date, setDate] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedHour, setSelectedHour] = useState(null);
-  const [currentDate, setCurrentDate] = useState(new Date());
+  const [currentDate, setCurrentDate] = useState(null);
   const [dayName, setDayName] = useState('');
-  const [hover, setHover] = useState(false);  // Adicionado para hover no botão
+  const [hover, setHover] = useState(false);
 
-  const namesForDays = new Array("Domingo", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado");
-
+  const namesForDays = ["Domingo", "Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira", "Sábado"];
   const selectDateAndHourPageModel = new SelectDateAndHourPageModel();
 
-  // Função para buscar feriados
-  useEffect(() => {
-    // console.log(cpf);
-    // console.log(type);
-    // console.log(nameInstructor);
-    // console.log(nome);
-    // console.log(tipo);
-    // console.log(codigo);
-    async function fetchHolidays() {
-      try {
-        const response = await fetch('https://brasilapi.com.br/api/feriados/v1/2024');
-        const data = await response.json();
-        setHolidays(data.map(holiday => holiday.date));
-      } catch (error) {
-        toast.error('Erro ao buscar os feriados.');
+  async function fetchInitialData() {
+    try {
+      const { currentTime, currentDate } = await selectDateAndHourPageModel.getCurrentTimeAndDateFromServer();
+      setCurrentTime(moment(currentTime, 'HH:mm:ss'));
+      setCurrentDate(moment(currentDate, 'YYYY-MM-DD'));
+
+      // console.log("Data (formatada):", moment(currentDate).format('YYYY-MM-DD'));
+      // console.log("Hora (formatada):", moment(currentTime, 'HH:mm:ss').format('HH:mm:ss'));
+
+      if (currentDate && !date) {
+        setDate(moment(currentDate, 'YYYY-MM-DD').toDate());
       }
+
+      const response = await fetch('https://brasilapi.com.br/api/feriados/v1/2024');
+      const data = await response.json();
+      setHolidays(data.map(holiday => holiday.date));
+    } catch (error) {
+      toast.error('Erro ao buscar os dados iniciais.');
+    } finally {
+      setInitialLoading(false);
     }
-    fetchHolidays();
+  }
+
+  async function fetchHours() {
+    setLoading(true);
+    try {
+      const { horasDisponiveis } = await selectDateAndHourPageModel.atualizarValores(
+        nameInstructor,
+        moment(date).format('YYYY-MM-DD')
+      );
+  
+      const dayOfWeek = moment(date).day(); // Obter o dia da semana (0 = Domingo, 1 = Segunda, ...)
+  
+      // Filtrar os horários: remover 7:00 se for segunda-feira
+      const filteredHoras = horasDisponiveis.filter(hora => {
+        if (dayOfWeek === 1 && hora === '07:00') { // Segunda-feira
+          return false;
+        }
+        return true;
+      });
+  
+      setHoras(filteredHoras); // Atualizar os horários disponíveis
+      setDayName(namesForDays[dayOfWeek]);
+    } catch (error) {
+      setError(error.message);
+    } finally {
+      setLoading(false);
+    }
+  }
+  
+  useEffect(() => {
+    fetchInitialData();
   }, []);
 
-  // Função para buscar horas disponíveis e horário atual
   useEffect(() => {
-    async function fetchHoursAndCurrentTime() {
-      setLoading(true);
-      try {
-        const { horasDisponiveis } = await selectDateAndHourPageModel.atualizarValores(
-          nameInstructor,
-          moment(date).format('YYYY-MM-DD')
-        );
-        const { currentTime, currentDate } = await selectDateAndHourPageModel.getCurrentTimeAndDateFromServer();
-        setHoras(horasDisponiveis);
-        setCurrentTime(currentTime);
-        setCurrentDate(currentDate);
-        let parsedDate = new Date(date);
-        setDayName(namesForDays[parsedDate.getDay()]);
-      } catch (error) {
-        setError(error.message);
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetchHoursAndCurrentTime();
+    if (date) fetchHours();
   }, [date]);
 
-  const showToast = (type, text1, text2) => {
-    toast.dismiss();  // Remove todos os toasts anteriores
-    toast[type](`${text1}: ${text2}`);
-  };
-
   const handleDateChange = (selectedDate) => {
-    // console.log('Data Selecionada:', selectedDate);
-    // console.log('Formato YYYY-MM-DD:', moment(selectedDate).format('YYYY-MM-DD'));
-    // console.log('Horário Local:', selectedDate.toString());
-    // console.log('Horário UTC:', selectedDate.toUTCString());
-    if (moment(selectedDate) >= moment(currentDate) && moment(selectedDate) <= moment().add(7, 'days')) {
-      setDate(selectedDate);
+    const selectedMoment = moment(selectedDate);
+    if (selectedMoment.isSameOrAfter(moment(currentDate), 'day') && selectedMoment.isSameOrBefore(moment().add(7, 'days'), 'day')) {
+      setDate(selectedMoment.toDate());
+    } else {
+      toast.error('Selecione uma data válida.');
     }
   };
 
   const handleHourClick = (hora) => {
-    if (hora < currentTime && moment(date).isSame(moment(), 'day')) {
-      showToast('error', 'Hora anterior à atual.', 'Escolha outro horário!');
+    const selectedHourMoment = moment(hora, 'HH:mm:ss');
+    if (selectedHourMoment.isBefore(currentTime) && moment(date).isSame(moment(), 'day')) {
+      toast.error('Hora anterior à atual. Escolha outro horário!');
     } else {
       setSelectedHour(hora);
       setModalVisible(true);
@@ -102,27 +112,21 @@ export default function SelectDateAndHour() {
   const confirmSelection = () => {
     setModalVisible(false);
     navigate('/confirmar', {
-      state: {
-        cpf,
-        type,
-        nameInstructor,
-        data: date,
-        hora: selectedHour,
-        nome,
-        tipo,
-        codigo,
-      }
+      state: { cpf, type, nameInstructor, data: date, hora: selectedHour, nome, tipo, codigo },
     });
   };
 
   const handleBack = () => {
-    if (codigo != 0 && tipo === 'adm') {
-      navigate('/selectAluno', { state: { nome: nameInstructor, codigo: codigo } });
+    if (codigo !== 0 && tipo === 'adm') {
+      navigate('/selectAluno', { state: { nome: nameInstructor, codigo } });
     } else {
       navigate('/selecionarInstrutor', { state: { cpf, type, nome } });
     }
   };
 
+  if (initialLoading) {
+    return <LoadingIndicator visible />;
+  }
 
   return (
     <div style={styles.container}>
@@ -140,8 +144,8 @@ export default function SelectDateAndHour() {
           <DatePicker
             selected={date}
             onChange={handleDateChange}
-            minDate={new Date()}
-            maxDate={moment().add(7, 'days').toDate()}
+            minDate={moment(currentDate).toDate()}
+            maxDate={moment(currentDate).add(7, 'days').toDate()}
             dateFormat="dd/MM/yyyy"
           />
           <h4 style={styles.nameDayText}>{dayName}</h4>
@@ -161,8 +165,9 @@ export default function SelectDateAndHour() {
 
       <div style={styles.listContainer}>
         {holidays.includes(moment(date).format('YYYY-MM-DD')) ||
-          moment(date).day() === 0 ||
-          moment(date).day() === 6 || horas.length === 0 ? (
+        moment(date).day() === 0 ||
+        moment(date).day() === 6 ||
+        horas.length === 0 ? (
           <p style={styles.messageText}>Dia não letivo ou sem horas disponíveis</p>
         ) : (
           horas.map((hora, index) => (
@@ -177,14 +182,13 @@ export default function SelectDateAndHour() {
         Voltar
       </Button>
 
-
       <Modal
         isOpen={modalVisible}
         onConfirm={confirmSelection}
         onCancel={() => setModalVisible(false)}
-        customStyles={customStyles.modal} // Personalização do modal
+        customStyles={customStyles.modal}
       >
-        <p>Você tem certeza que deseja selecionar essa data: {date.toLocaleDateString()} e {selectedHour}</p>
+        <p>Você tem certeza que deseja selecionar essa data: {moment(date).format('DD/MM/YYYY')} e {selectedHour}</p>
       </Modal>
 
       <ToastContainer />

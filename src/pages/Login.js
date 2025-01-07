@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import moment from 'moment';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { LoginPageModel } from '../pageModel/LoginPageModel';
@@ -8,6 +9,7 @@ import Cripto from '../controller/Cripto';
 import InputField from '../components/Input';
 import Button from '../components/Button'; // Importe o Button
 import ModalLogin from '../components/ModalLogin';
+import ModalErroHora from '../components/ModalHoraInvalida';
 
 function Login() {
     const [cpfNormal, setCpf] = useState('');
@@ -19,6 +21,7 @@ function Login() {
     const [modalMessage, setModalMessage] = useState('');
     const [seePass, setSeePass] = useState(false);
     const [modalMan, setModalMan] = useState(false);
+    const [modalHoraErro, setModalErroHora] = useState(false);
 
     const loginPageModel = new LoginPageModel();
     const navigate = useNavigate(); // Use useNavigate aqui
@@ -56,13 +59,13 @@ function Login() {
                     setSenha('');
                     return;
                 }
-                if(tipo === 'aluno'){
+                if (tipo === 'aluno') {
                     navigate('/home', { state: { nome, cpf, senha } });
                     setCpf('');
                     setSenha('');
-                }else if(tipo === 'instrutor'){
+                } else if (tipo === 'instrutor') {
                     const codigoInstrutor = await loginPageModel.searchCodigoInstrutor(usuarioId);
-                    navigate('/homeinstrutor', { state: { nome, codigo:codigoInstrutor.instrutor_id } });
+                    navigate('/homeinstrutor', { state: { nome, codigo: codigoInstrutor.instrutor_id } });
                     setCpf('');
                     setSenha('');
                 }
@@ -73,7 +76,7 @@ function Login() {
                 setSenha('');
             }
         } catch (error) {
-            showToast('error', 'Erro', `Ocorreu um erro ao tentar fazer login.: ${error.message}` );
+            showToast('error', 'Erro', `Ocorreu um erro ao tentar fazer login.: ${error.message}`);
             console.error(error.message);
             setCpf('');
         } finally {
@@ -103,13 +106,39 @@ function Login() {
     };
 
     const verificarManutencao = async () => {
-        const man = await loginPageModel.verificarManutencao();
-        if (man.valor === 'FALSE') {
-            return;
-        } else {
-            setModalMan(true);
+        try {
+            // Verificar status de manutenção
+            const man = await loginPageModel.verificarManutencao();
+
+            // Obter hora e data do servidor
+            const { currentTime, currentDate } = await loginPageModel.getCurrentTimeAndDateFromServer();
+            const serverTime = moment(currentTime, 'HH:mm:ss');
+            const serverDate = moment(currentDate, 'YYYY-MM-DD');
+
+            // Obter data e hora do dispositivo
+            const deviceDateTime = moment();
+
+            // Comparar datas
+            const diffDays = serverDate.diff(deviceDateTime, 'days');
+            const diffHours = serverTime.diff(deviceDateTime, 'hours');
+
+            if (diffDays !== 0 || Math.abs(diffHours) > 1) {
+                console.log('Horario Errado!')
+                setModalErroHora(true)
+                return;
+            }
+
+            // Verificar manutenção
+            if (man.valor === 'FALSE') {
+                return;
+            } else {
+                setModalMan(true);
+            }
+        } catch (error) {
+            console.error('Erro ao verificar manutenção:', error);
         }
     };
+
 
     useEffect(() => {
         verificarManutencao();
@@ -165,6 +194,11 @@ function Login() {
             <ModalLogin
                 visible={modalMan}
                 setModalVisible={setModalMan}
+            />
+
+            <ModalErroHora
+                visible={modalHoraErro}
+                setModalVisible={setModalErroHora}
             />
 
             {/* Modal de mensagem */}
