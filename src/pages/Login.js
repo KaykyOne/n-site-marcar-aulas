@@ -11,7 +11,9 @@ import Button from '../components/Button'; // Importe o Button
 import ModalLogin from '../components/ModalLogin';
 import ModalErroHora from '../components/ModalHoraInvalida';
 
-function Login() {
+export default function Login() {
+
+    //#region Logica
     const [cpfNormal, setCpf] = useState('');
     const [senhaInput, setSenha] = useState('');
     const [loading, setLoading] = useState(false);
@@ -154,6 +156,8 @@ function Login() {
         return () => clearInterval(interval);
     }, [isRunning, timer]);
 
+    //#endregion
+
     return (
         <div style={styles.container}>
             <img
@@ -283,5 +287,3 @@ const styles = {
         boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
     },
 };
-
-export default Login;

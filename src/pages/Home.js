@@ -6,7 +6,9 @@ import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Button from '../components/Button'; // Importe o componente Button
 
-const HomeView = () => {
+export default function HomeView() {
+  
+  //#region Logica
   const location = useLocation();
   const { nome, cpf, senha } = location.state || {}; // Recebe os dados
   const [loading, setLoading] = useState(false);
@@ -62,6 +64,8 @@ const HomeView = () => {
       setLoading(false);
     }
   };
+
+  //#endregion
 
   return (
     <div style={styles.container}>
@@ -134,5 +138,3 @@ const styles = {
     textAlign: 'center',
   },
 };
-
-export default HomeView;

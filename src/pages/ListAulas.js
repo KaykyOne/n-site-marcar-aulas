@@ -7,7 +7,9 @@ import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Modal from '../components/Modal';
 
-function ListAulas() {
+export default function ListAulas() {
+
+    //#region Logica
     const location = useLocation();
     const { cpf, nome } = location.state || {}; // Recebe os dados
     const [loading, setLoading] = useState(false);
@@ -110,6 +112,8 @@ function ListAulas() {
             </div>
         </div>
     );
+
+    //#endregion
 
     return (
         <div style={styles.container}>
@@ -251,7 +255,4 @@ const styles = {
         transition: 'background 0.3s',
     },
 };
-
-
-export default ListAulas;
 

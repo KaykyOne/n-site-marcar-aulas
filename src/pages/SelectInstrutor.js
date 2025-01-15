@@ -7,7 +7,9 @@ import 'react-toastify/dist/ReactToastify.css';
 import Modal from '../components/Modal';
 import Button from '../components/Button'; // Importe o componente Button
 
-const SelectInstructor = () => {
+export default function SelectInstructor() {
+
+    //#region Logica
     const location = useLocation();
     const { cpf, type, nome } = location.state || {};
     const [instrutores, setInstrutores] = useState([]);
@@ -60,6 +62,8 @@ const SelectInstructor = () => {
             {item}
         </Button>
     );
+
+    //#endregion
 
     return (
         <div style={styles.container}>
@@ -155,5 +159,3 @@ const styles = {
         marginTop: '15px',
     },
 };
-
-export default SelectInstructor;

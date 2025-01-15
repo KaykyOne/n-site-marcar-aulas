@@ -1,7 +1,9 @@
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 
-const Erro = () => {
+export default function Erro() {
+
+  //#region Logica
   const navigate = useNavigate();
   const location = useLocation();
   const { error } = location.state || {}; // Obtem o parâmetro 'error' passado na navegação
@@ -9,6 +11,8 @@ const Erro = () => {
   const handleFirstButton = () => {
     navigate('/');
   };
+
+  //#endregion
 
   return (
     <div style={styles.container}>
@@ -58,5 +62,3 @@ const styles = {
     border: 'none',
   },
 };
-
-export default Erro;

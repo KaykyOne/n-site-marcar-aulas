@@ -9,6 +9,8 @@ import LoadingIndicator from '../LoadingIndicator';
 import ModalConfirm from '../../components/ModalConfirm';
 
 export default function SelectAlunoView() {
+
+  //#region Logica
   const location = useLocation();
   const { nome, codigo } = location.state || {};
   const [cpf, setCPF] = useState('');
@@ -131,6 +133,8 @@ export default function SelectAlunoView() {
 
     fetchCategorias();
   }, [codigo]);
+
+  //#endregion
 
   return (
     <div style={styles.container}>

@@ -10,6 +10,8 @@ import moment from 'moment';
 import 'react-datepicker/dist/react-datepicker.css';
 
 export default function ListAulasInstrutorView() {
+
+    //#region  Logica
     const location = useLocation();
     const { codigo, nome } = location.state || {};
     const [loading, setLoading] = useState(false);
@@ -136,6 +138,8 @@ export default function ListAulasInstrutorView() {
         </div>
     );
 
+    //#endregion
+    
     return (
         <div style={styles.container}>
             <h1 style={styles.title}>Aulas</h1>

@@ -6,6 +6,8 @@ import { PerfilPageModel } from '../pageModel/PerfilPageModel';
 import InputField from '../components/Input';
 
 export default function Perfil() {
+
+    //#region Logica
     const { state: { cpf, nome } = {} } = useLocation();
     const [currentPassword, setCurrentPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
@@ -43,6 +45,8 @@ export default function Perfil() {
         }
     };
 
+    //#endregion
+
     return (
         <div style={styles.container}>
             <h1>Olá, {nome}</h1>
@@ -78,7 +82,6 @@ export default function Perfil() {
         </div>
     );
 }
-
 
 const styles = {
     container: {

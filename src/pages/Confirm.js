@@ -9,7 +9,9 @@ import 'react-toastify/dist/ReactToastify.css';
 import Button from '../components/Button';
 import { format } from 'date-fns';
 
-const Confirm = () => {
+export default function Confirm(){
+
+  //#region Logica
   const location = useLocation();
   const navigate = useNavigate();
   const { nameInstructor, data, cpf, type, hora, nome, tipo = 'normal', codigo = 0 } = location.state || {};
@@ -102,6 +104,8 @@ const Confirm = () => {
     }
   };
 
+  //#endregion
+
   return (
     <div style={styles.container}>
       <Modal
@@ -182,4 +186,3 @@ const styles = {
   }
 };
 
-export default Confirm;

@@ -1,7 +1,9 @@
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 
-const EndView = () => {
+export default function EndView(){
+
+  //#region Logica
   const navigate = useNavigate();
   const location = useLocation();
   const { cpf, nome, codigo = 0, tipo = 'normal', nomeInstrutor = 'nada' } = location.state || {}; // Obtém o parâmetro 'cpf' da navegação anterior
@@ -17,6 +19,8 @@ const EndView = () => {
       navigate('/selecionarTipo', { state: { cpf, nome } });
     }
   };
+
+  //#endregion
 
   return (
     <div style={styles.container}>
@@ -74,5 +78,3 @@ const styles = {
     border: 'none',
   },
 };
-
-export default EndView;

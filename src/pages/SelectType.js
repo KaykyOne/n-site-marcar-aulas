@@ -7,7 +7,9 @@ import 'react-toastify/dist/ReactToastify.css';
 import Modal from '../components/Modal';
 import Button from '../components/Button'; // Importe o componente Button
 
-const SelectTypeView = () => {
+export default function SelectTypeView () {
+
+    //#region Logica
     const location = useLocation();
     const navigate = useNavigate();
     const { cpf, nome } = location.state || {};
@@ -64,6 +66,8 @@ const SelectTypeView = () => {
             {item}
         </Button>
     );
+
+    //#endregion
 
     return (
         <div style={styles.container}>
@@ -146,5 +150,3 @@ const styles = {
         margin: 10,
     },
 };
-
-export default SelectTypeView;

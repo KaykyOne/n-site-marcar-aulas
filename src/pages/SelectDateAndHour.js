@@ -13,6 +13,8 @@ import { SelectDateAndHourPageModel } from '../pageModel/SelectDateAndHourPageMo
 import Button from '../components/Button';
 
 export default function SelectDateAndHour() {
+
+  //#region Logica
   const location = useLocation();
   const navigate = useNavigate();
   const { cpf, type, nameInstructor, nome, tipo = 'normal', codigo = 0 } = location.state || {};
@@ -127,6 +129,8 @@ export default function SelectDateAndHour() {
   if (initialLoading) {
     return <LoadingIndicator visible />;
   }
+
+  //#endregion
 
   return (
     <div style={styles.container}>
@@ -281,4 +285,3 @@ const customStyles = {
     },
   },
 };
-

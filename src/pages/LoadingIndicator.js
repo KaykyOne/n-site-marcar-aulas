@@ -1,6 +1,6 @@
 import React from 'react';
 
-const LoadingIndicator = ({ visible }) => {
+export default function LoadingIndicator ({ visible }){
   if (!visible) return null;
 
   return (
@@ -48,5 +48,3 @@ const styleSheet = document.createElement("style");
 styleSheet.type = "text/css";
 styleSheet.innerText = loaderStyles;
 document.head.appendChild(styleSheet);
-
-export default LoadingIndicator;

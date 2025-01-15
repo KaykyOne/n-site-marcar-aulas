@@ -6,6 +6,8 @@ import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 export default function ListAlunosView() {
+
+    //#region Logica
     const location = useLocation();
     const { codigo, nome } = location.state || {}; // Recebe os dados
     const [loading, setLoading] = useState(false);
@@ -48,6 +50,8 @@ export default function ListAlunosView() {
             <p style={styles.itemText}>Telefone: {aluno.usuarios?.telefone || 'Não especificado'}</p>
         </div>
     );
+
+    //#endregion
 
     return (
         <div style={styles.container}>
