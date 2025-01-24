@@ -13,7 +13,6 @@ import SelectAluno from './pages/Instrutor/SelectAlunoView';
 import ListAulasInstrutor from './pages/Instrutor/ListAulasInstrutorView';
 import ListAlunosView from './pages/Instrutor/ListAlunosView';
 
-
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
 function App() {

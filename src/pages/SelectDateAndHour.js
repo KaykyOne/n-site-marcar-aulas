@@ -64,18 +64,11 @@ export default function SelectDateAndHour() {
         nameInstructor,
         moment(date).format('YYYY-MM-DD')
       );
-  
+      
       const dayOfWeek = moment(date).day(); // Obter o dia da semana (0 = Domingo, 1 = Segunda, ...)
-  
-      // Filtrar os horários: remover 7:00 se for segunda-feira
-      const filteredHoras = horasDisponiveis.filter(hora => {
-        if (dayOfWeek === 1 && hora === '07:00') { // Segunda-feira
-          return false;
-        }
-        return true;
-      });
-  
-      setHoras(filteredHoras); // Atualizar os horários disponíveis
+
+      // Removendo a filtragem do horário 07:00 na segunda-feira
+      setHoras(horasDisponiveis);
       setDayName(namesForDays[dayOfWeek]);
     } catch (error) {
       setError(error.message);
@@ -83,7 +76,7 @@ export default function SelectDateAndHour() {
       setLoading(false);
     }
   }
-  
+
   useEffect(() => {
     fetchInitialData();
   }, []);
@@ -169,9 +162,9 @@ export default function SelectDateAndHour() {
 
       <div style={styles.listContainer}>
         {holidays.includes(moment(date).format('YYYY-MM-DD')) ||
-        moment(date).day() === 0 ||
-        moment(date).day() === 6 ||
-        horas.length === 0 ? (
+          moment(date).day() === 0 ||
+          moment(date).day() === 6 ||
+          horas.length === 0 ? (
           <p style={styles.messageText}>Dia não letivo ou sem horas disponíveis</p>
         ) : (
           horas.map((hora, index) => (
