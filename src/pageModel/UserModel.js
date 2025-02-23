@@ -49,15 +49,14 @@ export class UserModel {
 
     if (senhaAtual != '123456') {
       senhaAtual = Cripto(senhaAtual);
-
-
-      if (usuario.senha != senhaAtual) return false;
-
-      // Criptografa a nova senha
-      const senhaAtt = Cripto(novaSenha);
-
-      const resultado = await this.updatePassword(usuario, senhaAtt);
-      return { resultado, senhaAtt };
     }
+
+    if (usuario.senha != senhaAtual) return false;
+
+    // Criptografa a nova senha
+    const senhaAtt = Cripto(novaSenha);
+
+    const resultado = await this.updatePassword(usuario, senhaAtt);
+    return { resultado, senhaAtt };
   }
 }
