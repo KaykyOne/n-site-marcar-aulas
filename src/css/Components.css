@@ -1,0 +1,176 @@
+.show-button {
+    flex: 1;
+    border-radius: 0 8px 8px 0;
+    border: 1px solid #ccc;
+    background-color: var(--cor-secundaria);
+    cursor: pointer;
+    max-width: 20%;
+    margin-bottom: 15px;
+    padding: 0 5% 00 5%;
+    height: 40px;
+    color: #333;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.image {
+    height: 200px;
+    width: auto;
+}
+
+@media (max-width: 600px) {
+    .image {
+        height: 100px; /* Tamanho reduzido para telas pequenas */
+    }
+  }
+
+.input {
+    width: 100%;
+    height: 40px;
+    padding: 12px;
+    margin-bottom: 15px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Sombra leve */
+}
+
+.progressBarPas {
+    appearance: none;
+    width: 100%;
+    height: 10px;
+    border-radius: 5px;
+    background-color: white; /* Cor do fundo */
+    border: 1px solid #ccc; /* Borda opcional */
+}
+
+.progressBarPas::-webkit-progress-bar {
+    background-color: white; /* Cor do fundo no Chrome */
+    border-radius: 5px;
+}
+
+.progressBarPas::-webkit-progress-value {
+    background-color: var(--progress-color, var(--cor-primaria)); /* Cor dinâmica */
+    border-radius: 5px;
+}
+
+.progressBarPas::-moz-progress-bar {
+    background-color: var(--progress-color, var(--cor-primaria)); /* Firefox */
+    border-radius: 5px;
+}
+
+
+.button-back{
+    display: flex;
+    justify-content: start;
+    text-align: start;
+    gap: 8px;
+    width: 100%;
+    margin-bottom: 20px;
+    cursor: pointer;
+}
+
+.button-home,
+.button-back p {
+    color: var(--cor-primaria);
+}
+
+.button-back,
+.button-back span {
+    color: var(--cor-primaria);
+}
+
+.button-home{
+    display: flex;
+    justify-content: end;
+    text-align: end;
+    gap: 8px;
+    width: 100%;
+    margin-bottom: 20px;
+    cursor: pointer;
+}
+
+.button-back,
+.button-home {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+}
+
+.password-input {
+    max-width: 80%;
+    border-radius: 8px 0 0 8px;
+    border-right: none;
+}
+
+.button {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background-color: var(--cor-primaria); /* Valor padrão */
+    color: white; /* Valor padrão */
+    border-radius: 100px;
+    padding: 12px;
+    cursor: pointer;
+    border: none;
+    margin-top: 15px;
+    font-weight: bold;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: background 0.3s;
+}
+
+input[type="checkbox"] {
+    accent-color: var(--cor-primaria); /* Usa a variável da cor primária */
+}
+
+.checkbox-container input {
+    margin-right: 10px;
+    /* Espaço entre o checkbox e o texto */
+    padding: 0;
+    /* Remove qualquer padding extra */
+}
+
+.buttonSelect {
+    height: 100px;
+}
+
+/* Estilo para o DatePicker (input de data) */
+.custom-timepicker-input,
+.custom-datepicker-input {
+  width: 100%;
+  /* Ajuste a largura conforme necessário */
+  max-width: 400px;
+  /* Limita a largura máxima */
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 16px;
+  outline: none;
+  transition: border-color 0.3s;
+  margin-bottom: 20px;
+}
+
+.custom-timepicker-input:focus,
+.custom-datepicker-input:focus {
+  border-color: var(--cor-primaria);
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+}
+
+/* Estilo do calendário */
+.custom-calendar {
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.custom-calendar .react-datepicker__day--selected {
+  background-color: var(--cor-primaria);
+  color: #fff;
+  border-radius: 50%;
+}
+
+.custom-calendar .react-datepicker__day--today {
+  font-weight: bold;
+  color: var(--cor-secundaria);
+}

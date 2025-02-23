@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import LoadingIndicator from '../LoadingIndicator';
+import LoadingIndicator from '../../components/LoadingIndicator';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Button from '../../components/Button'; // Importe o componente Button
@@ -9,7 +9,7 @@ export default function HomeInstrutorView(){
 
   //#region Logica
   const location = useLocation();
-  const { nome, codigo } = location.state || {}; 
+  const { usuario, instrutor } = location.state || {}; 
   const [loading, setLoading] = useState(false);
   const [modalMessage, setModalMessage] = useState('');
   const [isModalVisible, setModalVisible] = useState(false);
@@ -28,7 +28,7 @@ export default function HomeInstrutorView(){
   const alterPage = async (page, codigo = 0, nome = "", senha = "") => {
     setLoading(true);
     try {
-        navigate(`/${page}`, { state: { codigo, nome, senha } });
+        navigate(`/${page}`, { state: { usuario, instrutor } });
     } finally {
       setLoading(false);
     }
@@ -38,14 +38,14 @@ export default function HomeInstrutorView(){
 
   return (
     <div style={styles.container}>
-      <h1 style={{ ...styles.welcomeText, fontSize: '1.5em' }}>Bem-vindo, {nome}!</h1>
-      <Button onClick={() => alterPage('selectAluno', codigo , nome)} back="#0056b3" cor="#FFF">
+      <h1 style={{ ...styles.welcomeText, fontSize: '1.5em' }}>Bem-vindo, {usuario.nome}!</h1>
+      <Button onClick={() => alterPage('selectAluno', usuario, instrutor)} back="#0056b3" cor="#FFF">
         Marcar Aula
       </Button>
-      <Button onClick={() => alterPage('listAulasInstrutor', codigo, nome)} back="#FFC601" cor="#333">
+      <Button onClick={() => alterPage('listAulasInstrutor', usuario, instrutor)} back="#FFC601" cor="#333">
         Aulas
       </Button>
-      <Button onClick={() => alterPage('listarAlunosInstrutor', codigo, nome)} back="gray" cor="white">
+      <Button onClick={() => alterPage('listarAlunosInstrutor', usuario, instrutor)} back="gray" cor="white">
         Alunos
       </Button>
       <Button onClick={() => navigate('/')} back="#0074D9" cor="#FFF" styleAct={{ width: '40%' }}>

@@ -1,24 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import Button from '../../components/Button';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { SelectAlunoPageModel } from '../../pageModel/SelectAlunoPageModel';
+import { UserModel } from '../../pageModel/UserModel';
 import InputField from '../../components/Input';
 import { toast, ToastContainer } from 'react-toastify';
 import Cripto from '../../controller/Cripto';
-import LoadingIndicator from '../LoadingIndicator';
+import LoadingIndicator from '../../components/LoadingIndicator';
 import ModalConfirm from '../../components/ModalConfirm';
 
 export default function SelectAlunoView() {
 
   //#region Logica
   const location = useLocation();
-  const { nome, codigo } = location.state || {};
+  const { usuario, instrutor } = location.state || {};
   const [cpf, setCPF] = useState('');
   const navigate = useNavigate();
   const [isModalVisible, setModalVisible] = useState(false);
   const [isConfirmModalVisible, setConfirmModalVisible] = useState(false);
   const [modalMessage, setModalMessage] = useState('');
-  const selectAlunoPageModel = new SelectAlunoPageModel();
+  const userModel = new UserModel();
   const [selectedOption, setSelectedOption] = useState('');
   const [categorias, setCategorias] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -39,23 +39,23 @@ export default function SelectAlunoView() {
   };
 
   const handleConfirmModalConfirm = () => {
-    if (alunoNome) {
-      const cpfCriptaddo = Cripto(cpf);
-      navigate(`/selecionarDataEHora`, {
-        state: {
-          cpf: cpfCriptaddo,
-          type: selectedOption,
-          nameInstructor: nome,
-          nome: alunoNome, // Usando alunoNome corretamente
-          tipo: 'adm',
-          codigo: codigo,
-        },
-      });
-    } else {
-      console.error('Erro: Nome do aluno vazio.');
-      showToast('error', 'Erro', 'Nome do aluno não encontrado.');
-    }
-    setConfirmModalVisible(false);
+    // if (alunoNome) {
+    //   const cpfCriptaddo = Cripto(cpf);
+    //   navigate(`/selecionarDataEHora`, {
+    //     state: {
+    //       cpf: cpfCriptaddo,
+    //       type: selectedOption,
+    //       nameInstructor: nome,
+    //       nome: alunoNome, // Usando alunoNome corretamente
+    //       tipo: 'adm',
+    //       codigo: codigo,
+    //     },
+    //   });
+    // } else {
+    //   console.error('Erro: Nome do aluno vazio.');
+    //   showToast('error', 'Erro', 'Nome do aluno não encontrado.');
+    // }
+    // setConfirmModalVisible(false);
   };
 
   const handleCancelModalConfirm = () => { 
@@ -74,7 +74,7 @@ export default function SelectAlunoView() {
         return;
       }
 
-      const aluno = await selectAlunoPageModel.searchUsersByCPF(cpf, codigo);
+      const aluno = await userModel.searchUsersByCPF(cpf);
       if (aluno) {
         setAlunoNome(`${aluno.nome} ${aluno.sobrenome}`); // Armazenando o nome do aluno
         setModalMessage(`Aluno encontrado: ${aluno.nome} ${aluno.sobrenome}`);
@@ -107,14 +107,14 @@ export default function SelectAlunoView() {
     // console.log(codigo);
 
     const fetchCategorias = async () => {
-      if (!codigo) {
+      if (!instrutor) {
         showToast('error', 'O código é necessário.', 'Erro');
         return;
       }
 
       setLoading(true);
       try {
-        const categoriasData = await selectAlunoPageModel.searchCategoriaInstrutor(codigo);
+        const categoriasData = instrutor.tipo_instrutor;
 
         if (categoriasData && categoriasData.tipo_instrutor) {
           const categoria = categoriasData.tipo_instrutor.trim(); // Remove espaços extras
@@ -132,7 +132,7 @@ export default function SelectAlunoView() {
     };
 
     fetchCategorias();
-  }, [codigo]);
+  }, [instrutor]);
 
   //#endregion
 
@@ -170,7 +170,7 @@ export default function SelectAlunoView() {
       </Button>
       <Button
         styleAct={styles.buttonBack}
-        onClick={() => navigate(`/homeinstrutor`, { state: { codigo, nome } })}
+        onClick={() => navigate(`/homeinstrutor`, { state: { usuario, instrutor} })}
         back="gray" cor="#FFF"
       >
         Voltar

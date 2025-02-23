@@ -2,23 +2,27 @@ import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { PerfilPageModel } from '../pageModel/PerfilPageModel';
+import { UserModel } from '../pageModel/UserModel';
 import InputField from '../components/Input';
+import ButtonBack from '../components/ButtonBack';
+import Button from '../components/Button';
 
 export default function Perfil() {
-
-    //#region Logica
-    const { state: { cpf, nome } = {} } = useLocation();
+    const location = useLocation();
+    const { usuario, configs } = location.state || {};
     const [currentPassword, setCurrentPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
     const [loading, setLoading] = useState(false);
+    const [nivelDaSenha, setNivelDaSenha] = useState('Ruim.');
+    const [nivelProgressBar, setnivelProgressBar] = useState(0);
     const navigate = useNavigate();
-    const perfilPageModel = new PerfilPageModel();
+    const userModel = new UserModel();
 
     const showToast = (type, text1, text2) => {
         toast.dismiss();  // Remove todos os toasts anteriores
         toast[type](`${text1}: ${text2}`);
     };
+
 
     const handleChangePassword = async () => {
         if (newPassword.length < 6 || newPassword.length > 12) {
@@ -26,17 +30,26 @@ export default function Perfil() {
             return;
         }
 
+        if (currentPassword == newPassword) {
+            showToast('error', 'Erro', 'A nova senha não pode ser igual a anterior!');
+            return;
+        }
+
+        if (newPassword == '123456') {
+            showToast('error', 'Erro', 'A nova senha não pode ser igual a padrão!');
+            return;
+        }
+
+
         setLoading(true);
         try {
-            const senhaAlterada = await perfilPageModel.alterarSenha(cpf, currentPassword, newPassword);
-            if (!senhaAlterada) {
-                showToast('error', 'Erro', 'Senha atual incorret');
+            const { resultado, senhaAtt } = await userModel.alterarSenha(usuario, currentPassword, newPassword);
+            if (!resultado) {
+                showToast('error', 'Erro', 'Senha atual incorreta');
                 return;
             }
+            usuario.senha = senhaAtt;
             showToast('success', 'Sucesso', 'Senha Alterada!');
-            setInterval(() => {
-                navigate('/home', { state: { cpf, nome } });
-            }, 3000);
 
         } catch (error) {
             showToast('error', 'Erro', `Erro ao alterar Senha: ${error}`);
@@ -45,11 +58,61 @@ export default function Perfil() {
         }
     };
 
+    function AlterandoSenhaEVerificando(str) {
+        const temMaiuscula = /[A-Z]/.test(str);
+        const temNumero = /\d/.test(str);
+        const temSimbolo = /[^A-Za-z0-9]/.test(str);
+        const tamanhoSuficiente = str.length >= 6;
+
+        let nivel = "Ruim.";
+        let progresso = 0;
+
+        if (tamanhoSuficiente) {
+            if (temMaiuscula && temNumero && temSimbolo) {
+                nivel = "Perfeito!!";
+                progresso = 100;
+            } else if (temMaiuscula && temNumero) {
+                nivel = "Ótimo!";
+                progresso = 80;
+            } else if (temMaiuscula) {
+                nivel = "Bom.";
+                progresso = 40;
+            } else {
+                nivel = "Aceitável.";
+                progresso = 30;
+            }
+        }
+
+        setNivelDaSenha(nivel);
+        setnivelProgressBar(progresso);
+        setNewPassword(str);
+    }
+
+    function getCorSenha(nivel) {
+        switch (nivel) {
+            case "Ruim.":
+                return "red";
+            case "Aceitável.":
+                return "orange";
+            case "Bom.":
+                return "green";
+            case "Ótimo!":
+                return "blue";
+            case "Perfeito!!":
+                return "green";
+            default:
+                return "gray";
+        }
+    }
+    
+
+
     //#endregion
 
     return (
-        <div style={styles.container}>
-            <h1>Olá, {nome}</h1>
+        <div className='container'>
+            <ButtonBack event={() => navigate('/home', { state: { usuario, configs } })} />
+            <h1>Olá, {usuario.nome}</h1>
             <h3>Altere sua Senha!</h3>
             <h5>Lembrando, a senha deve ter no minimo 6 e no máximo 12 caracteres!</h5>
             <InputField
@@ -61,63 +124,26 @@ export default function Perfil() {
             <InputField
                 placeholder="Nova Senha"
                 value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
+                onChange={(e) => AlterandoSenhaEVerificando(e.target.value)}
                 typ={'password'}
             />
-            <button
+            <h3 style={{ color: getCorSenha(nivelDaSenha) }}>Nível da Senha: {nivelDaSenha}</h3>
+            <progress
+                className='progressBarPas'
+                value={nivelProgressBar}
+                max="100"
+            ></progress>
+
+
+            <Button
                 onClick={handleChangePassword}
-                style={styles.button}
                 disabled={loading}
+
             >
                 {loading ? 'Alterando...' : 'Alterar Senha'}
-            </button>
-
-            <button
-                onClick={() => navigate('/home', { state: { cpf, nome } })}
-                style={styles.buttonBack}
-                disabled={loading}>
-                Voltar
-            </button>
+                <span className="material-icons">check</span>
+            </Button>
             <ToastContainer position="top-center" />
         </div>
     );
 }
-
-const styles = {
-    container: {
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        padding: '20px',
-        height: '100vh',
-        justifyContent: 'center',
-        textAlign: 'center',
-    },
-    button: {
-        width: '80%',
-        backgroundColor: '#0056b3', // Azul corporativo
-        color: '#fff',
-        borderRadius: '10px',
-        padding: '12px',
-        cursor: 'pointer',
-        marginTop: '15px',
-        border: 'none',
-        fontWeight: 'bold',
-        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-        transition: 'background 0.3s',
-    },
-    buttonBack: {
-        width: '80%',
-        backgroundColor: 'gray', // Azul corporativo
-        color: '#fff',
-        borderRadius: '10px',
-        padding: '12px',
-        cursor: 'pointer',
-        marginTop: '15px',
-        border: 'none',
-        fontWeight: 'bold',
-        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-        transition: 'background 0.3s',
-    },
-
-};

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import LoadingIndicator from '../LoadingIndicator';
-import { ListAlunosPageModel } from '../../pageModel/ListAlunosPageModel';
+import LoadingIndicator from '../../components/LoadingIndicator';
+import { UserModel } from '../../pageModel/UserModel';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -9,11 +9,11 @@ export default function ListAlunosView() {
 
     //#region Logica
     const location = useLocation();
-    const { codigo, nome } = location.state || {}; // Recebe os dados
+    const { usuario, instrutor } = location.state || {}; // Recebe os dados
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [alunos, setAlunos] = useState([]);
-    const listAlunosPageModel = new ListAlunosPageModel();
+    const userModel = new UserModel();
     const navigate = useNavigate();
 
     const showToast = (type, message) => {
@@ -26,7 +26,7 @@ export default function ListAlunosView() {
         setError(null);
 
         try {
-            const data = await listAlunosPageModel.searchAlunos(codigo);
+            const data = await userModel.searchAlunos(instrutor.instrutor_id);
             setAlunos(data || []);
 
             if (!data || data.length === 0) {
@@ -41,8 +41,8 @@ export default function ListAlunosView() {
     };
 
     useEffect(() => {
-        if (codigo) fetchAlunos();
-    }, [codigo]);
+        if (instrutor) fetchAlunos();
+    }, [instrutor]);
 
     const renderAlunoItem = (aluno) => (
         <div style={styles.itemContainer} key={aluno.usuario_id}>
@@ -66,7 +66,7 @@ export default function ListAlunosView() {
             )}
             <button
                 style={styles.buttonBack}
-                onClick={() => navigate('/homeinstrutor', { state: { codigo, nome } })}
+                onClick={() => navigate('/homeinstrutor', { state: { usuario, instrutor } })}
             >
                 Voltar
             </button>

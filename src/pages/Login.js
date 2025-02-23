@@ -1,15 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import moment from 'moment';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { LoginPageModel } from '../pageModel/LoginPageModel';
-import logoAutoEscola from "../imgs/logoAutoEscolaIdeal.png";
+import { InstrutorModel } from '../pageModel/InstrutorModel';
+import { UserModel } from '../pageModel/UserModel';
+import { ManagerModel } from '../pageModel/ManagerModel';
 import { useNavigate } from 'react-router-dom';
 import Cripto from '../controller/Cripto';
 import InputField from '../components/Input';
 import Button from '../components/Button'; // Importe o Button
 import ModalLogin from '../components/ModalLogin';
 import ModalErroHora from '../components/ModalHoraInvalida';
+import Modal from '../components/Modal';
+
+import logoNovusTech from '../imgs/logoNovusTech.png';
+import LogoApp from "../imgs/logoAutoEscolaIdeal.png";
 
 export default function Login() {
 
@@ -24,8 +28,13 @@ export default function Login() {
     const [seePass, setSeePass] = useState(false);
     const [modalMan, setModalMan] = useState(false);
     const [modalHoraErro, setModalErroHora] = useState(false);
+    const [chechRemember, setCheckRemember] = useState(false);
 
-    const loginPageModel = new LoginPageModel();
+    const instrutorModel = new InstrutorModel();
+    const lanagerModel = new ManagerModel();
+    const userModel = new UserModel();
+
+
     const navigate = useNavigate(); // Use useNavigate aqui
 
     const toggleModal = (message) => {
@@ -44,32 +53,51 @@ export default function Login() {
             return;
         }
 
+        if (!senhaInput) {
+            showToast('error', 'Erro', 'Por favor, insira a Senha.');
+            return;
+        }
+
         const cpf = Cripto(cpfNormal);
         setLoading(true);
 
         try {
-            const data = await loginPageModel.searchUsersByCPF(cpf);
-            const nome = data.nome;
-            const senha = data.senha;
-            const atividade = data.atividade;
-            const tipo = data.tipo_usuario;
-            const usuarioId = data.usuario_id;
+            const usuario = await userModel.searchUsersByCPF(cpf);
+            console.log(usuario);
+            if (!usuario) {
+                showToast('error', 'Erro', 'Cpf ou senha incorretos, ou usuário não existe!');
+                return;
+            }
+
+            rememberMe('login');
+
+            const senha = usuario.senha;
+            const atividade = usuario.atividade;
+            const tipo = usuario.tipo_usuario;
+            const usuarioId = usuario.usuario_id;
+            const configs = await lanagerModel.verificarManutencao(usuario.autoescola_id);
+            const manutencao = configs.find(item => item.chave === 'manutencao');
             if (senha === Cripto(senhaInput) || senhaInput === senha) {
                 if (!atividade) {
                     toggleModal('Usuário inativo ou com acesso restrito!');
-                    setCpf('');
-                    setSenha('');
+                    return;
+                }
+                if (manutencao.valor === 'TRUE') {
+                    toggleModal('Aparentemente a sua autoescola está com o app em manutenção!');
                     return;
                 }
                 if (tipo === 'aluno') {
-                    navigate('/home', { state: { nome, cpf, senha } });
+
+                    navigate('/home', { state: { usuario, configs } });
                     setCpf('');
                     setSenha('');
+                    return;
                 } else if (tipo === 'instrutor') {
-                    const codigoInstrutor = await loginPageModel.searchCodigoInstrutor(usuarioId);
-                    navigate('/homeinstrutor', { state: { nome, codigo: codigoInstrutor.instrutor_id } });
+                    const instrutor = await instrutorModel.searchInstrutorById(usuarioId);
+                    navigate('/homeinstrutor', { state: { usuario, configs, instrutor } });
                     setCpf('');
                     setSenha('');
+                    return;
                 }
 
             } else {
@@ -107,183 +135,142 @@ export default function Login() {
         }
     };
 
-    const verificarManutencao = async () => {
+    const rememberMe = (type) => {
+        setLoading(true);
         try {
-            // Verificar status de manutenção
-            const man = await loginPageModel.verificarManutencao();
+            if (type === 'restore') {
+                let senha = localStorage.getItem("senha");
+                let cpf = localStorage.getItem("cpf");
+                if (!senha || !cpf) {
+                    return;
+                } else {
+                    setCpf(cpf);
+                    setSenha(senha);
+                    setCheckRemember(true);
+                    return;
+                }
+            } else if (type === 'login') {
+                if (chechRemember) {
+                    localStorage.setItem('senha', senhaInput);
+                    localStorage.setItem('cpf', cpfNormal);
+                } else {
+                    localStorage.removeItem("senha");
+                    localStorage.removeItem("cpf");
+                }
 
-            // Obter hora e data do servidor
-            const { currentTime, currentDate } = await loginPageModel.getCurrentTimeAndDateFromServer();
-            const serverTime = moment(currentTime, 'HH:mm:ss');
-            const serverDate = moment(currentDate, 'YYYY-MM-DD');
-
-            // Obter data e hora do dispositivo
-            const deviceDateTime = moment();
-
-            // Comparar datas
-            const diffDays = serverDate.diff(deviceDateTime, 'days');
-            const diffHours = serverTime.diff(deviceDateTime, 'hours');
-
-            if (diffDays !== 0 || Math.abs(diffHours) > 1) {
-                console.log('Horario Errado!')
-                setModalErroHora(true)
-                return;
-            }
-
-            // Verificar manutenção
-            if (man.valor === 'FALSE') {
-                return;
-            } else {
-                setModalMan(true);
             }
         } catch (error) {
-            console.error('Erro ao verificar manutenção:', error);
+            console.error('erro ao salvar dados: ', error.message)
+        } finally {
+            setLoading(false);
         }
     };
 
+    const alterRemember = () => {
+        setCheckRemember(!chechRemember)
+        console.log(chechRemember);
+    };
 
     useEffect(() => {
-        verificarManutencao();
-        let interval;
-        if (isRunning && timer > 0) {
-            interval = setInterval(() => {
-                setTimer((prevTimer) => prevTimer - 1);
-            }, 1000);
-        } else if (timer === 0 && isRunning) {
-            setIsRunning(false);
-            setCpf('');
+        setLoading(true);
+        try {
+            let interval;
+            if (isRunning && timer > 0) {
+                interval = setInterval(() => {
+                    setTimer((prevTimer) => prevTimer - 1);
+                }, 1000);
+            } else if (timer === 0 && isRunning) {
+                setIsRunning(false);
+                setCpf('');
+            }
+            return () => clearInterval(interval);
+        } catch (error) {
+            console.error('Erro: ', error.message);
+        } finally {
+            setLoading(false);
         }
-        return () => clearInterval(interval);
+
+
     }, [isRunning, timer]);
+
+    useEffect(() => {
+        rememberMe('restore');
+    }, [])
 
     //#endregion
 
     return (
-        <div style={styles.container}>
-            <img
-                src={logoAutoEscola}
-                alt="Logo Auto Escola Ideal"
-                style={styles.image}
-            />
+        <div className="container">
+            <div className='container-vertical'>
+                <img
+                    src={LogoApp}
+                    alt="Logo Auto Escola Ideal"
+                    className="image"
+                />
+                <div>
+                    <h1 className='veryGreatText'>NovusAuto</h1>
+                    <h3>Seu aplicativo de Gerenciamento de aulas confiável e simples!</h3>
+                </div>
+            </div>
+
             <InputField
-                typ="text"
+                type="text"
                 placeholder="Digite seu CPF"
                 inputMode="numeric"
                 value={cpfNormal}
                 onChange={handleCpfChange}
+                classNamePersonalized='input'
             />
-            <div style={styles.containerPass}>
+            <div className="container-pass">
                 <InputField
-                    typ={seePass ? 'text' : 'password'}
+                    type={seePass ? 'text' : 'password'}
                     placeholder="Digite sua Senha"
                     value={senhaInput}
                     onChange={(e) => setSenha(e.target.value)}
-                    styleAct={styles.passwordInput}
+                    classNamePersonalized="input password-input"
                 />
-                <button onClick={() => setSeePass(!seePass)} style={styles.showButton}>
-                    {seePass ? 'Ocultar' : 'Mostrar'}
+                <button onClick={() => setSeePass(!seePass)} className="show-button">
+                    <span className="material-icons">{seePass ? 'visibility_off' : 'visibility'}</span>
                 </button>
+
             </div>
+            <label className="checkbox-container">
+                <input
+                    checked={chechRemember}
+                    value={chechRemember}
+                    onChange={alterRemember}  // Corrigido: chamando a função corretamente
+                    type="checkbox"
+                    id="minhaCheckbox"
+                    name="minhaCheckbox"
+                />
+                Salvar login
+            </label>
+
+
             {/* Substitua o botão padrão pelo componente Button */}
             <Button
                 onClick={login}
-                cor="#FFF"
-                back="#0056b3" // Azul corporativo
-                styleAct={styles.button}
                 disabled={loading}
             >
                 {loading ? 'Carregando...' : 'Entrar'}
+                <span className="material-icons">login</span>
             </Button>
-
-            <ModalLogin
-                visible={modalMan}
-                setModalVisible={setModalMan}
-            />
-
-            <ModalErroHora
-                visible={modalHoraErro}
-                setModalVisible={setModalErroHora}
-            />
+            <div className="footer">
+                <p>Feito por NovusTech <img className="logo" src={logoNovusTech} /></p>
+            </div>
+            <ModalLogin visible={modalMan} setModalVisible={setModalMan} />
+            <ModalErroHora visible={modalHoraErro} setModalVisible={setModalErroHora} />
 
             {/* Modal de mensagem */}
-            {isModalVisible && (
-                <div style={styles.modalContent}>
-                    <p>{modalMessage}</p>
-                    <button onClick={() => setModalVisible(false)} style={styles.modalButton}>
-                        Fechar
-                    </button>
-                </div>
-            )}
+            <Modal isOpen={isModalVisible}>
+                <p>{modalMessage}</p>
+                <Button back={'#A61723'} onClick={() => setModalVisible(false)} className="modal-button">
+                    Fechar
+                </Button>
+            </Modal>
 
             {/* Toast container */}
             <ToastContainer position="top-center" />
         </div>
     );
 }
-
-const styles = {
-    container: {
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: '20px',
-        height: '100vh',
-    },
-    containerPass: {
-        display: 'flex',
-        alignItems: 'center',
-        marginBottom: '20px',
-        width: '80%',
-    },
-    image: {
-        height: '100px',
-        width: 'auto',
-        marginBottom: '20px',
-    },
-    passwordInput: {
-        flex: 1,
-        padding: '12px',
-        borderRadius: '8px 0 0 8px',
-        border: '1px solid #ccc',
-        borderRight: 'none',
-        boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
-    },
-    showButton: {
-        padding: '12px',
-        borderRadius: '0 8px 8px 0',
-        border: '1px solid #ccc',
-        backgroundColor: '#FFC601',
-        cursor: 'pointer',
-        color: '#333',
-        boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
-    },
-    textLink: {
-        marginTop: '20px',
-        color: '#0056b3',
-        textDecoration: 'underline',
-        cursor: 'pointer',
-        fontSize: '0.9em',
-    },
-    modalContent: {
-        position: 'fixed',
-        top: '50%',
-        left: '50%',
-        transform: 'translate(-50%, -50%)',
-        backgroundColor: '#fff',
-        padding: '20px',
-        borderRadius: '12px',
-        textAlign: 'center',
-        boxShadow: '0 6px 12px rgba(0, 0, 0, 0.15)',
-    },
-    modalButton: {
-        backgroundColor: '#0056b3',
-        color: '#fff',
-        padding: '10px 20px',
-        marginTop: '10px',
-        cursor: 'pointer',
-        borderRadius: '8px',
-        border: 'none',
-        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-    },
-};

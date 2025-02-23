@@ -1,27 +1,29 @@
 import React, { useState, useEffect } from 'react';
 import moment from 'moment';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { ConfirmPageModel } from '../pageModel/ConfirmPageModel';
-import LoadingIndicator from './LoadingIndicator';
+import { ClassModel } from '../pageModel/ClassModel.js';
+import LoadingIndicator from '../components/LoadingIndicator';
 import Modal from '../components/Modal';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Button from '../components/Button';
 import { format } from 'date-fns';
+import ButtonBack from '../components/ButtonBack';
+import ButtonHome from '../components/ButtonHome';
 
-export default function Confirm(){
+export default function Confirm() {
 
   //#region Logica
   const location = useLocation();
   const navigate = useNavigate();
-  const { nameInstructor, data, cpf, type, hora, nome, tipo = 'normal', codigo = 0 } = location.state || {};
+  const { usuario, configs, instrutor, type, tipo, aluno, data, hora } = location.state || {};
   const [date] = useState(data);
   const [holidays] = useState([]);
   const [loading, setLoading] = useState(false);
   const [modalMessage, setModalMessage] = useState('');
   const [isModalVisible, setModalVisible] = useState(false);
 
-  const confirmPageModel = new ConfirmPageModel();
+  const classModel = new ClassModel();
 
   const isHoliday = (date) => holidays.includes(moment(date).format('YYYY-MM-DD'));
   const isWeekend = (date) => moment(date).day() === 0 || moment(date).day() === 6;
@@ -32,16 +34,15 @@ export default function Confirm(){
     setModalVisible(!isModalVisible);
   };
 
-
-  // useEffect(() => {
-  //   console.log(cpf, type, nameInstructor, nome, tipo, codigo);
-  // }, []);
-
+  useEffect(() => {
+    console.log((configs.find(item => item.chave === type)).valor);
+  }, []);
 
   const handleConfirm = async () => {
     try {
       setLoading(true);
       const formattedDate = format(date, 'yyyy-MM-dd');
+      console.log('Formatted Date:', formattedDate);
 
       if (isHoliday(date) || isWeekend(date) || formattedDate == '2025-01-01') {
         toggleModal('Data Indisponível: A data selecionada é um feriado, sábado ou domingo.');
@@ -49,18 +50,34 @@ export default function Confirm(){
         return;
       }
 
-      const user = await confirmPageModel.getUsuarioByCpf(cpf);
-      const totalClassCount = await confirmPageModel.countClass(user.usuario_id, 'Pendente');
-      const totalClassHoje = await confirmPageModel.countClassHoje(user.usuario_id, formattedDate);
-      const config = await confirmPageModel.getConfig();
-      let aulas = Number(config['aulas']);
-      const maximoNormalDia = config['maximoNormalDia'];
+      let user;
+      if (tipo === "adm") {
+        user = aluno;
+      } else {
+        user = usuario;
+      }
+      console.log('User:', user);
+
+      const totalClassCount = await classModel.countClass(user.usuario_id, 'Pendente');
+      console.log('Total Classes Pending:', totalClassCount);
+
+      const totalClassHoje = await classModel.countClass(user.usuario_id, null, formattedDate);
+      console.log('Total Classes Today:', totalClassHoje);
+
+      let aulas = (configs.find(item => item.chave === 'aulas')).valor;
+      const maximoNormalDia = (configs.find(item => item.chave === 'maximoNormalDia')).valor;
       const isOutraCidade = user.outra_cidade;
 
-      const numeroMaximoDeAulasDeUmTipoDeVeiculo = await confirmPageModel.getMaxVeiculo(type, formattedDate, hora);
-      console.log(numeroMaximoDeAulasDeUmTipoDeVeiculo);
+      console.log('Aulas:', aulas);
+      console.log('Maximo Normal Dia:', maximoNormalDia);
+      console.log('Is Outra Cidade:', isOutraCidade);
 
-      if(numeroMaximoDeAulasDeUmTipoDeVeiculo){
+      const numeroMaximoDeAulasDeUmTipoDeVeiculo = (configs.find(item => item.chave === type)).valor;
+      const aulasDoTipoJaMarcadas = await classModel.countClassByDateAndHoour(type, hora, formattedDate)
+      console.log('Max aulas tipo de veículo:', numeroMaximoDeAulasDeUmTipoDeVeiculo);
+      console.log('Max aulas tipo de veículo já marcadas :', aulasDoTipoJaMarcadas);
+
+      if (aulasDoTipoJaMarcadas >= numeroMaximoDeAulasDeUmTipoDeVeiculo) {
         toggleModal(`O número máximo de aulas do tipo '${type}' já foi atingido neste horário. Por favor, escolha outro horário!`);
         return;
       }
@@ -69,6 +86,8 @@ export default function Confirm(){
         aulas = aulas + 2;
       }
 
+      console.log('Aulas após ajuste para admin:', aulas);
+
       if (totalClassCount >= aulas) {
         toggleModal('Número máximo de aulas atingido. Conclua suas aulas para poder marcar mais!');
         return;
@@ -76,7 +95,7 @@ export default function Confirm(){
 
       if (tipo === 'adm') {
         if (totalClassHoje >= 2) {
-          toggleModal('Aluno atingiu o maximo de 2 aulas nesse dia!');
+          toggleModal('Aluno atingiu o máximo de 2 aulas nesse dia!');
           return;
         }
       } else if ((isOutraCidade || type === 'D' || type === 'E') && totalClassHoje >= 2) {
@@ -87,102 +106,70 @@ export default function Confirm(){
         return;
       }
 
-      const result = await confirmPageModel.createClass(nameInstructor, date, cpf, type, hora);
+      let result;
+
+      if (tipo === 'adm') {
+        result = await classModel.insertClass(instrutor, aluno, date, type, hora);
+      } else {
+        result = await classModel.insertClass(instrutor, usuario, date, type, hora);
+      }
+
+      console.log('Result da inserção da aula:', result);
+
       if (result) {
-        if (codigo !== 0 && tipo !== 'normal') {
-          navigate('/Fim', { state: { cpf: 0, nome: 'nada', codigo: codigo, tipo: 'adm', nomeInstrutor: nameInstructor } });
+        if (tipo === 'adm') {
+          navigate('/Fim', { state: { usuario, configs, instrutor, tipo } });
         } else {
-          navigate('/Fim', { state: { nameInstructor, data, cpf, type, hora, nome } });
+          navigate('/Fim', { state: { usuario, configs, instrutor, tipo } });
         }
       } else {
         navigate('/Erro', { state: { message: 'Não foi possível marcar a aula' } });
       }
     } catch (error) {
+      console.error('Error:', error);
       navigate('/Erro', { state: { message: error.message } });
     } finally {
       setLoading(false);
     }
   };
 
+
   //#endregion
 
   return (
-    <div style={styles.container}>
+    <div className='container'  >
+      <div className='button-container'>
+        <ButtonBack event={() => navigate('/selecionarDataEHora', { state: { usuario, instrutor, configs,  type,  tipo, aluno } })} />
+        <ButtonHome event={() => navigate('/home', { state: { usuario, configs } })} />
+      </div>
+
+      <h1>Confirme sua Aula</h1>
+      <h3 className='greatText'>Tipo da Aula: <span>{type}</span></h3>
+      <h3 className='greatText'>Instrutor: <span>{instrutor.nome_instrutor}</span></h3>
+      <h3 className='greatText'>Data Selecionada: <span>{moment(date).format('DD/MM/YYYY')}</span></h3>
+      <h3 className='greatText'>Hora da Aula: <span>{hora}</span></h3>
+
+      <LoadingIndicator visible={loading} />
+
+      <Button
+        onClick={loading ? null : handleConfirm}
+        disabled={loading}
+      >
+        {loading ? 'Processando...' : 'Finalizar'}
+      </Button>
+      <ToastContainer />
+
       <Modal
         isOpen={isModalVisible}
         onConfirm={() => setModalVisible(false)}
         onCancel={() => setModalVisible(false)}
       >
         <p>{modalMessage}</p>
+        <Button onClick={() => setModalVisible(false)}>
+          Ok
+        </Button>
       </Modal>
-
-      <h1 style={styles.title}>Confirme sua Aula</h1>
-      <h3 style={styles.detail}>Tipo da Aula: <span style={styles.detailValue}>{type}</span></h3>
-      <h3 style={styles.detail}>Instrutor: <span style={styles.detailValue}>{nameInstructor}</span></h3>
-      <h3 style={styles.detail}>Data Selecionada: <span style={styles.detailValue}>{moment(date).format('DD/MM/YYYY')}</span></h3>
-      <h3 style={styles.detail}>Hora da Aula: <span style={styles.detailValue}>{hora}</span></h3>
-
-      <LoadingIndicator visible={loading} />
-
-      <Button
-        style={styles.button}
-        onClick={loading ? null : handleConfirm}
-        disabled={loading}
-      >
-        {loading ? 'Processando...' : 'Finalizar'}
-      </Button>
-
-      <Button
-        styleAct={styles.buttonBack}
-        disabled={loading}
-        onClick={() => navigate('/selecionarDataEHora', { state: { cpf, type, nameInstructor, nome, tipo, codigo } })}
-        back="gray" cor="#FFF"
-      >
-        Voltar
-      </Button>
-      <ToastContainer />
     </div>
   );
-};
-
-const styles = {
-  container: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center', // Alinha o conteúdo verticalmente
-    padding: 20,
-    minHeight: '100vh', // Faz com que o contêiner ocupe toda a altura da tela
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 20,
-  },
-  detail: {
-    fontSize: 18,
-    margin: '5px 0',
-    color: '#555',
-  },
-  detailValue: {
-    fontWeight: 'bold',
-    color: '#333',
-  },
-  button: {
-    width: '80%',
-    backgroundColor: 'blue',
-    borderRadius: 8,
-    padding: 15,
-    color: '#fff',
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginTop: 10,
-    cursor: 'pointer',
-  },
-  buttonBack: {
-    backgroundColor: 'gray',
-    marginTop: 20,
-  }
 };
 

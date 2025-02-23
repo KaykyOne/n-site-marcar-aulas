@@ -1,0 +1,111 @@
+.container {
+    padding: 40px 20px 40px;
+    display: flex;
+    /* Sem aspas */
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    border-radius: 30px;
+    min-height: 100vh;
+}
+
+* {
+    margin: 0;
+}
+
+.container-input {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    text-align: center;
+    justify-content: center;
+    max-width: 500px;
+}
+
+.container-pass {
+    display: flex;
+    justify-content: center;
+    text-align: center;
+    align-items: center;
+    /* Alinha os itens verticalmente */
+    width: 100%;
+}
+
+.container-flat {
+    display: flex;
+    align-items: center;
+    /* Alinha o checkbox e o texto na vertical */
+    justify-content: center;
+    /* Centraliza o conteúdo */
+    text-align: center;
+    margin: 10px;
+    width: 100%;
+    gap: 10px;
+    /* Adiciona um espaço entre o campo de senha e o checkbox */
+}
+
+.container-error {
+    color: red;
+    justify-content: center;
+    text-align: center;
+    align-items: center;
+}
+
+.button-container {
+    display: flex;
+    justify-content: space-between; /* Um no começo, outro no fim */
+    align-items: center; /* Centraliza na vertical */
+    width: 100%;
+}
+
+.container-vertical {
+    align-items: center;
+    /* Alinha o checkbox e o texto na vertical */
+    justify-content: center;
+    /* Centraliza o conteúdo */
+    text-align: center;
+    margin: 10px;
+    width: 100%;
+    max-width: 400px;
+    gap: 10px;
+    /* Adiciona um espaço entre o campo de senha e o checkbox */
+}
+
+.container-vertical button {
+    width: 100%;
+}
+
+.itemContainer {
+    background-color: #D9D9D9;
+    min-width: 300px;
+    border-radius: 12px;
+    padding: 20px;
+    margin: 10px 0;
+    ;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.listContainer {
+    display: flex;
+    flex-wrap: wrap; /* Permite quebrar para a linha de baixo se não couber */
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+    gap: 10px; /* Espaçamento entre os botões */
+    overflow-x: auto; /* Adiciona rolagem horizontal se necessário */
+    max-width: 100%;
+    padding: 10px;
+}
+
+.listContainer button {
+    cursor: pointer;
+    padding: 10px 20px;
+    background-color: rgb(0, 86, 179);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    width: auto; /* Mantém o tamanho apenas necessário */
+    min-width: 90px;
+    transition: 0.3s;
+}

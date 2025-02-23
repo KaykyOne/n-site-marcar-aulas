@@ -32,8 +32,8 @@ export class SelectDateAndHourPageModel {
     return horas;
   }
 
-  async atualizarValores(nomeInstrutor, data) {
-    if (!nomeInstrutor || !data) {
+  async atualizarValores(instrutor, data) {
+    if (!instrutor || !data) {
       throw new Error('Todos os parâmetros são necessários.');
     }
 
@@ -42,16 +42,8 @@ export class SelectDateAndHourPageModel {
       throw new Error('Data inválida.');
     }
 
-    // Buscar código e tipo do instrutor
-    const { data: instrutorData, error: instrutorError } = await supabase
-      .from('instrutores')
-      .select('instrutor_id, tipo_instrutor')
-      .eq('nome_instrutor', nomeInstrutor)
-      .single();
-
-    if (instrutorError) throw new Error(instrutorError.message);
-    const instrutorId = instrutorData?.instrutor_id;
-    const instrutorTipo = instrutorData?.tipo_instrutor || '';
+    const instrutorId = instrutor?.instrutor_id;
+    const instrutorTipo = instrutor?.tipo_instrutor || '';
 
     // Buscar horários trabalhados e horários ocupados de forma paralela
     const [horariosTrabalhadosData, horariosInstrutorData, horasDosExames] =

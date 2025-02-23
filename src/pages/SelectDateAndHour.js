@@ -8,16 +8,19 @@ import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Modal from '../components/Modal';
 import { useNavigate, useLocation } from 'react-router-dom';
-import LoadingIndicator from './LoadingIndicator';
+import LoadingIndicator from '../components/LoadingIndicator';
 import { SelectDateAndHourPageModel } from '../pageModel/SelectDateAndHourPageModel';
 import Button from '../components/Button';
+import ButtonBack from '../components/ButtonBack';
+import ButtonHome from '../components/ButtonHome';
+import Count from '../components/Count';
 
 export default function SelectDateAndHour() {
 
   //#region Logica
   const location = useLocation();
   const navigate = useNavigate();
-  const { cpf, type, nameInstructor, nome, tipo = 'normal', codigo = 0 } = location.state || {};
+  const { usuario, configs, instrutor,  type,  tipo = 'normal', aluno = null} = location.state || {};
   const [initialLoading, setInitialLoading] = useState(true);
   const [loading, setLoading] = useState(false);
   const [holidays, setHolidays] = useState([]);
@@ -29,7 +32,6 @@ export default function SelectDateAndHour() {
   const [selectedHour, setSelectedHour] = useState(null);
   const [currentDate, setCurrentDate] = useState(null);
   const [dayName, setDayName] = useState('');
-  const [hover, setHover] = useState(false);
 
   const namesForDays = ["Domingo", "Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira", "Sábado"];
   const selectDateAndHourPageModel = new SelectDateAndHourPageModel();
@@ -61,7 +63,7 @@ export default function SelectDateAndHour() {
     setLoading(true);
     try {
       const { horasDisponiveis } = await selectDateAndHourPageModel.atualizarValores(
-        nameInstructor,
+        instrutor,
         moment(date).format('YYYY-MM-DD')
       );
       
@@ -78,6 +80,7 @@ export default function SelectDateAndHour() {
   }
 
   useEffect(() => {
+    console.log(configs);
     fetchInitialData();
   }, []);
 
@@ -107,15 +110,23 @@ export default function SelectDateAndHour() {
   const confirmSelection = () => {
     setModalVisible(false);
     navigate('/confirmar', {
-      state: { cpf, type, nameInstructor, data: date, hora: selectedHour, nome, tipo, codigo },
+      state: { usuario, configs, instrutor,  type, tipo, aluno, data: date, hora: selectedHour},
     });
   };
 
   const handleBack = () => {
-    if (codigo !== 0 && tipo === 'adm') {
-      navigate('/selectAluno', { state: { nome: nameInstructor, codigo } });
+    if (tipo === 'adm') {
+      navigate('/selectAluno', { state: { usuario, configs, instrutor } });
     } else {
-      navigate('/selecionarInstrutor', { state: { cpf, type, nome } });
+      navigate('/selecionarInstrutor', { state: { usuario, configs, type } });
+    }
+  };
+
+  const handleHome = () => {
+    if ( tipo === 'adm') {
+      navigate('/homeinstrutor', { state: { usuario, configs, instrutor } });
+    } else {
+      navigate('/home', { state: { usuario, configs } });
     }
   };
 
@@ -126,155 +137,60 @@ export default function SelectDateAndHour() {
   //#endregion
 
   return (
-    <div style={styles.container}>
-      <h3 style={styles.tipText}>Selecione a data para escolher um novo dia ou use as setas!</h3>
-      <div style={styles.rowContainer}>
-        <button
-          style={hover ? { ...styles.buttonDate, ...styles.buttonDateHover } : styles.buttonDate}
-          onMouseEnter={() => setHover(true)}
-          onMouseLeave={() => setHover(false)}
-          onClick={() => handleDateChange(moment(date).subtract(1, 'day').toDate())}
-        >
-          <AiOutlineLeft size={30} />
-        </button>
-        <div style={styles.containerCalendar}>
+    <div className='container'>
+      <div className='button-container'>
+        <ButtonBack event={handleBack} />
+        <ButtonHome event={handleHome} />
+      </div>
+
+      <h3 className='greatText'>Selecione a data e hora da sua aula!</h3>
+      <div className='container-flat'>
+        <AiOutlineLeft size={30} onClick={() => handleDateChange(moment(date).subtract(1, 'day').toDate())} />
+        <div className='container-vertical'>
           <DatePicker
             selected={date}
             onChange={handleDateChange}
             minDate={moment(currentDate).toDate()}
             maxDate={moment(currentDate).add(7, 'days').toDate()}
             dateFormat="dd/MM/yyyy"
+            className="custom-datepicker-input"
           />
-          <h4 style={styles.nameDayText}>{dayName}</h4>
+          <h4 className='greatText'>{dayName}</h4>
         </div>
-        <button
-          style={hover ? { ...styles.buttonDate, ...styles.buttonDateHover } : styles.buttonDate}
-          onMouseEnter={() => setHover(true)}
-          onMouseLeave={() => setHover(false)}
-          onClick={() => handleDateChange(moment(date).add(1, 'day').toDate())}
-        >
-          <AiOutlineRight size={30} />
-        </button>
+        <AiOutlineRight size={30} onClick={() => handleDateChange(moment(date).add(1, 'day').toDate())} />
       </div>
 
       <LoadingIndicator visible={loading} />
-      {error && <p style={styles.errorText}>{error}</p>}
+      {error && <p className='text-error'>{error}</p>}
 
-      <div style={styles.listContainer}>
+      <div className='listContainer '>
         {holidays.includes(moment(date).format('YYYY-MM-DD')) ||
           moment(date).day() === 0 ||
           moment(date).day() === 6 ||
           horas.length === 0 ? (
-          <p style={styles.messageText}>Dia não letivo ou sem horas disponíveis</p>
+          <div className='container-error'>
+            <p className='text-error'>
+              {'Nenhum horário disponivel essa data!'}
+            </p>
+          </div>
         ) : (
           horas.map((hora, index) => (
-            <button key={index} style={styles.button} onClick={() => handleHourClick(hora)}>
+            <Button back={'#030a90'} key={index} onClick={() => handleHourClick(hora)}>
               {hora}
-            </button>
+            </Button>
           ))
         )}
       </div>
 
-      <Button onClick={handleBack} back="gray" cor="#FFF" styleAct={styles.buttonBack}>
-        Voltar
-      </Button>
-
       <Modal
         isOpen={modalVisible}
-        onConfirm={confirmSelection}
-        onCancel={() => setModalVisible(false)}
-        customStyles={customStyles.modal}
       >
-        <p>Você tem certeza que deseja selecionar essa data: {moment(date).format('DD/MM/YYYY')} e {selectedHour}</p>
+        <p>Você tem certeza que deseja selecionar essa data: <strong>{moment(date).format('DD/MM/YYYY')} </strong>  ás <strong>{selectedHour}</strong> </p>
+        <Button back={'#2A8C68'} onClick={confirmSelection}>Sim</Button>
+        <Button back={'#A61723'} onClick={() => setModalVisible(false)}>Não</Button>
       </Modal>
-
+      <Count num={3} />
       <ToastContainer />
     </div>
   );
 }
-
-// Estilos
-const styles = {
-  container: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#f5f5f5',
-    padding: 20,
-    minHeight: '100vh',
-    overflowX: 'hidden', // Evita que o conteúdo saia da tela horizontalmente
-  },
-  nameDayText: {
-    textAlign: 'center',
-  },
-  containerCalendar: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    margin: 10,
-  },
-  rowContainer: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center'
-  },
-  button: {
-    cursor: 'pointer',
-    padding: '10px 20px',
-    backgroundColor: '#0056b3',
-    color: '#fff',
-    border: 'none',
-    borderRadius: '8px',
-    width: 'auto', // Ajuste de largura para não ocupar 100% da tela
-    minWidth: '90px', // Define uma largura mínima para cada botão
-    transition: 'all 0.3s ease',
-  },
-  buttonDate: {
-    cursor: 'pointer',
-    margin: '5px',
-    padding: '10px 20px',
-    backgroundColor: 'transparent',
-    color: 'blue',  // Cor azul para combinar com o tema
-    border: 'none',
-    display: 'flex',
-    alignItems: 'center',  // Centraliza o conteúdo do botão (ícone)
-    justifyContent: 'center',  // Garante que o ícone fique no centro
-  },
-  buttonBack: {
-    width: '40%',
-    borderRadius: 8,
-    marginTop: 20,
-  },
-  tipText: {
-    textAlign: 'center',
-    color: 'green',
-    marginBottom: '20px'
-  },
-  errorText: {
-    color: 'red'
-  },
-  listContainer: {
-    display: 'flex',
-    flexWrap: 'wrap', // Faz com que os botões se ajustem em várias linhas se não houver espaço
-    justifyContent: 'center', // Centraliza os botões
-    alignItems: 'center', // Alinha os botões no centro verticalmente
-    marginTop: '20px',
-    gap: '10px', // Espaço entre os botões
-    overflowX: 'auto', // Adiciona rolagem horizontal se necessário
-    maxWidth: '100%', // Impede que ultrapassem o limite da tela
-  },
-};
-
-// Estilos do modal
-const customStyles = {
-  modal: {
-    content: {
-      maxWidth: '400px',
-      margin: 'auto',
-      padding: '20px',
-      borderRadius: '8px',
-      textAlign: 'center',
-      backgroundColor: '#fff',
-    },
-  },
-};

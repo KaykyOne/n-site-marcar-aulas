@@ -21,7 +21,7 @@ const styles = {
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.3)',
+    backgroundColor: '#f4f4f4',
     zIndex: 1000,
   },
 };
@@ -29,9 +29,9 @@ const styles = {
 // Adicionando estilos de loader
 const loaderStyles = `
 .loader {
-  border: 16px solid #f3f3f3; /* Cor da borda externa */
-  border-top: 16px solid #3498db; /* Cor da borda interna */
-  border-radius: 50%;
+  border: 5px solid white; /* Cor da borda externa */
+  border-top: 5px solid darkgray; /* Cor da borda interna */
+  border-radius: 100%;
   width: 60px; /* Tamanho do loader */
   height: 60px; /* Tamanho do loader */
   animation: spin 2s linear infinite; /* Animação */

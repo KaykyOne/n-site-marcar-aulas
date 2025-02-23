@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import LoadingIndicator from '../LoadingIndicator';
-import { ListAulasPageModel } from '../../pageModel/ListAulasPageModel';
+import LoadingIndicator from '../../components/LoadingIndicator';
+import { ClassModel } from '../../pageModel/ClassModel.js';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import DatePicker from 'react-datepicker';
@@ -19,7 +19,7 @@ export default function ListAulasInstrutorView() {
     const [aulas, setAulas] = useState([]);
     const [currentTime, setCurrentTime] = useState(null);
     const [currentDate, setCurrentDate] = useState(null);
-    const listAulasPageModel = new ListAulasPageModel();
+    const classModel = new ClassModel();
     const navigate = useNavigate();
     const [modalVisible, setModalVisible] = useState(false);
     const [selectedAula, setSelectedAula] = useState(null);
@@ -43,7 +43,7 @@ export default function ListAulasInstrutorView() {
         ) {
             setDate(selectedDate);
             try {
-                const data = await listAulasPageModel.searchAulasInstrutor(codigo, formattedDate);
+                const data = await classModel.searchAulasInstrutor(codigo, formattedDate);
                 setAulas(data.aulas || []);
             } catch (err) {
                 setError('Erro ao buscar aulas para a data selecionada.');
@@ -58,7 +58,7 @@ export default function ListAulasInstrutorView() {
         setError(null);
         try {
             const formattedDate = moment(date || currentDate).format('YYYY-MM-DD');
-            const data = await listAulasPageModel.searchAulasInstrutor(codigo, formattedDate);
+            const data = await classModel.searchAulasInstrutor(codigo, formattedDate);
             setAulas(data.aulas || []);
             if (!data.aulas || !data.count) {
                 setError('Nenhuma aula encontrada.');
@@ -75,7 +75,7 @@ export default function ListAulasInstrutorView() {
         const fetchInitialData = async () => {
             setLoading(true);
             try {
-                const { currentTime, currentDate } = await listAulasPageModel.getCurrentTimeAndDateFromServer();
+                const { currentTime, currentDate } = await classModel.getCurrentTimeAndDateFromServer();
                 const parsedTime = moment(currentTime, 'HH:mm:ss');
                 const parsedDate = moment(currentDate, 'YYYY-MM-DD');
                 setCurrentTime(parsedTime);
@@ -114,7 +114,7 @@ export default function ListAulasInstrutorView() {
         if (selectedAula && selectedAula.aula_id) {
             try {
                 if (modalAction === 'Excluir') {
-                    const res = await listAulasPageModel.deleteAula(selectedAula.aula_id, selectedAula.data, selectedAula.hora);
+                    const res = await classModel.deleteAula(selectedAula.aula_id, selectedAula.data, selectedAula.hora);
                     showToast(res ? 'success' : 'error', res ? 'Sucesso' : 'Erro', res ? 'Aula excluída com sucesso!' : 'Não foi possível excluir a aula.');
                 }
                 fetchAulas();
