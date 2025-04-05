@@ -7,9 +7,10 @@ import InputField from '../components/Input';
 import ButtonBack from '../components/ButtonBack';
 import Button from '../components/Button';
 
+import useUserStore from '../store/useUserStore';
+
 export default function Perfil() {
-    const location = useLocation();
-    const { usuario, configs } = location.state || {};
+    const { usuario } = useUserStore();
     const [currentPassword, setCurrentPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
     const [loading, setLoading] = useState(false);
@@ -111,7 +112,7 @@ export default function Perfil() {
 
     return (
         <div className='container'>
-            <ButtonBack event={() => navigate('/home', { state: { usuario, configs } })} />
+            <ButtonBack event={() => navigate('/home')} />
             <h1>Olá, {usuario.nome}</h1>
             <h3>Altere sua Senha!</h3>
             <h5>Lembrando, a senha deve ter no minimo 6 e no máximo 12 caracteres!</h5>

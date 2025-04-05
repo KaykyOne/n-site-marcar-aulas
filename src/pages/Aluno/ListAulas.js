@@ -9,11 +9,12 @@ import Modal from '../../components/Modal';
 import ButtonBack from '../../components/ButtonBack';
 import Button from '../../components/Button';
 
+import useUserStore from '../../store/useUserStore.js';
+
 export default function ListAulas() {
+    const { usuario } = useUserStore();
 
     //#region Logica
-    const location = useLocation();
-    const { usuario, configs } = location.state || {}; // Recebe os dados
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [aulas, setAulas] = useState([]);
@@ -24,7 +25,6 @@ export default function ListAulas() {
     const [modalVisible, setModalVisible] = useState(false);
     const [selectedAula, setSelectedAula] = useState(null);
     const [modalAction, setModalAction] = useState(null);
-    const [maxAulas, setMaxAulas] = useState(null);
 
     const showToast = (type, text1, text2) => {
         toast.dismiss();
@@ -38,8 +38,6 @@ export default function ListAulas() {
             const { currentTime, currentDate } = await classModel.getCurrentTimeAndDateFromServer();
             setCurrentTime(currentTime);
             setCurrentDate(currentDate);
-            const configuracao = await classModel.searchMaxAulas(usuario);
-            setMaxAulas(configuracao);
 
             const data = await classModel.searchAulas(usuario.usuario_id);
             setAulas(data.aulas || []);
@@ -51,7 +49,7 @@ export default function ListAulas() {
             setLoading(false);
         }
     };
-
+  
     useEffect(() => {
         if (usuario) fetchAulas();
     }, [usuario]);
@@ -77,7 +75,7 @@ export default function ListAulas() {
     };
 
     const confirmAction = async () => {
-        const horaPraPoderExcluir = configs.find(item => item.chave === 'horasPraDesmarcarAulas');
+        const horaPraPoderExcluir = usuario.configuracoes.find(item => item.chave === 'horasPraDesmarcarAulas');
         if (selectedAula && selectedAula.aula_id) {
             try {
                 if (modalAction === 'Excluir') {
@@ -120,9 +118,8 @@ export default function ListAulas() {
 
     return (
         <div className='container'>
-            <ButtonBack event={() => navigate(`/home`, { state: { usuario, configs } })} />
+            <ButtonBack event={() => navigate(`/home`)} />
             <h1>Aulas</h1>
-            <h3>Número máximo de aulas que podem ser marcadas: {maxAulas}</h3>
 
             {loading && <LoadingIndicator />}
             {error || aulas.length === 0 ? (

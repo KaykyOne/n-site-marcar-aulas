@@ -8,12 +8,13 @@ export class ClassModel {
         this.serverTimeService = new ServerTimeService(); // Instancia a classe
     }
 
-    async insertClass(instrutor, aluno, data, type, hora) {
+    async insertClass(instrutor, aluno, data, type, hora, veiculo) {
         const horaFormatada = hora.includes(':') ? hora : new Date(hora).toISOString().substr(11, 5);
         try {
             const { data: aulaData, error } = await supabase.from('aulas').insert([{
                 aluno_id: aluno.usuario_id,
                 instrutor_id: instrutor.instrutor_id,
+                veiculo_id: veiculo.veiculo_id,
                 situacao: 'Pendente',
                 data: data,
                 hora: horaFormatada,
@@ -35,6 +36,7 @@ export class ClassModel {
     }
 
     async countClass(id, situacao = null, data = null) {
+        console.log("data que está pesquisando as aulas: ", data);
         try {
             let query = supabase.from('aulas').select('*', { count: 'exact' }).eq('aluno_id', id);
 

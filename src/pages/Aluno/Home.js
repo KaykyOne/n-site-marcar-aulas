@@ -1,27 +1,23 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import LoadingIndicator from '../../components/LoadingIndicator';
-import { LogModel } from '../../pageModel/LogModel';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import Button from '../../components/Button'; // Importe o componente Button
+import Button from '../../components/Button'; 
+
 import Modal from '../../components/Modal';
 import ButtonBack from '../../components/ButtonBack';
+import useUserStore from '../../store/useUserStore';
+import modalIcon from '../../imgs/icons/undraw_notify_rnwe.svg'
 
 export default function HomeView() {
+  const { usuario } = useUserStore();
 
-  //#region Logica
-  const location = useLocation();
-  const { usuario, configs } = location.state || {}; // Recebe os dados
   const [loading, setLoading] = useState(false);
   const [modalMessage, setModalMessage] = useState('');
   const [isModalVisible, setModalVisible] = useState(false);
   const navigate = useNavigate();
-  const hasVerified = useRef(false);
   const [ horasAntes, setHorasAntes ] = useState('');
-
-  // Use useMemo para garantir que o LogModel não seja recriado em cada renderização
-  const Log = new LogModel();
 
   const toggleModal = (message) => {
     setModalMessage(message);
@@ -42,33 +38,16 @@ export default function HomeView() {
   };
 
   useEffect(() => {
-    const verificarAulasPendentes = async () => {
-      if (hasVerified.current) return;
-      hasVerified.current = true;
-      const horas = configs.find(item => item.chave === 'horasPraDesmarcarAulas');
-      setHorasAntes(horas.valor);
-
-      setLoading(true);
-      try {
-        await Log.checkAndUpdateLog(usuario.usuario_id);
-      } catch (error) {
-        showToast('error', 'Erro', error.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
+    let horas = usuario.configuracoes.find(config => config.chave === "horasPraDesmarcarAulas");
+    setHorasAntes(horas.valor)
     verificarSenha();
+  }, []);
 
-    verificarAulasPendentes();
-  }, [usuario]);
-
-  const alterPage = async (page, usuario) => {
+  const alterPage = (page) => {
     setLoading(true);
     try {
       if (usuario.atividade) {
-        await new Promise((resolve) => setTimeout(resolve, 500));
-        navigate(`/${page}`, { state: { usuario, configs } });
+        navigate(`/${page}`);
       } else {
         toggleModal('Ops! Sua conta está bloqueada. Por favor, entre em contato com o nosso atendimento para resolver isso rapidinho!');
       }
@@ -78,22 +57,21 @@ export default function HomeView() {
       setLoading(false);
     }
   };
-
   //#endregion
 
   return (
     <div className='container'>
-      <ButtonBack event={() => navigate('/')}/>
+      <ButtonBack event={() => navigate("/")}/>
       <h1 className='greatText'>Bem-vindo, {usuario.nome}!</h1>
-      <Button onClick={() => alterPage('selecionarTipo', usuario)}>
-        Marcar Aula
+      <Button onClick={() => alterPage('selecionarTipo')}>
+        Marcar Aulas
         <span className="material-icons">add</span>
       </Button>
-      <Button onClick={() => alterPage('listarAulas', usuario)}>
-        Aulas
+      <Button onClick={() => alterPage('listarAulas')}>
+        Listar Aulas
         <span className="material-icons">directions_car</span>
       </Button>
-      <Button onClick={() => alterPage('perfil', usuario)} back="#ffcc00" cor="black">
+      <Button onClick={() => alterPage('perfil')} back="#ffcc00" cor="black">
         Alterar Senha
         <span className="material-icons">key</span>
       </Button>
@@ -110,8 +88,9 @@ export default function HomeView() {
 
       <LoadingIndicator visible={loading} />
       <Modal isOpen={isModalVisible}>
+          <img className='image' src={modalIcon}/>
           <p>{modalMessage}</p>
-          <Button back={'#A61723'} onClick={() => setModalVisible(false)}cor="#FFF">
+          <Button back={'#4B003B'} onClick={() => setModalVisible(false)}cor="#FFF">
             Fechar
           </Button>
       </Modal>

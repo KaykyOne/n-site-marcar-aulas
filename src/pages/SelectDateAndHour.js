@@ -1,26 +1,27 @@
 import React, { useState, useEffect } from 'react';
-import moment from 'moment';
-import 'moment/locale/pt-br'; // Para exibir os dias da semana e meses em português
 import { AiOutlineLeft, AiOutlineRight } from 'react-icons/ai';
 import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Modal from '../components/Modal';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import LoadingIndicator from '../components/LoadingIndicator';
-import { SelectDateAndHourPageModel } from '../pageModel/SelectDateAndHourPageModel';
 import Button from '../components/Button';
 import ButtonBack from '../components/ButtonBack';
 import ButtonHome from '../components/ButtonHome';
 import Count from '../components/Count';
 
+import { PegarData } from '../controller/ControllerDataEHora';
+import { SearchAndFilterHour } from '../controller/ControllerAulas';
+import useAulaStore from '../store/useAulaStore';
+import useUserStore from '../store/useUserStore';
+import { format, isValid, isBefore, addDays, subDays, isAfter } from 'date-fns';
+import { formatarDataParaSalvar } from '../utils/dataFormat';
+
 export default function SelectDateAndHour() {
 
-  //#region Logica
-  const location = useLocation();
   const navigate = useNavigate();
-  const { usuario, configs, instrutor,  type,  tipo = 'normal', aluno = null} = location.state || {};
   const [initialLoading, setInitialLoading] = useState(true);
   const [loading, setLoading] = useState(false);
   const [holidays, setHolidays] = useState([]);
@@ -33,27 +34,34 @@ export default function SelectDateAndHour() {
   const [currentDate, setCurrentDate] = useState(null);
   const [dayName, setDayName] = useState('');
 
-  const namesForDays = ["Domingo", "Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira", "Sábado"];
-  const selectDateAndHourPageModel = new SelectDateAndHourPageModel();
+  const { updateAula, aula } = useAulaStore.getState();
+  const { usuario } = useUserStore();
+  const instrutor = aula.instrutor.instrutor_id;
+  const veiculo = aula.veiculo.veiculo_id;
+  const tipo = usuario.tipo_usuario === "aluno" ? "normal" : "adm";
 
-  async function fetchInitialData() {
+  const namesForDays = ["Erro", "Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira", "Sábado", "Domingo"];
+
+  const fetchInitialData = async () => {
     try {
-      const { currentTime, currentDate } = await selectDateAndHourPageModel.getCurrentTimeAndDateFromServer();
-      setCurrentTime(moment(currentTime, 'HH:mm:ss'));
-      setCurrentDate(moment(currentDate, 'YYYY-MM-DD'));
+      const now = await PegarData(); // Obtendo data e hora atual do dispositivo
+      const dataAtual = format(now, 'yyyy-MM-dd'); // Formatar para 'yyyy-MM-dd'
+      const horaAtual = format(now, 'HH:mm'); // Formatar para 'HH:mm'
 
-      // console.log("Data (formatada):", moment(currentDate).format('YYYY-MM-DD'));
-      // console.log("Hora (formatada):", moment(currentTime, 'HH:mm:ss').format('HH:mm:ss'));
+      setCurrentDate(dataAtual);
+      setCurrentTime(horaAtual);
+      setDate(now);
+      // console.log(horaAtual);
+      // console.log(dataAtual);
 
-      if (currentDate && !date) {
-        setDate(moment(currentDate, 'YYYY-MM-DD').toDate());
-      }
 
+      // Feriados (opcional, ainda pode continuar buscando de uma API se desejar)
       const response = await fetch('https://brasilapi.com.br/api/feriados/v1/2024');
       const data = await response.json();
       setHolidays(data.map(holiday => holiday.date));
     } catch (error) {
       toast.error('Erro ao buscar os dados iniciais.');
+      console.error(error);
     } finally {
       setInitialLoading(false);
     }
@@ -62,15 +70,15 @@ export default function SelectDateAndHour() {
   async function fetchHours() {
     setLoading(true);
     try {
-      const { horasDisponiveis } = await selectDateAndHourPageModel.atualizarValores(
+      const result = await SearchAndFilterHour(
         instrutor,
-        moment(date).format('YYYY-MM-DD')
+        veiculo,
+        date // Usando date-fns para formatar a data
       );
-      
-      const dayOfWeek = moment(date).day(); // Obter o dia da semana (0 = Domingo, 1 = Segunda, ...)
 
-      // Removendo a filtragem do horário 07:00 na segunda-feira
-      setHoras(horasDisponiveis);
+      const dayOfWeek = format(date, 'i'); // Retorna o índice do dia da semana (1 = Segunda-feira, 2 = Terça-feira, ...)
+      // console.log(dayOfWeek);
+      setHoras(result);
       setDayName(namesForDays[dayOfWeek]);
     } catch (error) {
       setError(error.message);
@@ -80,7 +88,6 @@ export default function SelectDateAndHour() {
   }
 
   useEffect(() => {
-    console.log(configs);
     fetchInitialData();
   }, []);
 
@@ -89,17 +96,22 @@ export default function SelectDateAndHour() {
   }, [date]);
 
   const handleDateChange = (selectedDate) => {
-    const selectedMoment = moment(selectedDate);
-    if (selectedMoment.isSameOrAfter(moment(currentDate), 'day') && selectedMoment.isSameOrBefore(moment().add(7, 'days'), 'day')) {
-      setDate(selectedMoment.toDate());
-    } else {
-      toast.error('Selecione uma data válida.');
+    if (!date) {
+      setDate(selectedDate);
+      return;
     }
+    if (isAfter(selectedDate, addDays(currentDate, 7))) {
+      toast.error('Data muito longe!');
+      return;
+    }
+  
+    setDate(selectedDate);
   };
+  
 
   const handleHourClick = (hora) => {
-    const selectedHourMoment = moment(hora, 'HH:mm:ss');
-    if (selectedHourMoment.isBefore(currentTime) && moment(date).isSame(moment(), 'day')) {
+    const selectedHourParsed = new Date(`1970-01-01T${hora}:00`); // Parse a hora
+    if (isBefore(selectedHourParsed, new Date(currentTime)) && isBefore(date, new Date())) {
       toast.error('Hora anterior à atual. Escolha outro horário!');
     } else {
       setSelectedHour(hora);
@@ -109,32 +121,28 @@ export default function SelectDateAndHour() {
 
   const confirmSelection = () => {
     setModalVisible(false);
-    navigate('/confirmar', {
-      state: { usuario, configs, instrutor,  type, tipo, aluno, data: date, hora: selectedHour},
-    });
+    updateAula('hora', selectedHour);
+    const dataFormatada = formatarDataParaSalvar(date)
+    updateAula('data', dataFormatada);
+    console.log(selectedHour, " asdasdda ", dataFormatada)
+    navigate('/confirmar');
   };
 
   const handleBack = () => {
-    if (tipo === 'adm') {
-      navigate('/selectAluno', { state: { usuario, configs, instrutor } });
-    } else {
-      navigate('/selecionarInstrutor', { state: { usuario, configs, type } });
-    }
+    navigate("/selecionarVeiculo")
   };
 
   const handleHome = () => {
-    if ( tipo === 'adm') {
-      navigate('/homeinstrutor', { state: { usuario, configs, instrutor } });
+    if (tipo === 'adm') {
+      navigate('/homeinstrutor');
     } else {
-      navigate('/home', { state: { usuario, configs } });
+      navigate('/home');
     }
   };
 
   if (initialLoading) {
     return <LoadingIndicator visible />;
   }
-
-  //#endregion
 
   return (
     <div className='container'>
@@ -145,47 +153,52 @@ export default function SelectDateAndHour() {
 
       <h3 className='greatText'>Selecione a data e hora da sua aula!</h3>
       <div className='container-flat'>
-        <AiOutlineLeft size={30} onClick={() => handleDateChange(moment(date).subtract(1, 'day').toDate())} />
+        <AiOutlineLeft size={30} onClick={() => handleDateChange(subDays(date, 1))} />
         <div className='container-vertical'>
           <DatePicker
-            selected={date}
+            selected={date}  // Garantindo que o valor de `date` seja um objeto `Date`
             onChange={handleDateChange}
-            minDate={moment(currentDate).toDate()}
-            maxDate={moment(currentDate).add(7, 'days').toDate()}
+            minDate={new Date(currentDate)} // Usando a data atual
+            maxDate={addDays(new Date(currentDate), 7)} // Limite para 7 dias à frente
             dateFormat="dd/MM/yyyy"
             className="custom-datepicker-input"
           />
           <h4 className='greatText'>{dayName}</h4>
         </div>
-        <AiOutlineRight size={30} onClick={() => handleDateChange(moment(date).add(1, 'day').toDate())} />
+        <AiOutlineRight size={30} onClick={() => handleDateChange(addDays(date, 1))} />
       </div>
 
       <LoadingIndicator visible={loading} />
       {error && <p className='text-error'>{error}</p>}
 
-      <div className='listContainer '>
-        {holidays.includes(moment(date).format('YYYY-MM-DD')) ||
-          moment(date).day() === 0 ||
-          moment(date).day() === 6 ||
-          horas.length === 0 ? (
+
+      <div className='listContainer'>
+        {holidays.includes(format(date, 'yyyy-MM-dd')) ||
+          format(date, 'i') == 7 ||
+          format(date, 'i') == 6 ? (
           <div className='container-error'>
             <p className='text-error'>
-              {'Nenhum horário disponivel essa data!'}
+              {'Nenhum horário disponível essa data!'}
             </p>
           </div>
-        ) : (
+        ) : horas.length > 0 ? (
           horas.map((hora, index) => (
-            <Button back={'#030a90'} key={index} onClick={() => handleHourClick(hora)}>
+            <Button back={'#4B003B'} key={index} onClick={() => handleHourClick(hora)}>
               {hora}
             </Button>
           ))
+        ) : (
+          <div className='container-error'>
+            <p className='text-error'>
+              {'Nenhum horário disponível essa data!'}
+            </p>
+          </div>
         )}
       </div>
 
-      <Modal
-        isOpen={modalVisible}
-      >
-        <p>Você tem certeza que deseja selecionar essa data: <strong>{moment(date).format('DD/MM/YYYY')} </strong>  ás <strong>{selectedHour}</strong> </p>
+
+      <Modal isOpen={modalVisible}>
+        <p>Você tem certeza que deseja selecionar essa data: <strong>{format(date, 'dd/MM/yyyy')} </strong>  ás <strong>{selectedHour}</strong> </p>
         <Button back={'#2A8C68'} onClick={confirmSelection}>Sim</Button>
         <Button back={'#A61723'} onClick={() => setModalVisible(false)}>Não</Button>
       </Modal>

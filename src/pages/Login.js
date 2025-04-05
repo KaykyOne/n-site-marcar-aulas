@@ -1,40 +1,31 @@
 import React, { useState, useEffect } from 'react';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { InstrutorModel } from '../pageModel/InstrutorModel';
-import { UserModel } from '../pageModel/UserModel';
-import { ManagerModel } from '../pageModel/ManagerModel';
 import { useNavigate } from 'react-router-dom';
-import Cripto from '../controller/Cripto';
 import InputField from '../components/Input';
 import Button from '../components/Button'; // Importe o Button
 import ModalLogin from '../components/ModalLogin';
 import ModalErroHora from '../components/ModalHoraInvalida';
 import Modal from '../components/Modal';
+import { LoginFunc } from '../controller/ControllerUser';
+import useUserStore from '../store/useUserStore';
 
 import logoNovusTech from '../imgs/logoNovusTech.png';
-import LogoApp from "../imgs/logoAutoEscolaIdeal.png";
+import LogoApp from "../imgs/LogoNovusCFC.png";
 
 export default function Login() {
+    //#region Logica 
+    const { usuario } = useUserStore();
 
-    //#region Logica
     const [cpfNormal, setCpf] = useState('');
     const [senhaInput, setSenha] = useState('');
     const [loading, setLoading] = useState(false);
-    const [timer, setTimer] = useState(0);
-    const [isRunning, setIsRunning] = useState(false);
     const [isModalVisible, setModalVisible] = useState(false);
     const [modalMessage, setModalMessage] = useState('');
     const [seePass, setSeePass] = useState(false);
     const [modalMan, setModalMan] = useState(false);
     const [modalHoraErro, setModalErroHora] = useState(false);
-    const [chechRemember, setCheckRemember] = useState(false);
-
-    const instrutorModel = new InstrutorModel();
-    const lanagerModel = new ManagerModel();
-    const userModel = new UserModel();
-
-
+    const [chechRemember, setCheckRemember] = useState(true);
     const navigate = useNavigate(); // Use useNavigate aqui
 
     const toggleModal = (message) => {
@@ -58,65 +49,55 @@ export default function Login() {
             return;
         }
 
-        const cpf = Cripto(cpfNormal);
         setLoading(true);
+        setTimeout(() => {
+            if(loading){
+                setLoading(false);
+                showToast('error', 'Erro', 'Erro ao fazer login!');
+            }
+        }, 5000);        
 
+        // console.log(usuario);
         try {
-            const usuario = await userModel.searchUsersByCPF(cpf);
-            console.log(usuario);
-            if (!usuario) {
+            let responseUsuario = await LoginFunc(cpfNormal, senhaInput, usuario.updated_at ? usuario.updated_at : null, usuario.autoescola_id, usuario.configuracoes);
+            if (!responseUsuario) {
                 showToast('error', 'Erro', 'Cpf ou senha incorretos, ou usuário não existe!');
                 return;
             }
+            // console.log(responseUsuario);
+            let atividade = responseUsuario.atividade;
+            if(atividade == false && responseUsuario){
+                showToast('error', 'Erro', 'Você está desativado');
+                return;
+            }
+            let usuarioAtual;
+            if(responseUsuario === true){
+                usuarioAtual = usuario;
+            }else{
+                usuarioAtual = responseUsuario;
+            }
 
-            rememberMe('login');
-
-            const senha = usuario.senha;
-            const atividade = usuario.atividade;
-            const tipo = usuario.tipo_usuario;
-            const usuarioId = usuario.usuario_id;
-            const configs = await lanagerModel.verificarManutencao(usuario.autoescola_id);
-            const manutencao = configs.find(item => item.chave === 'manutencao');
-            if (senha === Cripto(senhaInput) || senhaInput === senha) {
-                if (!atividade) {
-                    toggleModal('Usuário inativo ou com acesso restrito!');
+            if(usuarioAtual.usuario_id != null){
+                const manutencaoConfig  = usuarioAtual.configuracoes.find(config => config.chave === "manutencao");
+                const manutencao = manutencaoConfig ? manutencaoConfig.valor : "TRUE";
+                if(manutencao === "TRUE"){
+                    toggleModal("O sistema de sua autoescola está em manutenção!");
                     return;
                 }
-                if (manutencao.valor === 'TRUE') {
-                    toggleModal('Aparentemente a sua autoescola está com o app em manutenção!');
+                // console.log(usuarioAtual.tipo_usuario);
+                if (usuarioAtual.tipo_usuario === "aluno") {
+                    rememberMe("login");
+                    navigate("home");
                     return;
                 }
-                if (tipo === 'aluno') {
-
-                    navigate('/home', { state: { usuario, configs } });
-                    setCpf('');
-                    setSenha('');
-                    return;
-                } else if (tipo === 'instrutor') {
-                    const instrutor = await instrutorModel.searchInstrutorById(usuarioId);
-                    navigate('/homeinstrutor', { state: { usuario, configs, instrutor } });
-                    setCpf('');
-                    setSenha('');
-                    return;
-                }
-
-            } else {
-                toggleModal('Nenhum usuário encontrado com esse CPF.');
-                setCpf('');
-                setSenha('');
+            }else{
+                return;
             }
         } catch (error) {
-            showToast('error', 'Erro', `Ocorreu um erro ao tentar fazer login.: ${error.message}`);
-            console.error(error.message);
-            setCpf('');
-        } finally {
+            console.error("Erro no login:", error);
+        }finally{
             setLoading(false);
         }
-    };
-
-    const startTimer = () => {
-        setTimer(60);
-        setIsRunning(true);
     };
 
     const handleCpfChange = (event) => {
@@ -126,12 +107,6 @@ export default function Login() {
         } else {
             showToast('error', 'Erro', 'O CPF deve conter Apenas numeros!');
             setCpf('');
-        }
-
-        if (!isRunning) {
-            startTimer();
-        } else {
-            setTimer(60);
         }
     };
 
@@ -168,30 +143,8 @@ export default function Login() {
 
     const alterRemember = () => {
         setCheckRemember(!chechRemember)
-        console.log(chechRemember);
+        // console.log(chechRemember);
     };
-
-    useEffect(() => {
-        setLoading(true);
-        try {
-            let interval;
-            if (isRunning && timer > 0) {
-                interval = setInterval(() => {
-                    setTimer((prevTimer) => prevTimer - 1);
-                }, 1000);
-            } else if (timer === 0 && isRunning) {
-                setIsRunning(false);
-                setCpf('');
-            }
-            return () => clearInterval(interval);
-        } catch (error) {
-            console.error('Erro: ', error.message);
-        } finally {
-            setLoading(false);
-        }
-
-
-    }, [isRunning, timer]);
 
     useEffect(() => {
         rememberMe('restore');
@@ -208,7 +161,7 @@ export default function Login() {
                     className="image"
                 />
                 <div>
-                    <h1 className='veryGreatText'>NovusAuto</h1>
+                    <h1 className='veryGreatText'>NovusCFC</h1>
                     <h3>Seu aplicativo de Gerenciamento de aulas confiável e simples!</h3>
                 </div>
             </div>

@@ -17,6 +17,11 @@
     width: auto;
 }
 
+.imageModal {
+    height: 100%;
+    width: 100%;
+}
+
 @media (max-width: 600px) {
     .image {
         height: 100px; /* Tamanho reduzido para telas pequenas */

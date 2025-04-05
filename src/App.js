@@ -12,6 +12,7 @@ import HomeInstrutor from './pages/Instrutor/HomeInstrutorView';
 import SelectAluno from './pages/Instrutor/SelectAlunoView';
 import ListAulasInstrutor from './pages/Instrutor/ListAulasInstrutorView';
 import ListAlunosView from './pages/Instrutor/ListAlunosView';
+import SelectVeicle from './pages/Aluno/SelectVeicle';
 
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
@@ -48,6 +49,8 @@ function App() {
           <Route path="/listAulasInstrutor" element={<ListAulasInstrutor />} />
           {/* Página de Listar Os Alunos do instrutor o Aluno */}
           <Route path="/listarAlunosInstrutor" element={<ListAlunosView />} />
+          {/* Página de Listar Os veiculos do instrutor ao Aluno */}
+          <Route path="/selecionarVeiculo" element={<SelectVeicle />} />
         </Routes>
       </BrowserRouter>
     </div>

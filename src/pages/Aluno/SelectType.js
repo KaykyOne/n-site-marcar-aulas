@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import LoadingIndicator from '../../components/LoadingIndicator';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -8,16 +8,21 @@ import Button from '../../components/Button'; // Importe o componente Button
 import Count from '../../components/Count';
 import ButtonBack from '../../components/ButtonBack';
 
+import useAulaStore from '../../store/useAulaStore';
+import useUserStore from '../../store/useUserStore';
+
 export default function SelectTypeView() {
 
     //#region Logica
-    const location = useLocation();
     const navigate = useNavigate();
-    const { usuario, configs } = location.state || {};
+    const updateAula = useAulaStore.getState().updateAula;
+    const resetAula = useAulaStore.getState().resetAula;
+
+    const { usuario } = useUserStore();
     const [categorias, setCategorias] = useState([]);
     const [loading, setLoading] = useState(false);
     const [modalVisible, setModalVisible] = useState(false);
-    const [selectedType, setSelectedType] = useState(null);
+    const [selectedType, setSelectedType] = useState(null); 
 
     const categoriasEscrito = {
         A: "Moto",
@@ -56,7 +61,7 @@ export default function SelectTypeView() {
                 setLoading(false);
             }
         };
-
+        resetAula();
         fetchCategorias();
     }, [usuario]);
 
@@ -72,7 +77,12 @@ export default function SelectTypeView() {
 
     const confirmSelection = () => {
         setModalVisible(false);
-        navigate('/selecionarInstrutor', { state: { usuario, configs, type: selectedType } });
+        updateAula('tipo', selectedType.toUpperCase());
+        updateAula('aluno_id', usuario.usuario_id);
+        updateAula('autoescola_id', usuario.autoescola_id);
+
+
+        navigate('/selecionarInstrutor');
     };
 
     const renderCategoriaItem = (item, index) => (
@@ -93,7 +103,7 @@ export default function SelectTypeView() {
 
     return (
         <div className='container'>
-            <ButtonBack event={() => navigate('/home', { state: { usuario, configs } })} />
+            <ButtonBack event={() => navigate('/home')} />
             <h1 className='greatText'>Clique no tipo da AULA que deseja marcar!</h1>
             <LoadingIndicator visible={loading} />
             {categorias.Count === 0 ? (

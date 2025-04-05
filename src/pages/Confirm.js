@@ -1,22 +1,36 @@
 import React, { useState, useEffect } from 'react';
 import moment from 'moment';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { ClassModel } from '../pageModel/ClassModel.js';
 import LoadingIndicator from '../components/LoadingIndicator';
 import Modal from '../components/Modal';
-import { toast, ToastContainer } from 'react-toastify';
+import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Button from '../components/Button';
 import { format } from 'date-fns';
 import ButtonBack from '../components/ButtonBack';
 import ButtonHome from '../components/ButtonHome';
 
+import useAulaStore from '../store/useAulaStore';
+import useUserStore from '../store/useUserStore';
+import useAlunoStore from '../store/useAlunoStore.js';
+import { formatarDataParaExibir } from '../utils/dataFormat';
+
 export default function Confirm() {
 
   //#region Logica
-  const location = useLocation();
+  const { aula } = useAulaStore.getState();
+  const { usuario } = useUserStore();   
+  const { aluno } = useAlunoStore.getState();
+  const instrutor = aula.instrutor; 
+  const configs = usuario.configuracoes;
+  const veiculo = aula.veiculo;
+  const type = aula.tipo;
+  const tipo = usuario.tipo_usuario === "aluno" ? "normal" : "adm";
+  const data = aula.data;
+  const hora = aula.hora;
+
   const navigate = useNavigate();
-  const { usuario, configs, instrutor, type, tipo, aluno, data, hora } = location.state || {};
   const [date] = useState(data);
   const [holidays] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -34,17 +48,16 @@ export default function Confirm() {
     setModalVisible(!isModalVisible);
   };
 
-  useEffect(() => {
-    console.log((configs.find(item => item.chave === type)).valor);
-  }, []);
+  // useEffect(() => {
+
+  //   console.log((configs.find(item => item.chave === type)).valor);
+  // }, []);
 
   const handleConfirm = async () => {
     try {
       setLoading(true);
-      const formattedDate = format(date, 'yyyy-MM-dd');
-      console.log('Formatted Date:', formattedDate);
 
-      if (isHoliday(date) || isWeekend(date) || formattedDate == '2025-01-01') {
+      if (isHoliday(date) || isWeekend(date) || date == '2025-01-01') {
         toggleModal('Data Indisponível: A data selecionada é um feriado, sábado ou domingo.');
         setLoading(false);
         return;
@@ -61,7 +74,7 @@ export default function Confirm() {
       const totalClassCount = await classModel.countClass(user.usuario_id, 'Pendente');
       console.log('Total Classes Pending:', totalClassCount);
 
-      const totalClassHoje = await classModel.countClass(user.usuario_id, null, formattedDate);
+      const totalClassHoje = await classModel.countClass(user.usuario_id, null, date);
       console.log('Total Classes Today:', totalClassHoje);
 
       let aulas = (configs.find(item => item.chave === 'aulas')).valor;
@@ -73,14 +86,14 @@ export default function Confirm() {
       console.log('Is Outra Cidade:', isOutraCidade);
 
       const numeroMaximoDeAulasDeUmTipoDeVeiculo = (configs.find(item => item.chave === type)).valor;
-      const aulasDoTipoJaMarcadas = await classModel.countClassByDateAndHoour(type, hora, formattedDate)
+      const aulasDoTipoJaMarcadas = await classModel.countClassByDateAndHoour(type, hora, date)
       console.log('Max aulas tipo de veículo:', numeroMaximoDeAulasDeUmTipoDeVeiculo);
       console.log('Max aulas tipo de veículo já marcadas :', aulasDoTipoJaMarcadas);
 
-      if (aulasDoTipoJaMarcadas >= numeroMaximoDeAulasDeUmTipoDeVeiculo) {
-        toggleModal(`O número máximo de aulas do tipo '${type}' já foi atingido neste horário. Por favor, escolha outro horário!`);
-        return;
-      }
+      // if (aulasDoTipoJaMarcadas >= numeroMaximoDeAulasDeUmTipoDeVeiculo) {
+      //   toggleModal(`O número máximo de aulas do tipo '${type}' já foi atingido neste horário. Por favor, escolha outro horário!`);
+      //   return;
+      // }
 
       if (tipo === 'adm') {
         aulas = aulas + 2;
@@ -109,9 +122,9 @@ export default function Confirm() {
       let result;
 
       if (tipo === 'adm') {
-        result = await classModel.insertClass(instrutor, aluno, date, type, hora);
+        result = await classModel.insertClass(instrutor, aluno, date, type, hora, veiculo);
       } else {
-        result = await classModel.insertClass(instrutor, usuario, date, type, hora);
+        result = await classModel.insertClass(instrutor, usuario, date, type, hora, veiculo);
       }
 
       console.log('Result da inserção da aula:', result);
@@ -139,14 +152,14 @@ export default function Confirm() {
   return (
     <div className='container'  >
       <div className='button-container'>
-        <ButtonBack event={() => navigate('/selecionarDataEHora', { state: { usuario, instrutor, configs,  type,  tipo, aluno } })} />
-        <ButtonHome event={() => navigate('/home', { state: { usuario, configs } })} />
+        <ButtonBack event={() => navigate('/selecionarDataEHora')} />
+        <ButtonHome event={() => navigate('/home')} />
       </div>
 
       <h1>Confirme sua Aula</h1>
       <h3 className='greatText'>Tipo da Aula: <span>{type}</span></h3>
       <h3 className='greatText'>Instrutor: <span>{instrutor.nome_instrutor}</span></h3>
-      <h3 className='greatText'>Data Selecionada: <span>{moment(date).format('DD/MM/YYYY')}</span></h3>
+      <h3 className='greatText'>Data Selecionada: <span>{formatarDataParaExibir(date)}</span></h3>
       <h3 className='greatText'>Hora da Aula: <span>{hora}</span></h3>
 
       <LoadingIndicator visible={loading} />
