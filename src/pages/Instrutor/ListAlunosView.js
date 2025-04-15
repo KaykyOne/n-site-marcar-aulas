@@ -1,20 +1,24 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import LoadingIndicator from '../../components/LoadingIndicator';
 import { UserModel } from '../../pageModel/UserModel';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import Button from '../../components/Button';
+import InputField from '../../components/Input';
+import ButtonBack from '../../components/ButtonBack';
+
+import useInstrutorStore from '../../store/useInstrutorStore';
 
 export default function ListAlunosView() {
-
-    //#region Logica
-    const location = useLocation();
-    const { usuario, instrutor } = location.state || {}; // Recebe os dados
+    const { instrutor } = useInstrutorStore();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [alunos, setAlunos] = useState([]);
+    const [alunosFiltrados, setAlunosFiltrados] = useState([]);
     const userModel = new UserModel();
     const navigate = useNavigate();
+    const mensagem = encodeURIComponent('Olá! Vamos marcar uma Aula?');
 
     const showToast = (type, message) => {
         toast.dismiss();
@@ -28,6 +32,7 @@ export default function ListAlunosView() {
         try {
             const data = await userModel.searchAlunos(instrutor.instrutor_id);
             setAlunos(data || []);
+            setAlunosFiltrados(data || []);
 
             if (!data || data.length === 0) {
                 setError('Nenhum aluno encontrado.');
@@ -45,88 +50,60 @@ export default function ListAlunosView() {
     }, [instrutor]);
 
     const renderAlunoItem = (aluno) => (
-        <div style={styles.itemContainer} key={aluno.usuario_id}>
-            <p style={styles.itemTitle}>Nome: {aluno.usuarios?.nome || 'Não especificado'} {aluno.usuarios?.sobrenome || 'Não especificado'}</p>
-            <p style={styles.itemText}>Telefone: {aluno.usuarios?.telefone || 'Não especificado'}</p>
+        <div
+            key={aluno.usuario_id}
+            className=" border min-w-[300px] border-gray-300 rounded-xl p-4 mb-4 shadow-sm bg-white">
+                    
+            <p className="font-semibold text-lg text-gray-800 capitalize">
+                {aluno.usuarios?.nome || 'Não especificado'} {aluno.usuarios?.sobrenome || 'Não especificado'}
+            </p>
+
+            <div className='flex flex-col gap-2'>
+                <Button type={2} onClick={() => window.open(`https://wa.me/55${aluno.usuarios?.telefone}?text=${mensagem}?`, '_blank')}>
+                    Entrar em Contato
+                    <span className="material-icons">forum</span>
+                </Button>
+                <Button onClick={() => marcarAula(aluno)}>
+                    Marcar Aula
+                    <span className="material-icons">add</span>
+                </Button>
+            </div>
         </div>
     );
 
-    //#endregion
+    const marcarAula = (aluno) => {
+        
+        navigate('/selectAluno');
+    }
+
+    const pesquisarAluno = (valor) => {
+        if (valor === null) {
+            setAlunosFiltrados(alunos);
+        }
+        const res = alunos.filter((aluno) => {
+            const nomeCompleto = `${aluno.usuarios?.nome || ''} ${aluno.usuarios?.sobrenome || ''}`.toLowerCase();
+            return nomeCompleto.includes(valor.toLowerCase());
+        });
+        setAlunosFiltrados(res);
+    };
+
 
     return (
-        <div style={styles.container}>
-            <h1 style={styles.title}>Lista de Alunos</h1>
+        <div className="flex flex-col max-w-2xl h-full p-6 gap-2 mt-16">
+            <ButtonBack event={() => navigate(`/homeInstrutor`)} />
+            <h1 className="text-2xl font-bold mb-6 text-center text-gray-900">Lista de Alunos</h1>
+            <InputField className='min-w-[300px]:' onChange={(e) => pesquisarAluno(e.target.value)} placeholder={'Nome...'} />
             {loading && <LoadingIndicator />}
             {error || alunos.length === 0 ? (
-                <div style={styles.errorContainer}>
-                    <p style={styles.errorText}>{error ? `Erro: ${error}` : 'Nenhum aluno encontrado!'}</p>
+                <div className="bg-red-100 border border-red-300 text-red-700 p-4 rounded mb-4 text-center">
+                    <p>{error ? `Erro: ${error}` : 'Nenhum aluno encontrado!'}</p>
                 </div>
             ) : (
-                <div style={styles.listContainer}>{alunos.map(renderAlunoItem)}</div>
+                <div className='flex flex-col max-h-[500px] overflow-y-auto'>{alunosFiltrados.map(renderAlunoItem)}</div>
             )}
-            <button
-                style={styles.buttonBack}
-                onClick={() => navigate('/homeinstrutor', { state: { usuario, instrutor } })}
-            >
-                Voltar
-            </button>
+
             <ToastContainer position="top-center" />
+
         </div>
     );
 }
-
-const styles = {
-    container: {
-        padding: '20px',
-        backgroundColor: '#f5f5f5',
-        minHeight: '100vh',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'flex-start',
-    },
-    title: {
-        fontSize: '1.5em',
-        fontWeight: 'bold',
-        marginBottom: '20px',
-        color: '#003366',
-    },
-    listContainer: {
-        width: '100%',
-        maxHeight: '70vh',
-        overflowY: 'auto',
-        padding: '10px',
-        boxSizing: 'border-box',
-    },
-    errorContainer: {
-        color: 'red',
-    },
-    itemContainer: {
-        backgroundColor: '#D9D9D9',
-        borderRadius: '12px',
-        padding: '20px',
-        margin: '10px 0',
-        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-    },
-    itemTitle: {
-        fontSize: '1.2em',
-        fontWeight: 'bold',
-        marginBottom: '10px',
-    },
-    itemText: {
-        fontSize: '1em',
-    },
-    buttonBack: {
-        width: '40%',
-        backgroundColor: '#0074D9',
-        borderRadius: '12px',
-        color: '#fff',
-        fontWeight: 'bold',
-        padding: '15px',
-        cursor: 'pointer',
-        marginTop: '20px',
-        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-        border: 'none',
-        transition: 'background 0.3s',
-    },
-};

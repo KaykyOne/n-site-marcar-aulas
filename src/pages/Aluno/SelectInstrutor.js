@@ -17,7 +17,7 @@ export default function SelectInstructor() {
 
     //#region Logica
     const { updateAula, aula } = useAulaStore.getState();
-    const { usuario } = useUserStore();    
+    const { usuario } = useUserStore();
 
     const [instrutores, setInstrutores] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -69,9 +69,16 @@ export default function SelectInstructor() {
     };
 
     const renderInstrutorItem = (item) => (
-        <Button key={item.instrutor_id} onClick={() => handleButtonClick(item)}>
-            {item.nome_instrutor}
-        </Button>
+        <div className='flex bg-white shadow-md p-3 rounded-xl align-middle justify-start gap-3' key={item.instrutor_id} onClick={() => handleButtonClick(item)}>
+            <div className='w-full text-start'>
+                <h1>Instrutor: </h1>
+                <h1 className='font-bold text-4xl capitalize'>{item.nome_instrutor}</h1>
+                <Button className='mt-2'>
+                    Selecionar
+                    <span className="material-icons">arrow_forward_ios</span>
+                </Button>
+            </div>
+        </div >
     );
 
     const onCancel = () => {
@@ -82,18 +89,18 @@ export default function SelectInstructor() {
     //#endregion
 
     return (
-        <div className='container'>
+        <div className='flex flex-col gap-5'>
             <LoadingIndicator visible={loading} />
-            <div className='button-container'>
-                <ButtonBack event={() => navigate('/selecionarTipo')}  />
+            <div className='flex justify-between items-center w-full mb-3'>
+                <ButtonBack event={() => navigate('/selecionarTipo')} />
                 <ButtonHome event={() => navigate('/home')} />
             </div>
             <h1 className='greatText'>
                 Clique no instrutor que deseja marcar a aula!
             </h1>
             {instrutores.length === 0 ? (
-                <div className='container-error'>
-                    <p className='text-error'>
+                <div className='flex flex-col'>
+                    <p className='text-red-800'>
                         {'Nenhum instrutor encontrado, entre em contato com o suporte!'}
                     </p>
                     <span className="material-icons">
@@ -101,7 +108,7 @@ export default function SelectInstructor() {
                     </span>
                 </div>
             ) : (
-                <div className='container-vertical'>
+                <div className='flex flex-col gap-3 max-h-[500px] overflow-y-auto'>
                     {instrutores.map(renderInstrutorItem)}
                 </div>
             )}
@@ -109,8 +116,14 @@ export default function SelectInstructor() {
             <Modal
                 isOpen={modalVisible}   >
                 <p>Você tem certeza que deseja selecionar o instrutor: <strong>{selectedInstructor?.nome_instrutor}</strong></p>
-                <Button back={'#2A8C68'} onClick={confirmSelection}>Sim</Button>
-                <Button back={'#A61723'} onClick={() => onCancel()}>Não</Button>
+                <Button onClick={confirmSelection} type={4}>Sim
+                    <span className="material-icons">
+                        check
+                    </span></Button>
+                <Button onClick={() => onCancel()} type={3}>Não
+                    <span className="material-icons">
+                        close
+                    </span></Button>
             </Modal>
 
             <ToastContainer />

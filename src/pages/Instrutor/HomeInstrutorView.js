@@ -4,12 +4,13 @@ import LoadingIndicator from '../../components/LoadingIndicator';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Button from '../../components/Button'; // Importe o componente Button
+import useUserStore from '../../store/useUserStore';
+import useInstrutorStore from '../../store/useInstrutorStore';
 
-export default function HomeInstrutorView(){
+export default function HomeInstrutorView() {
 
-  //#region Logica
-  const location = useLocation();
-  const { usuario, instrutor } = location.state || {}; 
+  const { usuario } = useUserStore();
+  const { instrutor } = useInstrutorStore();
   const [loading, setLoading] = useState(false);
   const [modalMessage, setModalMessage] = useState('');
   const [isModalVisible, setModalVisible] = useState(false);
@@ -20,53 +21,45 @@ export default function HomeInstrutorView(){
     setModalVisible(!isModalVisible);
   };
 
-  // const showToast = (type, text1, text2) => {
-  //   toast.dismiss();
-  //   toast[type](`${text1}: ${text2}`);
-  // };
-
-  const alterPage = async (page, codigo = 0, nome = "", senha = "") => {
+  const alterPage = async (page) => {
     setLoading(true);
     try {
-        navigate(`/${page}`, { state: { usuario, instrutor } });
+      if (instrutor.atividade_instrutor === true) {
+        navigate(`/${page}`);
+      }
+
     } finally {
       setLoading(false);
     }
   };
 
+  useEffect(() => {
+    console.log(instrutor);
+  }, [])
+
   //#endregion
 
   return (
-    <div style={styles.container}>
-      <h1 style={{ ...styles.welcomeText, fontSize: '1.5em' }}>Bem-vindo, {usuario.nome}!</h1>
-      <Button onClick={() => alterPage('selectAluno', usuario, instrutor)} back="#0056b3" cor="#FFF">
-        Marcar Aula
-      </Button>
-      <Button onClick={() => alterPage('listAulasInstrutor', usuario, instrutor)} back="#FFC601" cor="#333">
+    <div className='flex flex-col gap-3 min-w-[200px]'>
+      <h1 className='font-bold text-2xl capitalize'>Bem-vindo, {instrutor.nome_instrutor}!</h1>  
+      <Button onClick={() => alterPage('listAulasInstrutor')} type={1}>
         Aulas
+        <span className="material-icons">directions_car</span>
       </Button>
-      <Button onClick={() => alterPage('listarAlunosInstrutor', usuario, instrutor)} back="gray" cor="white">
+      <Button onClick={() => alterPage('listarAlunosInstrutor')} type={1}>
         Alunos
+        <span className="material-icons">groups</span>
       </Button>
-      <Button onClick={() => navigate('/')} back="#0074D9" cor="#FFF" styleAct={{ width: '40%' }}>
+      <Button onClick={() => navigate('/')} type={2}>
         Voltar
+        <span className="material-icons">logout</span>
       </Button>
-      <a
-        style={styles.txtTermo}
-        onClick={() =>
-          toggleModal(
-            'Termos de Utilização\n\nO aluno é responsável por:\n- Marcar suas aulas no sistema.\n- Desmarcar as aulas com antecedência mínima de 12 horas.\n- Comparecer no horário agendado. Ausências podem levar a penalidades.\n\nAo continuar utilizando o sistema, você aceita esses termos.'
-          )
-        }
-      >
-        Termos de Utilização — Clique aqui para conferir
-      </a>
 
       <LoadingIndicator visible={loading} />
       {isModalVisible && (
-        <div style={styles.modalContent}>
+        <div className='flex flex-col'>
           <p>{modalMessage}</p>
-          <Button onClick={() => setModalVisible(false)} back="#0056b3" cor="#FFF">
+          <Button onClick={() => setModalVisible(false)} type={1}>
             Fechar
           </Button>
         </div>
@@ -74,36 +67,4 @@ export default function HomeInstrutorView(){
       <ToastContainer position="top-center" />
     </div>
   );
-};
-
-const styles = {
-  container: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: '20px',
-    height: '100vh',
-  },
-  txtTermo: {
-    fontSize: '10px',
-    margin: '20px',
-    cursor: 'pointer',
-  },
-  welcomeText: {
-    fontWeight: 'bold',
-    marginBottom: '20px',
-    color: '#003366', // Azul escuro para contraste
-  },
-  modalContent: {
-    position: 'fixed',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
-    backgroundColor: '#fff',
-    padding: '20px',
-    borderRadius: '15px',
-    boxShadow: '0 6px 12px rgba(0, 0, 0, 0.15)', // Sombra mais visível
-    textAlign: 'center',
-  },
 };

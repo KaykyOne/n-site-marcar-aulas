@@ -35,11 +35,7 @@
     z-index: 1001;
 }
 
-.modalButtons {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 20px;
-}
+
 
 .overlay {
     position: fixed;
@@ -51,6 +47,12 @@
     display: flex;
     align-items: center;
     justify-content: center;
+}
+
+.modalButtons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
 }
 
 .modal {

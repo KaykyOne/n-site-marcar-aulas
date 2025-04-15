@@ -26,6 +26,21 @@ export default function ListAulas() {
     const [selectedAula, setSelectedAula] = useState(null);
     const [modalAction, setModalAction] = useState(null);
 
+    const categoriasEscrito = {
+        A: "Moto",
+        B: "Carro",
+        C: "Caminhão",
+        D: "Ônibus"
+    };
+
+    const iconsButton = {
+        A: "two_wheeler",
+        B: "directions_car",
+        C: "local_shipping",
+        D: "directions_bus",
+        E: "local_shipping"
+    };
+
     const showToast = (type, text1, text2) => {
         toast.dismiss();
         toast[type](`${text1}: ${text2}`);
@@ -49,14 +64,14 @@ export default function ListAulas() {
             setLoading(false);
         }
     };
-  
+
     useEffect(() => {
         if (usuario) fetchAulas();
     }, [usuario]);
 
     const handleAction = (action, item) => {
         const { data, hora } = item;
-        
+
         if (action === 'Excluir') {
             setSelectedAula(item);
             setModalAction('Excluir');
@@ -89,7 +104,7 @@ export default function ListAulas() {
                             showToast('error', 'Erro', `A aula não  pode ser excluida, isso deve ser feito com ${horaPraPoderExcluir.valor} horas de antecedência!`);
                         }
                     }
-                } 
+                }
                 fetchAulas();
                 setModalVisible(false);
                 setSelectedAula(null);
@@ -100,43 +115,55 @@ export default function ListAulas() {
     };
 
     const renderAulaItem = (item) => (
-        <div className='itemContainer' key={item.aula_id}>
-            <p>Data: {format(parseISO(item.data), 'dd/MM/yyyy')}</p>
-            <p>Tipo: {item.tipo}</p>
-            <p>Hora: {item.hora}</p>
-            <p>Instrutor: {item.instrutores?.nome_instrutor || 'Não especificado'}</p>
-            <div>
-                <Button back="red" cor="white" onClick={() => handleAction('Excluir', item)}>
-                    Excluir
-                    <span className="material-icons">delete</span>
-                </Button>
+        <div className='flex gap-3 bg-white shadow-md rounded-lg p-3 justify-start items-stretch text-start m-2' key={item.aula_id}>
+
+            <div className='flex flex-col border-r-2 border-gray-400 p-1 m-2 justify-center'>
+                <span className="material-icons text-7xl">
+                    {iconsButton[item.tipo] || ""}
+                </span>
             </div>
+
+
+            <div className='flex flex-col min-w-[150px]'>
+                <h1 className='font-bold text-2xl'>{format(parseISO(item.data), 'dd/MM/yyyy')}</h1>
+                <p><strong>Hora:</strong> {item.hora}</p>
+                <p className='capitalize'><strong>Instrutor:</strong> {item.instrutores?.nome_instrutor || 'Não especificado'}</p>
+                <div className='p-2'>
+
+                </div>
+            </div>
+            <Button type={3} onClick={() => handleAction('Excluir', item)}>
+                <span className="material-icons">delete</span>
+            </Button>
         </div>
     );
 
     //#endregion
 
     return (
-        <div className='container'>
+        <div className='flex flex-col'>
             <ButtonBack event={() => navigate(`/home`)} />
-            <h1>Aulas</h1>
+            <h1 className='font-bold text-2xl '>Aulas</h1>
 
-            {loading && <LoadingIndicator />}
-            {error || aulas.length === 0 ? (
-                <div>
-                    <p className='text-error'>
-                        {error ? `Erro: ${error}` : 'Nenhuma aula marcada!'}
-                    </p>
-                </div>
-            ) : (
-                <div>{aulas.map(renderAulaItem)}</div>
-            )}
+            <div className='min-h-[400px] min-w-[250px] align-top mt-3 max-h-[500px] overflow-y-auto'>
+                {loading && <LoadingIndicator />}
+                {error || aulas.length === 0 ? (
+                    <div>
+                        <p className='text-error'>
+                            {error ? `Erro: ${error}` : 'Nenhuma aula marcada!'}
+                        </p>
+                    </div>
+                ) : (
+                    <div>{aulas.map(renderAulaItem)}</div>
+                )}
+            </div>
+
 
             <Modal
                 isOpen={modalVisible}>
                 <p>{modalAction === 'Excluir' ? `Deseja excluir a aula ${selectedAula?.tipo}?` : `Deseja confirmar a aula de tipo: ${selectedAula?.tipo}?`}</p>
-                <Button back={'#2A8C68'} onClick={confirmAction}>sim <span className="material-icons">check</span></Button>
-                <Button back={'#A61723'} onClick={() => setModalVisible(false)}>não <span className="material-icons">close</span></Button>
+                <Button type={4} onClick={confirmAction}>sim <span className="material-icons">check</span></Button>
+                <Button type={3} onClick={() => setModalVisible(false)}>não <span className="material-icons">close</span></Button>
             </Modal>
             <ToastContainer position="top-center" />
         </div>

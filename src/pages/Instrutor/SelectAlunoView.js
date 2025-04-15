@@ -9,8 +9,6 @@ import LoadingIndicator from '../../components/LoadingIndicator';
 import ModalConfirm from '../../components/ModalConfirm';
 
 export default function SelectAlunoView() {
-
-  //#region Logica
   const location = useLocation();
   const { usuario, instrutor } = location.state || {};
   const [cpf, setCPF] = useState('');
@@ -22,7 +20,8 @@ export default function SelectAlunoView() {
   const [selectedOption, setSelectedOption] = useState('');
   const [categorias, setCategorias] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [alunoNome, setAlunoNome] = useState(''); // Novo estado para armazenar o nome do aluno
+  const [alunoNome, setAlunoNome] = useState('');
+  const [telefoneAluno, setTelefoneAluno] = useState('');
 
   const toggleModal = (message) => {
     setModalMessage(message);
@@ -30,7 +29,7 @@ export default function SelectAlunoView() {
   };
 
   const showToast = (type, text1, text2) => {
-    toast.dismiss(); // Remove todos os toasts anteriores
+    toast.dismiss();
     toast[type](`${text1}: ${text2}`);
   };
 
@@ -39,26 +38,11 @@ export default function SelectAlunoView() {
   };
 
   const handleConfirmModalConfirm = () => {
-    // if (alunoNome) {
-    //   const cpfCriptaddo = Cripto(cpf);
-    //   navigate(`/selecionarDataEHora`, {
-    //     state: {
-    //       cpf: cpfCriptaddo,
-    //       type: selectedOption,
-    //       nameInstructor: nome,
-    //       nome: alunoNome, // Usando alunoNome corretamente
-    //       tipo: 'adm',
-    //       codigo: codigo,
-    //     },
-    //   });
-    // } else {
-    //   console.error('Erro: Nome do aluno vazio.');
-    //   showToast('error', 'Erro', 'Nome do aluno não encontrado.');
-    // }
-    // setConfirmModalVisible(false);
+    // lógica da navegação pode ser inserida aqui
+    setConfirmModalVisible(false);
   };
 
-  const handleCancelModalConfirm = () => { 
+  const handleCancelModalConfirm = () => {
     setConfirmModalVisible(false);
   };
 
@@ -76,7 +60,8 @@ export default function SelectAlunoView() {
 
       const aluno = await userModel.searchUsersByCPF(cpf);
       if (aluno) {
-        setAlunoNome(`${aluno.nome} ${aluno.sobrenome}`); // Armazenando o nome do aluno
+        setAlunoNome(`${aluno.nome} ${aluno.sobrenome}`);
+        setTelefoneAluno(aluno.telefone);
         setModalMessage(`Aluno encontrado: ${aluno.nome} ${aluno.sobrenome}`);
         setConfirmModalVisible(true);
       } else {
@@ -103,9 +88,6 @@ export default function SelectAlunoView() {
   };
 
   useEffect(() => {
-    // console.log(nome);
-    // console.log(codigo);
-
     const fetchCategorias = async () => {
       if (!instrutor) {
         showToast('error', 'O código é necessário.', 'Erro');
@@ -117,7 +99,7 @@ export default function SelectAlunoView() {
         const categoriasData = instrutor.tipo_instrutor;
 
         if (categoriasData && categoriasData.tipo_instrutor) {
-          const categoria = categoriasData.tipo_instrutor.trim(); // Remove espaços extras
+          const categoria = categoriasData.tipo_instrutor.trim();
           setCategorias(categoria.split('').map((char) => char.toUpperCase()));
         } else {
           console.error('tipo_instrutor não encontrado ou inválido:', categoriasData);
@@ -134,12 +116,11 @@ export default function SelectAlunoView() {
     fetchCategorias();
   }, [instrutor]);
 
-  //#endregion
-
   return (
-    <div style={styles.container}>
+    <div className="flex flex-col items-center justify-center min-h-screen p-6 bg-gray-100">
       <LoadingIndicator visible={loading} />
-      <h1 style={styles.title}>Selecionar Aluno</h1>
+      <h1 className="text-2xl font-bold text-blue-900 mb-6">Selecionar Aluno</h1>
+
       <InputField
         typ="text"
         placeholder="Digite seu CPF"
@@ -152,33 +133,49 @@ export default function SelectAlunoView() {
         id="comboBox"
         value={selectedOption}
         onChange={handleChange}
-        style={styles.select}
+        className="w-4/5 p-3 mb-5 text-lg bg-white border border-gray-300 rounded-lg shadow-sm"
       >
         <option value="">Selecione o tipo da aula</option>
         {categorias.map((option) => (
-          <option key={option} value={option}>
-            {option}
-          </option>
+          <option key={option} value={option}>{option}</option>
         ))}
       </select>
+
       <Button
-        styleAct={styles.buttonBack}
         onClick={handleClick}
-        back="blue" cor="#FFF"
+        back="blue"
+        cor="#FFF"
+        className="mb-4"
       >
         Avançar
       </Button>
+
       <Button
-        styleAct={styles.buttonBack}
-        onClick={() => navigate(`/homeinstrutor`, { state: { usuario, instrutor} })}
-        back="gray" cor="#FFF"
+        onClick={() => navigate(`/homeinstrutor`, { state: { usuario, instrutor } })}
+        back="gray"
+        cor="#FFF"
+        className="mb-4"
       >
         Voltar
       </Button>
 
+      {telefoneAluno && (
+        <Button
+          onClick={() => {
+            const numero = telefoneAluno.replace(/\D/g, '');
+            const mensagem = encodeURIComponent(`Olá ${alunoNome}, tudo bem?`);
+            window.open(`https://wa.me/55${numero}?text=${mensagem}`, '_blank');
+          }}
+          back="green"
+          cor="#FFF"
+        >
+          Chamar no WhatsApp
+        </Button>
+      )}
+
       {isModalVisible && (
-        <div style={styles.modalContent}>
-          <p>{modalMessage}</p>
+        <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white p-6 rounded-xl shadow-lg text-center">
+          <p className="mb-4">{modalMessage}</p>
           <Button onClick={() => setModalVisible(false)} back="#0056b3" cor="#FFF">
             Fechar
           </Button>
@@ -192,58 +189,8 @@ export default function SelectAlunoView() {
           onCancel={handleCancelModalConfirm}
         />
       )}
+
       <ToastContainer position="top-center" />
     </div>
   );
 }
-
-const styles = {
-  container: {
-    padding: '20px',
-    backgroundColor: '#f5f5f5',
-    minHeight: '100vh',
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  modalContent: {
-    position: 'fixed',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
-    backgroundColor: '#fff',
-    padding: '20px',
-    borderRadius: '15px',
-    boxShadow: '0 6px 12px rgba(0, 0, 0, 0.15)', // Sombra mais visível
-    textAlign: 'center',
-  },
-  select: {
-    width: '80%',
-    padding: '12px',
-    fontSize: '1.1em',
-    borderRadius: '8px',
-    border: '1px solid #ccc',
-    marginBottom: '20px',
-    backgroundColor: '#fff',
-    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-    transition: 'border 0.3s',
-  },
-  title: {
-    fontSize: '1.5em',
-    fontWeight: 'bold',
-    marginBottom: '20px',
-    color: '#003366',
-  },
-  buttonBack: {
-    backgroundColor: '#0074D9',
-    color: '#fff',
-    fontWeight: 'bold',
-    padding: '10px 20px',
-    borderRadius: '8px',
-    cursor: 'pointer',
-    border: 'none',
-    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-    transition: 'background 0.3s',
-  },
-};

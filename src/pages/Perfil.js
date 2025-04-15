@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { UserModel } from '../pageModel/UserModel';
@@ -31,12 +31,12 @@ export default function Perfil() {
             return;
         }
 
-        if (currentPassword == newPassword) {
+        if (currentPassword === newPassword) {
             showToast('error', 'Erro', 'A nova senha não pode ser igual a anterior!');
             return;
         }
 
-        if (newPassword == '123456') {
+        if (newPassword === '123456') {
             showToast('error', 'Erro', 'A nova senha não pode ser igual a padrão!');
             return;
         }
@@ -111,7 +111,7 @@ export default function Perfil() {
     //#endregion
 
     return (
-        <div className='container'>
+        <div className='flex flex-col gap-2'>
             <ButtonBack event={() => navigate('/home')} />
             <h1>Olá, {usuario.nome}</h1>
             <h3>Altere sua Senha!</h3>

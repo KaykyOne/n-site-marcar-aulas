@@ -2,7 +2,7 @@ import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import Button from '../components/Button';
 
-export default function EndView(){
+export default function EndView() {
 
   //#region Logica
   const navigate = useNavigate();
@@ -14,9 +14,9 @@ export default function EndView(){
   };
 
   const secondClassButton = () => {
-    if(tipo == 'adm'){
+    if (tipo === 'adm') {
       navigate('/homeinstrutor', { state: { usuario, configs, instrutor } });
-    }else{
+    } else {
       navigate('/selecionarTipo', { state: { usuario, configs } });
     }
   };
@@ -24,15 +24,16 @@ export default function EndView(){
   //#endregion
 
   return (
-    <div className='container'>
+    <div className='flex flex-col gap-3'>
       <h1>Sucesso!</h1>
-
-      <Button back={'#2A8C68'} onClick={handleSecondButton}>
-        Início
-      </Button>
-      <Button onClick={secondClassButton}>
-        Marcar Outra Aula
-      </Button>
-    </div>
+      <Button onClick={handleSecondButton} type={4}>Início
+        <span className="material-icons">
+          home
+        </span></Button>
+      <Button onClick={secondClassButton} type={1}>Marcar Outra Aula
+        <span className="material-icons">
+          replay
+        </span></Button>
+    </div >
   );
 };

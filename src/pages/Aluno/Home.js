@@ -25,7 +25,7 @@ export default function HomeView() {
   };
 
   const verificarSenha = () => {
-    if(usuario.senha == '123456'){
+    if(usuario.senha === '123456'){
       setModalMessage("Percebemos que sua senha ainda é a padrão(123456), aconselhamos mudar para uma maior segurança!");
       setModalVisible(true); 
       return;
@@ -60,9 +60,9 @@ export default function HomeView() {
   //#endregion
 
   return (
-    <div className='container'>
+    <div className='flex flex-col md:w-[600px] p-4 gap-4'>
       <ButtonBack event={() => navigate("/")}/>
-      <h1 className='greatText'>Bem-vindo, {usuario.nome}!</h1>
+      <h1 className='font-bold text-2xl capitalize'>Bem-vindo, {usuario.nome}!</h1>
       <Button onClick={() => alterPage('selecionarTipo')}>
         Marcar Aulas
         <span className="material-icons">add</span>
@@ -71,7 +71,7 @@ export default function HomeView() {
         Listar Aulas
         <span className="material-icons">directions_car</span>
       </Button>
-      <Button onClick={() => alterPage('perfil')} back="#ffcc00" cor="black">
+      <Button onClick={() => alterPage('perfil')} type={2}>
         Alterar Senha
         <span className="material-icons">key</span>
       </Button>
@@ -94,6 +94,7 @@ export default function HomeView() {
             Fechar
           </Button>
       </Modal>
+      
       <ToastContainer position="top-center" />
     </div>
   );

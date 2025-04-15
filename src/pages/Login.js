@@ -8,6 +8,7 @@ import ModalLogin from '../components/ModalLogin';
 import ModalErroHora from '../components/ModalHoraInvalida';
 import Modal from '../components/Modal';
 import { LoginFunc } from '../controller/ControllerUser';
+import { GetInstrutor } from '../controller/ControllerInstrutor';
 import useUserStore from '../store/useUserStore';
 
 import logoNovusTech from '../imgs/logoNovusTech.png';
@@ -51,11 +52,11 @@ export default function Login() {
 
         setLoading(true);
         setTimeout(() => {
-            if(loading){
+            if (loading) {
                 setLoading(false);
                 showToast('error', 'Erro', 'Erro ao fazer login!');
             }
-        }, 5000);        
+        }, 5000);
 
         // console.log(usuario);
         try {
@@ -66,21 +67,21 @@ export default function Login() {
             }
             // console.log(responseUsuario);
             let atividade = responseUsuario.atividade;
-            if(atividade == false && responseUsuario){
+            if (atividade === false && responseUsuario) {
                 showToast('error', 'Erro', 'Você está desativado');
                 return;
             }
             let usuarioAtual;
-            if(responseUsuario === true){
+            if (responseUsuario === true) {
                 usuarioAtual = usuario;
-            }else{
+            } else {
                 usuarioAtual = responseUsuario;
             }
 
-            if(usuarioAtual.usuario_id != null){
-                const manutencaoConfig  = usuarioAtual.configuracoes.find(config => config.chave === "manutencao");
+            if (usuarioAtual.usuario_id != null) {
+                const manutencaoConfig = usuarioAtual.configuracoes.find(config => config.chave === "manutencao");
                 const manutencao = manutencaoConfig ? manutencaoConfig.valor : "TRUE";
-                if(manutencao === "TRUE"){
+                if (manutencao === "FALSE") {
                     toggleModal("O sistema de sua autoescola está em manutenção!");
                     return;
                 }
@@ -89,13 +90,17 @@ export default function Login() {
                     rememberMe("login");
                     navigate("home");
                     return;
+                }else if(usuarioAtual.tipo_usuario === "instrutor"){
+                    rememberMe("login");
+                    await GetInstrutor(usuarioAtual.usuario_id);
+                    navigate("homeinstrutor");
                 }
-            }else{
+            } else {
                 return;
             }
         } catch (error) {
             console.error("Erro no login:", error);
-        }finally{
+        } finally {
             setLoading(false);
         }
     };
@@ -150,79 +155,88 @@ export default function Login() {
         rememberMe('restore');
     }, [])
 
-    //#endregion
-
+    //#endregion    
     return (
-        <div className="container">
-            <div className='container-vertical'>
+        <div className="flex flex-col justify-center h-full w-full">
+
+            <div className="flex flex-col pt-10 items-center text-center gap-2  bg-primary rounded-t-[50px]">
                 <img
                     src={LogoApp}
                     alt="Logo Auto Escola Ideal"
-                    className="image"
+                    className="h-full w-full max-w-[200px] max-h-[200px]"
                 />
-                <div>
-                    <h1 className='veryGreatText'>NovusCFC</h1>
-                    <h3>Seu aplicativo de Gerenciamento de aulas confiável e simples!</h3>
+
+                <div className='flex flex-col w-full h-full gap-4 p-4 bg-[#f4f4f4] rounded-tl-[50px] pt-10 align-middle justify-center items-center'>
+                    <h1 className='text-3xl mb-2'>Login</h1>
+                    {/* CPF */}
+                    <InputField
+                        type="text"
+                        placeholder="Digite seu CPF"
+                        inputMode="numeric"
+                        value={cpfNormal}
+                        onChange={handleCpfChange}
+                        classNamePersonalized="input"
+                    />
+
+                    {/* Senha + botão de mostrar/ocultar */}
+                    <div className="flex items-center align-middle justify-center w-full gap-2">
+                        <InputField
+                            type={seePass ? 'text' : 'password'}
+                            placeholder="Digite sua Senha"
+                            value={senhaInput}
+                            onChange={(e) => setSenha(e.target.value)}
+                            classNamePersonalized="input password-input"
+                        />
+                        <button onClick={() => setSeePass(!seePass)} className="flex h-[50px] rounded-md w-[100px]  bg-secondary justify-center align-middle items-center">
+                            <span className="material-icons">
+                                {seePass ? 'visibility_off' : 'visibility'}
+                            </span>
+                        </button>
+                    </div>
+
+                    <label className="flex items-center gap-2">
+                        <input
+                            checked={chechRemember}
+                            value={chechRemember}
+                            onChange={alterRemember}
+                            type="checkbox"
+                            id="minhaCheckbox"
+                            name="minhaCheckbox"
+                        />
+                        Salvar login
+                    </label>
+
+                    {/* Botão login */}
+                    <Button onClick={login} disabled={loading}>
+                        {loading ? 'Carregando...' : 'Entrar'}
+                        <span className="material-icons">login</span>
+                    </Button>
+
+                    {/* Footer */}
+                    <div className="footer text-sm text-gray-500 flex items-center gap-2 mt-4">
+                        <p>Feito por NovusTech</p>
+                        <img className="logo w-5 h-5" src={logoNovusTech} alt="NovusTech logo" />
+                    </div>
                 </div>
             </div>
 
-            <InputField
-                type="text"
-                placeholder="Digite seu CPF"
-                inputMode="numeric"
-                value={cpfNormal}
-                onChange={handleCpfChange}
-                classNamePersonalized='input'
-            />
-            <div className="container-pass">
-                <InputField
-                    type={seePass ? 'text' : 'password'}
-                    placeholder="Digite sua Senha"
-                    value={senhaInput}
-                    onChange={(e) => setSenha(e.target.value)}
-                    classNamePersonalized="input password-input"
-                />
-                <button onClick={() => setSeePass(!seePass)} className="show-button">
-                    <span className="material-icons">{seePass ? 'visibility_off' : 'visibility'}</span>
-                </button>
-
-            </div>
-            <label className="checkbox-container">
-                <input
-                    checked={chechRemember}
-                    value={chechRemember}
-                    onChange={alterRemember}  // Corrigido: chamando a função corretamente
-                    type="checkbox"
-                    id="minhaCheckbox"
-                    name="minhaCheckbox"
-                />
-                Salvar login
-            </label>
 
 
-            {/* Substitua o botão padrão pelo componente Button */}
-            <Button
-                onClick={login}
-                disabled={loading}
-            >
-                {loading ? 'Carregando...' : 'Entrar'}
-                <span className="material-icons">login</span>
-            </Button>
-            <div className="footer">
-                <p>Feito por NovusTech <img className="logo" src={logoNovusTech} /></p>
-            </div>
+            {/* Modais */}
             <ModalLogin visible={modalMan} setModalVisible={setModalMan} />
             <ModalErroHora visible={modalHoraErro} setModalVisible={setModalErroHora} />
-
-            {/* Modal de mensagem */}
             <Modal isOpen={isModalVisible}>
                 <p>{modalMessage}</p>
-                <Button back={'#A61723'} onClick={() => setModalVisible(false)} className="modal-button">
+                <Button
+                    back="#A61723"
+                    onClick={() => setModalVisible(false)}
+                    className="modal-button"
+                >
                     Fechar
                 </Button>
             </Modal>
 
-            {/* Toast container */}
+            {/* Toast */}
             <ToastContainer position="top-center" />
         </div>
     );

@@ -13,10 +13,10 @@ import useAulaStore from '../../store/useAulaStore';
 import useUserStore from '../../store/useUserStore';
 
 export default function SelectVeicle() {
-    
+
     //#region Logica
     const { updateAula, aula } = useAulaStore.getState();
-    const { usuario } = useUserStore();    
+    const { usuario } = useUserStore();
 
     const [veiculos, setVeiculos] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -33,13 +33,13 @@ export default function SelectVeicle() {
             }
             setLoading(true);
             try {
-                
+
                 const instrutor = aula.instrutor.id_instrutor;
                 console.log(aula)
                 console.log(aula.instrutor.instrutor_id);
                 console.log(aula.tipo);
 
-                const veiclesData = await SelectVeicleByInstrutor(aula.instrutor.instrutor_id, aula.tipo); 
+                const veiclesData = await SelectVeicleByInstrutor(aula.instrutor.instrutor_id, aula.tipo);
                 setVeiculos(veiclesData || []); // Garante que seja um array                
             } catch (error) {
                 showToast('Erro', 'Ocorreu um erro ao buscar os veículos.');
@@ -73,9 +73,16 @@ export default function SelectVeicle() {
     };
 
     const renderVeicleItem = (item) => (
-        <Button key={item.veiculo_id} onClick={() => handleButtonClick(item)}>
-            {item.modelo}
-        </Button>
+        <div className='flex bg-white shadow-md p-3 rounded-xl align-middle justify-start gap-3' key={item.veiculo_id} onClick={() => handleButtonClick(item)}>
+            <div className='w-full text-start'>
+                <h1>Instrutor: </h1>
+                <h1 className='font-bold text-4xl capitalize'>{item.modelo}</h1>
+                <Button className='mt-2'>
+                    Selecionar
+                    <span className="material-icons">arrow_forward_ios</span>
+                </Button>
+            </div>
+        </div >
     );
 
     const onCancel = () => {
@@ -86,9 +93,9 @@ export default function SelectVeicle() {
     //#endregion
 
     return (
-        <div className='container'>
+        <div className='flex flex-col gap-5'>
             <LoadingIndicator visible={loading} />
-            <div className='button-container'>
+            <div className='flex justify-between items-center w-full mb-3'>
                 <ButtonBack event={() => navigate('/selecionarInstrutor')} />
                 <ButtonHome event={() => navigate('/home')} />
             </div>
@@ -96,22 +103,28 @@ export default function SelectVeicle() {
                 Clique no veículo que deseja utilizar na aula!
             </h1>
             {veiculos.length === 0 ? (
-                <div className='container-error'>
+                <div className='flex flex-col'>
                     <p className='text-error'>
                         {'Nenhum veículo encontrado, entre em contato com o suporte!'}
                     </p>
                     <span className="material-icons">error</span>
                 </div>
             ) : (
-                <div className='container-vertical'>
+                <div className='flex flex-col gap-3 max-h-[500px] overflow-y-auto'>
                     {veiculos.map(renderVeicleItem)}
                 </div>
             )}
             <Count num={3} />
             <Modal isOpen={modalVisible}>
                 <p>Você tem certeza que deseja selecionar o veículo: <strong>{selectedVeicle?.modelo}</strong>?</p>
-                <Button back={'#2A8C68'} onClick={confirmSelection}>Sim</Button>
-                <Button back={'#A61723'} onClick={onCancel}>Não</Button>
+                <Button onClick={confirmSelection} type={4}>Sim
+                    <span className="material-icons">
+                        check
+                    </span></Button>
+                <Button onClick={() => onCancel()} type={3}>Não
+                    <span className="material-icons">
+                        close
+                    </span></Button>
             </Modal>
 
             <ToastContainer />

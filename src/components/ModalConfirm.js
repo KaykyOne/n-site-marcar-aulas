@@ -1,57 +1,25 @@
-import React, { useState } from 'react';
+import React from 'react';
 
 export default function ModalConfirm({ message, onConfirm, onCancel }) {
   return (
-    <div style={styles.overlay}>
-      <div style={styles.modal}>
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+      <div className="bg-white p-6 rounded-lg text-center shadow-md w-[90%] max-w-md">
         <p>{message}</p>
-        <div style={styles.buttons}>
-          <button style={styles.confirmButton} onClick={onConfirm}>Sim</button>
-          <button style={styles.cancelButton} onClick={onCancel}>Não</button>
+        <div className="mt-5 flex justify-between gap-4">
+          <button
+            onClick={onConfirm}
+            className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition"
+          >
+            Sim
+          </button>
+          <button
+            onClick={onCancel}
+            className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition"
+          >
+            Não
+          </button>
         </div>
       </div>
     </div>
   );
 }
-
-const styles = {
-  overlay: {
-    position: 'fixed',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  modal: {
-    backgroundColor: 'white',
-    padding: '20px',
-    borderRadius: '8px',
-    textAlign: 'center',
-    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-  },
-  buttons: {
-    marginTop: '20px',
-    display: 'flex',
-    justifyContent: 'space-between',
-  },
-  confirmButton: {
-    padding: '10px 20px',
-    backgroundColor: 'green',
-    color: 'white',
-    border: 'none',
-    borderRadius: '4px',
-    cursor: 'pointer',
-  },
-  cancelButton: {
-    padding: '10px 20px',
-    backgroundColor: 'red',
-    color: 'white',
-    border: 'none',
-    borderRadius: '4px',
-    cursor: 'pointer',
-  },
-};

@@ -22,7 +22,7 @@ export default function SelectTypeView() {
     const [categorias, setCategorias] = useState([]);
     const [loading, setLoading] = useState(false);
     const [modalVisible, setModalVisible] = useState(false);
-    const [selectedType, setSelectedType] = useState(null); 
+    const [selectedType, setSelectedType] = useState(null);
 
     const categoriasEscrito = {
         A: "Moto",
@@ -86,12 +86,21 @@ export default function SelectTypeView() {
     };
 
     const renderCategoriaItem = (item, index) => (
-        <Button key={index} onClick={() => handleButtonClick(item)}>
-            {categoriasEscrito[item] || item}
-            <span className="material-icons">
-                {iconsButton[item] || ""}
-            </span>
-        </Button>
+        <div className='flex bg-white shadow-md p-3 rounded-xl align-middle justify-start gap-3' key={index} onClick={() => handleButtonClick(item)}>
+            <h1 className='text-7xl font-bold p-2 border-r-2 border-gray-400'>{item}</h1>
+            <div className='w-full'>
+                <div className='flex justify-start align-middle gap-1'>
+                    <h1 className='font-bold'>{categoriasEscrito[item] || item}</h1>
+                    <span className="material-icons">
+                        {iconsButton[item] || ""}
+                    </span>
+                </div>
+                <Button className='mt-2' type={1}>
+                    Selecionar
+                    <span className="material-icons">arrow_forward_ios</span>
+                </Button>
+            </div>
+        </div>
     );
 
     const onCancel = () => {
@@ -102,13 +111,13 @@ export default function SelectTypeView() {
     //#endregion
 
     return (
-        <div className='container'>
+        <div className='flex flex-col gap-5'>
             <ButtonBack event={() => navigate('/home')} />
-            <h1 className='greatText'>Clique no tipo da AULA que deseja marcar!</h1>
+            <h1 className='font-bold'>Clique no tipo da AULA que deseja marcar!</h1>
             <LoadingIndicator visible={loading} />
             {categorias.Count === 0 ? (
-                <div className='container-error'>
-                    <p className='text-error'>
+                <div className='flex flex-col'>
+                    <p className='text-red-800'>
                         {'Nenhuma categoria encontrada, entre em contato com o suporte!'}
                     </p>
                     <span className="material-icons">
@@ -116,7 +125,7 @@ export default function SelectTypeView() {
                     </span>
                 </div>
             ) : (
-                <div className='container-vertical'>
+                <div className='flex flex-col gap-3'>
                     {categorias.map(renderCategoriaItem)}
                 </div>
             )}
@@ -124,9 +133,15 @@ export default function SelectTypeView() {
             <Count num={1} />
             <Modal
                 isOpen={modalVisible}   >
-                <p>Você tem certeza que deseja selecionar o tipo: {selectedType}</p>
-                <Button back={'#2A8C68'}  onClick={confirmSelection}>Sim</Button>
-                <Button back={'#A61723'} onClick={() => onCancel()}>Não</Button>
+                <p>Você tem certeza que deseja selecionar o tipo: <strong>{categoriasEscrito[selectedType]}</strong></p>
+                <Button onClick={confirmSelection} type={4}>Sim
+                    <span className="material-icons">
+                        check
+                    </span></Button>
+                <Button onClick={() => onCancel()} type={3}>Não
+                    <span className="material-icons">
+                        close
+                    </span></Button>
             </Modal>
 
             <ToastContainer />

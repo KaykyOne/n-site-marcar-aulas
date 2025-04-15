@@ -16,8 +16,9 @@ import { PegarData } from '../controller/ControllerDataEHora';
 import { SearchAndFilterHour } from '../controller/ControllerAulas';
 import useAulaStore from '../store/useAulaStore';
 import useUserStore from '../store/useUserStore';
-import { format, isValid, isBefore, addDays, subDays, isAfter } from 'date-fns';
+import { format, isBefore, addDays, subDays, isAfter } from 'date-fns';
 import { formatarDataParaSalvar } from '../utils/dataFormat';
+
 
 export default function SelectDateAndHour() {
 
@@ -68,18 +69,24 @@ export default function SelectDateAndHour() {
   }
 
   async function fetchHours() {
+    const dayOfWeek = format(date, 'i');
+    setDayName(namesForDays[dayOfWeek]);
+    if(dayOfWeek == 7 || dayOfWeek == 6){
+      setHoras([]);
+      return;
+    }
     setLoading(true);
     try {
       const result = await SearchAndFilterHour(
         instrutor,
         veiculo,
-        date // Usando date-fns para formatar a data
+        date
       );
 
-      const dayOfWeek = format(date, 'i'); // Retorna o índice do dia da semana (1 = Segunda-feira, 2 = Terça-feira, ...)
+      // Retorna o índice do dia da semana (1 = Segunda-feira, 2 = Terça-feira, ...)
       // console.log(dayOfWeek);
       setHoras(result);
-      setDayName(namesForDays[dayOfWeek]);
+
     } catch (error) {
       setError(error.message);
     } finally {
@@ -96,6 +103,10 @@ export default function SelectDateAndHour() {
   }, [date]);
 
   const handleDateChange = (selectedDate) => {
+    if(isAfter(currentDate, selectedDate)){
+      return;
+    }
+
     if (!date) {
       setDate(selectedDate);
       return;
@@ -104,10 +115,10 @@ export default function SelectDateAndHour() {
       toast.error('Data muito longe!');
       return;
     }
-  
+
     setDate(selectedDate);
   };
-  
+
 
   const handleHourClick = (hora) => {
     const selectedHourParsed = new Date(`1970-01-01T${hora}:00`); // Parse a hora
@@ -145,15 +156,15 @@ export default function SelectDateAndHour() {
   }
 
   return (
-    <div className='container'>
-      <div className='button-container'>
+    <div className='flex flex-col h-full mt-10'>
+      <div className='flex justify-between items-center w-full mb-3'>
         <ButtonBack event={handleBack} />
         <ButtonHome event={handleHome} />
       </div>
 
-      <h3 className='greatText'>Selecione a data e hora da sua aula!</h3>
-      <div className='container-flat'>
-        <AiOutlineLeft size={30} onClick={() => handleDateChange(subDays(date, 1))} />
+      <h3 className='font-bold text-2xl mb-4'>Selecione a data e hora da sua aula!</h3>
+      <div className='flex items-center justify-center gap-2'>
+        <AiOutlineLeft className='cursor-pointer' size={30} onClick={() => handleDateChange(subDays(date, 1))} />
         <div className='container-vertical'>
           <DatePicker
             selected={date}  // Garantindo que o valor de `date` seja um objeto `Date`
@@ -163,19 +174,19 @@ export default function SelectDateAndHour() {
             dateFormat="dd/MM/yyyy"
             className="custom-datepicker-input"
           />
-          <h4 className='greatText'>{dayName}</h4>
         </div>
-        <AiOutlineRight size={30} onClick={() => handleDateChange(addDays(date, 1))} />
+        <AiOutlineRight className='cursor-pointer' size={30} onClick={() => handleDateChange(addDays(date, 1))} />
       </div>
+      <h4 className='font-bold'>{dayName}</h4>
 
       <LoadingIndicator visible={loading} />
       {error && <p className='text-error'>{error}</p>}
 
 
-      <div className='listContainer'>
+      <div className='flex flex-col gap-3'>
         {holidays.includes(format(date, 'yyyy-MM-dd')) ||
-          format(date, 'i') == 7 ||
-          format(date, 'i') == 6 ? (
+          format(date, 'i') === 7 ||
+          format(date, 'i') === 6 ? (
           <div className='container-error'>
             <p className='text-error'>
               {'Nenhum horário disponível essa data!'}
@@ -199,10 +210,16 @@ export default function SelectDateAndHour() {
 
       <Modal isOpen={modalVisible}>
         <p>Você tem certeza que deseja selecionar essa data: <strong>{format(date, 'dd/MM/yyyy')} </strong>  ás <strong>{selectedHour}</strong> </p>
-        <Button back={'#2A8C68'} onClick={confirmSelection}>Sim</Button>
-        <Button back={'#A61723'} onClick={() => setModalVisible(false)}>Não</Button>
-      </Modal>
-      <Count num={3} />
+                <Button onClick={confirmSelection} type={4}>Sim
+                    <span className="material-icons">
+                        check
+                    </span></Button>
+                <Button onClick={() => setModalVisible(false)} type={3}>Não
+                    <span className="material-icons">
+                        close
+                    </span></Button>
+            </Modal>
+      <Count className='bottom-0' num={4} />
       <ToastContainer />
     </div>
   );

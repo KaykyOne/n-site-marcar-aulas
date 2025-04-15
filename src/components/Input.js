@@ -1,15 +1,37 @@
-import React from 'react';
-import '../css/Components.css';
-
-export default function InputField({ placeholder, inputMode, value, onChange, type, classNamePersonalized}) {
+export default function InputField({
+    placeholder,
+    inputMode = "text",
+    value,
+    onChange,
+    type = "text",
+    className = "",
+  }) {
     return (
-        <input
-            type={type || 'text'}
-            inputMode={inputMode || 'text'}
-            placeholder={placeholder}
-            value={value}
-            onChange={onChange}
-            className={classNamePersonalized ? classNamePersonalized : 'input'}
-        />
+      <input
+        type={type}
+        inputMode={inputMode}
+        placeholder={placeholder}
+        value={value}
+        onChange={onChange}
+        className={`
+          h-[50px]
+          w-full
+          p-3
+          bg-white
+          border
+          border-gray-300
+          rounded-md
+          shadow-sm
+          placeholder-gray-400
+          focus:outline-none
+          focus:ring-2
+          focus:ring-primary
+          focus:border-transparent
+          transition-all
+          duration-200
+          ${className}
+        `}
+      />
     );
-}
+  }
+  

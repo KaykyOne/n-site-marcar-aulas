@@ -57,7 +57,7 @@ export default function Confirm() {
     try {
       setLoading(true);
 
-      if (isHoliday(date) || isWeekend(date) || date == '2025-01-01') {
+      if (isHoliday(date) || isWeekend(date) || date==='2025-01-01') {
         toggleModal('Data Indisponível: A data selecionada é um feriado, sábado ou domingo.');
         setLoading(false);
         return;
@@ -150,39 +150,53 @@ export default function Confirm() {
   //#endregion
 
   return (
-    <div className='container'  >
-      <div className='button-container'>
-        <ButtonBack event={() => navigate('/selecionarDataEHora')} />
-        <ButtonHome event={() => navigate('/home')} />
-      </div>
+<div className="flex flex-col  px-4 py-6 bg-white shadow-md rounded-xl max-w-2xl mx-auto">
+  <div className="flex justify-between items-center w-full mb-6">
+    <ButtonBack event={() => navigate('/selecionarDataEHora')} />
+    <ButtonHome event={() => navigate('/home')} />
+  </div>
 
-      <h1>Confirme sua Aula</h1>
-      <h3 className='greatText'>Tipo da Aula: <span>{type}</span></h3>
-      <h3 className='greatText'>Instrutor: <span>{instrutor.nome_instrutor}</span></h3>
-      <h3 className='greatText'>Data Selecionada: <span>{formatarDataParaExibir(date)}</span></h3>
-      <h3 className='greatText'>Hora da Aula: <span>{hora}</span></h3>
+  <h1 className="text-3xl font-semibold text-center mb-6 text-gray-800">Confirme sua Aula</h1>
 
-      <LoadingIndicator visible={loading} />
+  <div className="space-y-3 mb-6">
+    <h3 className="text-lg text-gray-700">
+      <span className="font-semibold">Tipo da Aula:</span> {type}
+    </h3>
+    <h3 className="text-lg text-gray-700">
+      <span className="font-semibold">Instrutor:</span> {instrutor.nome_instrutor}
+    </h3>
+    <h3 className="text-lg text-gray-700">
+      <span className="font-semibold">Data Selecionada:</span> {formatarDataParaExibir(date)}
+    </h3>
+    <h3 className="text-lg text-gray-700">
+      <span className="font-semibold">Hora da Aula:</span> {hora}
+    </h3>
+  </div>
 
-      <Button
-        onClick={loading ? null : handleConfirm}
-        disabled={loading}
-      >
-        {loading ? 'Processando...' : 'Finalizar'}
-      </Button>
-      <ToastContainer />
+  <LoadingIndicator visible={loading} />
 
-      <Modal
-        isOpen={isModalVisible}
-        onConfirm={() => setModalVisible(false)}
-        onCancel={() => setModalVisible(false)}
-      >
-        <p>{modalMessage}</p>
-        <Button onClick={() => setModalVisible(false)}>
-          Ok
-        </Button>
-      </Modal>
-    </div>
+  <Button
+    onClick={loading ? null : handleConfirm}
+    disabled={loading}
+    className="mt-4"
+  >
+    {loading ? 'Processando...' : 'Finalizar'}
+  </Button>
+
+  <ToastContainer />
+
+  <Modal
+    isOpen={isModalVisible}
+    onConfirm={() => setModalVisible(false)}
+    onCancel={() => setModalVisible(false)}
+  >
+    <p className="text-gray-800">{modalMessage}</p>
+    <Button onClick={() => setModalVisible(false)} className="mt-4">
+      Ok
+    </Button>
+  </Modal>
+</div>
+
   );
 };
 
