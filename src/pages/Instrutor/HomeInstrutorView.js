@@ -9,7 +9,6 @@ import useInstrutorStore from '../../store/useInstrutorStore';
 
 export default function HomeInstrutorView() {
 
-  const { usuario } = useUserStore();
   const { instrutor } = useInstrutorStore();
   const [loading, setLoading] = useState(false);
   const [modalMessage, setModalMessage] = useState('');
@@ -50,8 +49,12 @@ export default function HomeInstrutorView() {
         Alunos
         <span className="material-icons">groups</span>
       </Button>
+      <Button onClick={() => navigate(`/perfil`, { state: { tipo: 1 } })} type={1}>
+        Alterar Senha
+        <span className="material-icons">key</span>
+      </Button>
       <Button onClick={() => navigate('/')} type={2}>
-        Voltar
+        Sair
         <span className="material-icons">logout</span>
       </Button>
 

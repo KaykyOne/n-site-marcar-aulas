@@ -85,11 +85,6 @@ export default function Confirm() {
       console.log('Maximo Normal Dia:', maximoNormalDia);
       console.log('Is Outra Cidade:', isOutraCidade);
 
-      const numeroMaximoDeAulasDeUmTipoDeVeiculo = (configs.find(item => item.chave === type)).valor;
-      const aulasDoTipoJaMarcadas = await classModel.countClassByDateAndHoour(type, hora, date)
-      console.log('Max aulas tipo de veículo:', numeroMaximoDeAulasDeUmTipoDeVeiculo);
-      console.log('Max aulas tipo de veículo já marcadas :', aulasDoTipoJaMarcadas);
-
       // if (aulasDoTipoJaMarcadas >= numeroMaximoDeAulasDeUmTipoDeVeiculo) {
       //   toggleModal(`O número máximo de aulas do tipo '${type}' já foi atingido neste horário. Por favor, escolha outro horário!`);
       //   return;

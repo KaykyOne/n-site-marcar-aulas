@@ -1,6 +1,6 @@
 {
-  "name": "site-marcar-aulas",
-  "version": "0.1.0",
+  "name": "novus-cfc",
+  "version": "1.0.0",
   "private": true,
   "homepage": "https://autoescolaidealjales.com.br",
   "dependencies": {

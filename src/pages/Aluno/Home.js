@@ -71,7 +71,7 @@ export default function HomeView() {
         Listar Aulas
         <span className="material-icons">directions_car</span>
       </Button>
-      <Button onClick={() => alterPage('perfil')} type={2}>
+      <Button onClick={() => navigate(`/perfil`, { state: { tipo: 2 } })} type={2}>
         Alterar Senha
         <span className="material-icons">key</span>
       </Button>

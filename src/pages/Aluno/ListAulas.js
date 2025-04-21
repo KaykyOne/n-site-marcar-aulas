@@ -8,6 +8,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import Modal from '../../components/Modal';
 import ButtonBack from '../../components/ButtonBack';
 import Button from '../../components/Button';
+import RenderAula from '../../components/RenderAula.js';
 
 import useUserStore from '../../store/useUserStore.js';
 
@@ -25,21 +26,6 @@ export default function ListAulas() {
     const [modalVisible, setModalVisible] = useState(false);
     const [selectedAula, setSelectedAula] = useState(null);
     const [modalAction, setModalAction] = useState(null);
-
-    const categoriasEscrito = {
-        A: "Moto",
-        B: "Carro",
-        C: "Caminhão",
-        D: "Ônibus"
-    };
-
-    const iconsButton = {
-        A: "two_wheeler",
-        B: "directions_car",
-        C: "local_shipping",
-        D: "directions_bus",
-        E: "local_shipping"
-    };
 
     const showToast = (type, text1, text2) => {
         toast.dismiss();
@@ -115,27 +101,7 @@ export default function ListAulas() {
     };
 
     const renderAulaItem = (item) => (
-        <div className='flex gap-3 bg-white shadow-md rounded-lg p-3 justify-start items-stretch text-start m-2' key={item.aula_id}>
-
-            <div className='flex flex-col border-r-2 border-gray-400 p-1 m-2 justify-center'>
-                <span className="material-icons text-7xl">
-                    {iconsButton[item.tipo] || ""}
-                </span>
-            </div>
-
-
-            <div className='flex flex-col min-w-[150px]'>
-                <h1 className='font-bold text-2xl'>{format(parseISO(item.data), 'dd/MM/yyyy')}</h1>
-                <p><strong>Hora:</strong> {item.hora}</p>
-                <p className='capitalize'><strong>Instrutor:</strong> {item.instrutores?.nome_instrutor || 'Não especificado'}</p>
-                <div className='p-2'>
-
-                </div>
-            </div>
-            <Button type={3} onClick={() => handleAction('Excluir', item)}>
-                <span className="material-icons">delete</span>
-            </Button>
-        </div>
+        <RenderAula item={item} key={item.aula_id} tipo={2} handleAction={handleAction}/>
     );
 
     //#endregion

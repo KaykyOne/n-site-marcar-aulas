@@ -5,6 +5,7 @@ export default function InputField({
     onChange,
     type = "text",
     className = "",
+    disabled = false,
   }) {
     return (
       <input
@@ -31,6 +32,7 @@ export default function InputField({
           duration-200
           ${className}
         `}
+        disabled={disabled}
       />
     );
   }

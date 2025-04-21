@@ -81,7 +81,7 @@ export default function Login() {
             if (usuarioAtual.usuario_id != null) {
                 const manutencaoConfig = usuarioAtual.configuracoes.find(config => config.chave === "manutencao");
                 const manutencao = manutencaoConfig ? manutencaoConfig.valor : "TRUE";
-                if (manutencao === "FALSE") {
+                if (manutencao === "TRUE") {
                     toggleModal("O sistema de sua autoescola está em manutenção!");
                     return;
                 }

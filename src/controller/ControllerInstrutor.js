@@ -35,4 +35,59 @@ const GetInstrutor = async (instrutorId) => {
     }
 };
 
-export { GetInstrutor };
+const GetAlunos = async (instrutorId) => {
+    if (!instrutorId) {
+        console.warn("ID do instrutor não informado");
+        return null; 
+    }
+
+    try {
+        const response = await fetch(`${urlBack}/buscarAlunos?instrutor_id=${instrutorId}`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json"
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error("Erro na resposta do servidor");
+        }
+
+        const data = await response.json();
+        return data;
+
+    } catch (err) {
+        console.error("Erro na requisição:", err);
+        return null;
+    }
+};
+
+const SearchAulasInstrutor = async (instrutorId, data) => {
+    if (!instrutorId || !data) {
+        console.warn("ID do instrutor ou data não informado");
+        return null; 
+    }
+
+    try {
+        const response = await fetch(`${urlBack}/buscarAulasPorInstrutor?instrutor_id=${instrutorId}&data=${data}`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json"
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error("Erro na resposta do servidor");
+        }
+
+        const res = await response.json();
+        return res;
+
+    } catch (err) {
+        console.error("Erro na requisição:", err);
+        return null;
+    }
+};
+
+
+export { GetInstrutor, GetAlunos, SearchAulasInstrutor };

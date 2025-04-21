@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { UserModel } from '../pageModel/UserModel';
@@ -11,6 +11,8 @@ import useUserStore from '../store/useUserStore';
 
 export default function Perfil() {
     const { usuario } = useUserStore();
+    const location = useLocation();
+    const tipo = location.state?.tipo;
     const [currentPassword, setCurrentPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
     const [loading, setLoading] = useState(false);
@@ -105,14 +107,22 @@ export default function Perfil() {
                 return "gray";
         }
     }
-    
 
+    const handleBack = () => {
+        if(tipo === 1){
+            navigate('/homeInstrutor')
+            return;
+        }else{
+            navigate('/home')
+            return;
+        }
+    }
 
     //#endregion
 
     return (
         <div className='flex flex-col gap-2'>
-            <ButtonBack event={() => navigate('/home')} />
+            <ButtonBack event={handleBack} />
             <h1>Olá, {usuario.nome}</h1>
             <h3>Altere sua Senha!</h3>
             <h5>Lembrando, a senha deve ter no minimo 6 e no máximo 12 caracteres!</h5>

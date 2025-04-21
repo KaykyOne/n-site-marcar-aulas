@@ -21,7 +21,8 @@ export class UserModel {
     let { data, error } = await supabase
       .from('usuarios_instrutores')
       .select("usuario_id, usuarios(usuario_id, nome, sobrenome, telefone)")
-      .eq('instrutor_id', instrutor_id);
+      .eq('instrutor_id', instrutor_id)
+      .eq('', true);
 
     if (error) {
       console.log(error.message);

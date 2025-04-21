@@ -9,10 +9,10 @@ import End from './pages/End';
 import Erro from './pages/Erro';
 import Perfil from './pages/Perfil';
 import HomeInstrutor from './pages/Instrutor/HomeInstrutorView';
-import SelectAluno from './pages/Instrutor/SelectAlunoView';
 import ListAulasInstrutor from './pages/Instrutor/ListAulasInstrutorView';
 import ListAlunosView from './pages/Instrutor/ListAlunosView';
 import SelectVeicle from './pages/Aluno/SelectVeicle';
+import CreateAula from './pages/Instrutor/CreateAula';
 
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
@@ -44,13 +44,13 @@ function App() {
           {/* Página Home Instrutor */}
           <Route path="/homeinstrutor" element={<HomeInstrutor />} />
           {/* Página de Selecionar o Aluno */}
-          <Route path="/selectAluno" element={<SelectAluno />} />
-          {/* Página de Selecionar o Aluno */}
           <Route path="/listAulasInstrutor" element={<ListAulasInstrutor />} />
           {/* Página de Listar Os Alunos do instrutor o Aluno */}
           <Route path="/listarAlunosInstrutor" element={<ListAlunosView />} />
           {/* Página de Listar Os veiculos do instrutor ao Aluno */}
           <Route path="/selecionarVeiculo" element={<SelectVeicle />} />
+          {/* Página de Listar Os veiculos do instrutor ao Aluno */}
+          <Route path="/criarAula" element={<CreateAula />} />
         </Routes>
       </BrowserRouter>
     </div>

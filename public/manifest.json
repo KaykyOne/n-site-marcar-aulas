@@ -1,24 +1,24 @@
 {
-  "short_name": "MarcarAulasIdeal",
+  "short_name": "novuscfc",
   "name": "Marque suas aulas aqui!",
   "icons": [
     {
-      "src": "favicon.ico",
-      "sizes": "64x64 32x32 24x24 16x16",
+      "src": "favicon-v2.ico",
+      "sizes": "32x32",
       "type": "image/x-icon"
     },
     {
-      "src": "logo192.png",
+      "src": "logo192-v2.png",
       "type": "image/png",
       "sizes": "192x192"
     },
     {
-      "src": "logo256.png",
+      "src": "logo256-v2.png",
       "type": "image/png",
       "sizes": "256x256"
     },
     {
-      "src": "logo512.png",
+      "src": "logo512-v2.png",
       "type": "image/png",
       "sizes": "512x512"
     }
@@ -26,5 +26,7 @@
   "start_url": "/",
   "display": "standalone",
   "theme_color": "#000000",
-  "background_color": "#ffffff"
+  "background_color": "#ffffff",
+  "lang": "pt-BR",
+  "dir": "ltr"
 }
