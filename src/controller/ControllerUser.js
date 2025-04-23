@@ -10,7 +10,7 @@ const LoginFunc = async (cpf, senha, lastUpdated, autoescola_id, configuracoes) 
     }
 
     try {
-        const response = await fetch(`${urlBack}/login`, {  
+        const response = await fetch(`${urlBack}/usuario/login`, {  
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ cpf, senha, lastUpdate: lastUpdated, autoescola_id, configuracoes }),

@@ -156,7 +156,7 @@ export default function SelectDateAndHour() {
   }
 
   return (
-    <div className='flex flex-col h-full mt-10'>
+    <div className='flex flex-col h-full mt-10 p-5'>
       <div className='flex justify-between items-center w-full mb-3'>
         <ButtonBack event={handleBack} />
         <ButtonHome event={handleHome} />

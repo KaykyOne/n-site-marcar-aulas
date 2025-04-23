@@ -8,7 +8,7 @@ const SelectVeicleByInstrutor = async (id_instrutor, type) => {  // Passando a d
     }
 
     try {
-        const response = await fetch(`${urlBack}/buscarVeiculos?instrutor_id=${id_instrutor}&tipo=${type}`, {
+        const response = await fetch(`${urlBack}/veiculos/buscarVeiculos?instrutor_id=${id_instrutor}&tipo=${type}`, {
             method: 'GET',
             headers: { 'Content-Type': 'application/json' },
         });

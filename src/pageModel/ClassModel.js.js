@@ -87,49 +87,6 @@ export class ClassModel {
         }
     }
 
-    async searchAulasInstrutor(codigo, dia) {
-        try {
-            // Busca as aulas associadas ao ID do aluno
-            const { data, error } = await supabase
-                .from('aulas')
-                .select(`
-            aula_id,
-            data,
-            hora,
-            tipo,
-            aluno_id,
-            usuarios (
-              nome
-            )
-          `)
-                .eq('instrutor_id', codigo)
-                .eq('data', dia)
-                .order('data', { ascending: true });
-
-            if (error) {
-                console.error("Erro ao buscar aulas:", error);
-                return null; // Retorna null em caso de erro
-            }
-
-            const { data: count, error: errorCount } = await supabase
-                .from('aulas')
-                .select('*', { count: 'exact' })
-                .eq('instrutor_id', codigo)
-                .eq('situacao', 'Concluída');
-
-            if (errorCount) {
-                console.error('Erro ao contar gerais aulas:', errorCount.message);
-                return null; // Retorna null em caso de erro
-            }
-
-            this.aulas = data || []; // Armazena os dados no ViewModel
-            return { aulas: this.aulas, count };
-
-        } catch (error) {
-            return null;
-        }
-    }
-
     async searchAulas(alunoId) {
         try {
             if (!alunoId) {

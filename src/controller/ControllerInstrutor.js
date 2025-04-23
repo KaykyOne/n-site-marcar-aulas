@@ -10,7 +10,7 @@ const GetInstrutor = async (instrutorId) => {
     }
 
     try {
-        const response = await fetch(`${urlBack}/buscarInstrutor`, {
+        const response = await fetch(`${urlBack}/instrutor/buscarInstrutor`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ id: instrutorId }),
@@ -42,7 +42,7 @@ const GetAlunos = async (instrutorId) => {
     }
 
     try {
-        const response = await fetch(`${urlBack}/buscarAlunos?instrutor_id=${instrutorId}`, {
+        const response = await fetch(`${urlBack}/instrutor/buscarAlunos?instrutor_id=${instrutorId}`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json"
@@ -69,7 +69,7 @@ const SearchAulasInstrutor = async (instrutorId, data) => {
     }
 
     try {
-        const response = await fetch(`${urlBack}/buscarAulasPorInstrutor?instrutor_id=${instrutorId}&data=${data}`, {
+        const response = await fetch(`${urlBack}/instrutor/buscarAulasPorInstrutor?instrutor_id=${instrutorId}&data=${data}`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json"

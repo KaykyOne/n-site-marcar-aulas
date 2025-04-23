@@ -22,6 +22,7 @@
   
   body {
     display: flex;
+    touch-action: manipulation;
     justify-content: center;
     align-items: center;
     height: 100%;

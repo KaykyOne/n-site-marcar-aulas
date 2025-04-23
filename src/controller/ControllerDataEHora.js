@@ -2,7 +2,7 @@ const urlBack = process.env.REACT_APP_URL_BACK;
 
 const PegarData = async () => {
     try {
-      const response = await fetch(`${urlBack}/pegarDataAtual`, {
+      const response = await fetch(`${urlBack}/sistema/pegarDataAtual`, {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },
       });

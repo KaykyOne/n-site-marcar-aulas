@@ -7,7 +7,7 @@ const SearchAndFilterHour = async (instrutor_id, veiculo_id, data) => {
     }
 
     try {
-        const response = await fetch(`${urlBack}/buscarHorarioLivre?instrutor_id=${instrutor_id}&veiculo_id=${veiculo_id}&data=${data}`, {
+        const response = await fetch(`${urlBack}/aulas/buscarHorarioLivre?instrutor_id=${instrutor_id}&veiculo_id=${veiculo_id}&data=${data}`, {
             method: 'GET',
             headers: { 'Content-Type': 'application/json' },
         });
@@ -34,7 +34,7 @@ const InsertClass = async (instrutor_id, aluno_id, data, tipo, hora, veiculo_id,
     }
 
     try {
-        const response = await fetch(`${urlBack}/inserirAula`, {
+        const response = await fetch(`${urlBack}/aulas/inserirAula`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({

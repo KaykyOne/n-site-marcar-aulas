@@ -32,10 +32,13 @@ export class UserModel {
   }
 
   async updatePassword(usuario, novaSenha) {
+    console.log(novaSenha);
+    console.log(usuario);
+
     const { error } = await supabase
       .from('usuarios')
       .update({ senha: novaSenha })
-      .eq('cpf', usuario.cpf);
+      .eq('usuario_id', usuario.usuario_id);
 
     if (error) {
       console.error('Erro ao atualizar a senha:', error);
