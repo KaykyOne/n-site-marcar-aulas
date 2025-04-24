@@ -108,7 +108,7 @@ export default function SelectInstructor() {
                     </span>
                 </div>
             ) : (
-                <div className='flex flex-col gap-3 max-h-[500px] overflow-y-auto'>
+                <div className='flex flex-col gap-3 max-h-[400px] overflow-y-auto'>
                     {instrutores.map(renderInstrutorItem)}
                 </div>
             )}

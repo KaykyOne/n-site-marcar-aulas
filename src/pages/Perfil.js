@@ -121,7 +121,7 @@ export default function Perfil() {
     //#endregion
 
     return (
-        <div className='flex flex-col gap-2'>
+        <div className='flex flex-col gap-2 p-3'>
             <ButtonBack event={handleBack} />
             <h1>Olá, {usuario.nome}</h1>
             <h3>Altere sua Senha!</h3>

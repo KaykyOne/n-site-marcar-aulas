@@ -107,31 +107,40 @@ export default function ListAulas() {
     //#endregion
 
     return (
-        <div className='flex flex-col'>
-            <ButtonBack event={() => navigate(`/home`)} />
-            <h1 className='font-bold text-2xl '>Aulas</h1>
-
-            <div className='min-h-[400px] min-w-[250px] align-top mt-3 max-h-[500px] overflow-y-auto'>
-                {loading && <LoadingIndicator />}
-                {error || aulas.length === 0 ? (
-                    <div>
-                        <p className='text-error'>
-                            {error ? `Erro: ${error}` : 'Nenhuma aula marcada!'}
-                        </p>
-                    </div>
-                ) : (
-                    <div>{aulas.map(renderAulaItem)}</div>
-                )}
+      <div className='flex flex-col max-w-md mx-auto px-4'>
+          <ButtonBack className={"ml-5"} event={() => navigate(`/home`)} />
+          <h1 className='font-bold text-2xl mb-2'>Aulas</h1>
+      
+          <div className='w-full mt-3 h-[60vh] overflow-y-auto rounded-md border'>
+            {loading && <LoadingIndicator />}
+            {error || aulas.length === 0 ? (
+              <div className='p-5'>
+                <p className='text-error'>
+                  {error ? `Erro: ${error}` : 'Nenhuma aula marcada!'}
+                </p>
+              </div>
+            ) : (
+              <div className='p-4'>{aulas.map(renderAulaItem)}</div>
+            )}
+          </div>
+      
+          <Modal isOpen={modalVisible}>
+            <p className='mb-4'>
+              {modalAction === 'Excluir'
+                ? `Deseja excluir a aula ${selectedAula?.tipo}?`
+                : `Deseja confirmar a aula de tipo: ${selectedAula?.tipo}?`}
+            </p>
+            <div className="flex gap-2 justify-center">
+              <Button type={4} onClick={confirmAction}>
+                sim <span className="material-icons">check</span>
+              </Button>
+              <Button type={3} onClick={() => setModalVisible(false)}>
+                não <span className="material-icons">close</span>
+              </Button>
             </div>
-
-
-            <Modal
-                isOpen={modalVisible}>
-                <p>{modalAction === 'Excluir' ? `Deseja excluir a aula ${selectedAula?.tipo}?` : `Deseja confirmar a aula de tipo: ${selectedAula?.tipo}?`}</p>
-                <Button type={4} onClick={confirmAction}>sim <span className="material-icons">check</span></Button>
-                <Button type={3} onClick={() => setModalVisible(false)}>não <span className="material-icons">close</span></Button>
-            </Modal>
-            <ToastContainer position="top-center" />
+          </Modal>
+      
+          <ToastContainer position="top-center" />
         </div>
-    );
+      );      
 }

@@ -20,23 +20,23 @@ export default function RenderAula({ item, tipo, handleAction = null }) {
             </div>
 
             {/* Infos principais */}
-            <div className='flex flex-col min-w-[150px]'>
+            <div className='flex flex-col flex-1'>
                 {tipo !== 1 && (
-                    <h1 className='font-bold text-2xl'>{formatarDataParaExibir(item.data)}</h1>
+                    <h1 className='font-bold'>{formatarDataParaExibir(item.data)}</h1>
                 )
                 }
 
-                <p><strong>Hora:</strong> {item.hora}</p>
+                <p><strong>Hora:</strong> <br/> {item.hora}</p>
 
                 {tipo === 1 ? (
-                    <p className='capitalize'><strong>Aluno:</strong> {(`${item.nome} ${item.sobrenome}`) || 'Não especificado'}</p>
+                    <p className='capitalize'><strong>Aluno:</strong> <br/> {(`${item.nome} ${item.sobrenome}`) || 'Não especificado'}</p>
                 ) : (
-                    <p className='capitalize'><strong>Instrutor:</strong> {item.instrutores?.nome_instrutor || 'Não especificado'}</p>
+                    <p className='capitalize'><strong>Instrutor:</strong> <br/> {item.instrutores?.nome_instrutor || 'Não especificado'}</p>
                 )}
 
                 {tipo === 1 && (
                     <>
-                        <p><strong>Veículo:</strong> {`${item.placa} ${item.modelo}`}</p>
+                        <p><strong>Veículo:</strong> {`${item.placa} <br/> ${item.modelo}`}</p>
                     </>
                 )}
             </div>
