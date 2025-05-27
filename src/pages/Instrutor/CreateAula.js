@@ -6,14 +6,17 @@ import InputField from '../../components/Input';
 import ButtonBack from '../../components/ButtonBack';
 import DateTimePicker from '../../components/DateTimePicker';
 import Button from '../../components/Button';
-import { SelectVeicleByInstrutor } from '../../controller/ControllerVeiculo';
-import { SearchAndFilterHour, InsertClass } from '../../controller/ControllerAulas';
 import { formatarDataParaSalvar } from '../../utils/dataFormat';
 import { toast, ToastContainer } from 'react-toastify';
 
 import { useNavigate, useLocation } from 'react-router-dom';
+import useAula from '../../hooks/useAula';
+
 
 export default function CreateAula() {
+
+    const { SelectVeicleByInstrutor, SearchAndFilterHour, InsertClass } = useAula();
+
     const navigate = useNavigate();
     const location = useLocation();
     const { aluno } = location.state || {};

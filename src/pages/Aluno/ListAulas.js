@@ -1,8 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import LoadingIndicator from '../../components/LoadingIndicator';
-import { ClassModel } from '../../pageModel/ClassModel.js';
-import { format, parseISO } from 'date-fns';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Modal from '../../components/Modal';
@@ -11,16 +9,16 @@ import Button from '../../components/Button';
 import RenderAula from '../../components/RenderAula.js';
 
 import useUserStore from '../../store/useUserStore.js';
+import useAula from '../../hooks/useAula.js'
 
 export default function ListAulas() {
     const { usuario } = useUserStore();
+    const { SearchAulas } = useAula();
 
     //#region Logica
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [aulas, setAulas] = useState([]);
-    const [currentTime, setCurrentTime] = useState(null);
-    const [currentDate, setCurrentDate] = useState(null);
     const classModel = new ClassModel();
     const navigate = useNavigate();
     const [modalVisible, setModalVisible] = useState(false);
@@ -33,21 +31,13 @@ export default function ListAulas() {
     };
 
     const fetchAulas = async () => {
-        setLoading(true);
-        setError(null);
         try {
-            const { currentTime, currentDate } = await classModel.getCurrentTimeAndDateFromServer();
-            setCurrentTime(currentTime);
-            setCurrentDate(currentDate);
-
-            const data = await classModel.searchAulas(usuario.usuario_id);
+            const data = await SearchAulas(usuario.usuario_id);
             setAulas(data.aulas || []);
             if (!data.aulas) setError('Nenhuma aula encontrada.');
         } catch (error) {
             setError(error.message);
             showToast('error', 'Erro', error.message);
-        } finally {
-            setLoading(false);
         }
     };
 

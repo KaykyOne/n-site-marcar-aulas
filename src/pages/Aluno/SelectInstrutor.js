@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { InstrutorModel } from '../../pageModel/InstrutorModel';
 import { toast, ToastContainer } from 'react-toastify';
 import LoadingIndicator from '../../components/LoadingIndicator';
 import 'react-toastify/dist/ReactToastify.css';
@@ -12,9 +11,11 @@ import Count from '../../components/Count';
 
 import useAulaStore from '../../store/useAulaStore';
 import useUserStore from '../../store/useUserStore';
+import useInstrutor from '../../hooks/useInstrutor'
 
 export default function SelectInstructor() {
 
+    const { SearchInstrutorByAluno } = useInstrutor();
     //#region Logica
     const { updateAula, aula } = useAulaStore.getState();
     const { usuario } = useUserStore();
@@ -24,7 +25,6 @@ export default function SelectInstructor() {
     const [modalVisible, setModalVisible] = useState(false);
     const [selectedInstructor, setSelectedInstructor] = useState(null);
 
-    const instrutorModel = new InstrutorModel();
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -35,7 +35,7 @@ export default function SelectInstructor() {
             }
             setLoading(true);
             try {
-                const instructorsData = await instrutorModel.searchInstructoresForCategory(usuario.usuario_id, aula.tipo);
+                const instructorsData = await SearchInstrutorByAluno(usuario.usuario_id, aula.tipo, usuario.autoescola_id);
                 setInstrutores(instructorsData);
             } catch (error) {
                 showToast('Erro', 'Ocorreu um erro ao buscar os instrutores.');

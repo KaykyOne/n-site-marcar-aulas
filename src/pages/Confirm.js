@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import moment from 'moment';
 import { useNavigate } from 'react-router-dom';
-import { ClassModel } from '../pageModel/ClassModel.js';
 import LoadingIndicator from '../components/LoadingIndicator';
 import Modal from '../components/Modal';
 import 'react-toastify/dist/ReactToastify.css';
@@ -12,10 +11,12 @@ import ButtonHome from '../components/ButtonHome';
 import useAulaStore from '../store/useAulaStore';
 import useUserStore from '../store/useUserStore';
 import { formatarDataParaExibir, formatarDataParaSalvar } from '../utils/dataFormat';
-import { InsertClass } from '../controller/ControllerAulas.js';
 import { toast, ToastContainer } from 'react-toastify';
+import useAula from '../hooks/useAula.js';
 
 export default function Confirm() {
+
+  const { InsertClass } = useAula();
 
   //#region Logica
   const { aula } = useAulaStore.getState();

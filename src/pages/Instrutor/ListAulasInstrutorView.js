@@ -5,13 +5,17 @@ import 'react-toastify/dist/ReactToastify.css';
 import 'react-datepicker/dist/react-datepicker.css';
 import DateTimePicker from '../../components/DateTimePicker.js';
 import { formatarDataParaSalvar } from '../../utils/dataFormat';
-import { SearchAulasInstrutor } from '../../controller/ControllerInstrutor.js';
 import RenderAula from '../../components/RenderAula.js';
 import ButtonBack from '../../components/ButtonBack.js';
 
 import useInstrutorStore from '../../store/useInstrutorStore';
 
+import useInstrutor from '../../hooks/useInstrutor';
+
 export default function ListAulasInstrutorView() {
+
+    const { SearchAulasInstrutor} = useInstrutor();
+
     const { instrutor } = useInstrutorStore();
     const [loading, setLoading] = useState(false);
     const [aulas, setAulas] = useState([])

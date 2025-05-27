@@ -12,8 +12,8 @@ import ButtonBack from '../components/ButtonBack';
 import ButtonHome from '../components/ButtonHome';
 import Count from '../components/Count';
 
-import { PegarData } from '../controller/ControllerDataEHora';
-import { SearchAndFilterHour } from '../controller/ControllerAulas';
+import useAula from '../hooks/useAula';
+import useGeneric from '../hooks/useGeneric';
 import useAulaStore from '../store/useAulaStore';
 import useUserStore from '../store/useUserStore';
 import { format, isBefore, addDays, subDays, isAfter } from 'date-fns';
@@ -21,6 +21,9 @@ import { formatarDataParaSalvar } from '../utils/dataFormat';
 
 
 export default function SelectDateAndHour() {
+
+  const { PegarData } = useGeneric();
+  const { SearchAndFilterHour} = useAula();
 
   const navigate = useNavigate();
   const [initialLoading, setInitialLoading] = useState(true);

@@ -1,16 +1,19 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { UserModel } from '../pageModel/UserModel';
 import InputField from '../components/Input';
 import ButtonBack from '../components/ButtonBack';
 import Button from '../components/Button';
 
 import useUserStore from '../store/useUserStore';
+import useGeneric from '../hooks/useGeneric';
 
 export default function Perfil() {
     const { usuario } = useUserStore();
+    const { AlterarSenha } = useGeneric();
+
+
     const location = useLocation();
     const tipo = location.state?.tipo;
     const [currentPassword, setCurrentPassword] = useState('');
@@ -46,7 +49,7 @@ export default function Perfil() {
 
         setLoading(true);
         try {
-            const { resultado, senhaAtt } = await userModel.alterarSenha(usuario, currentPassword, newPassword);
+            const { resultado, senhaAtt } = await AlterarSenha(usuario.usuario_id, usuario.senha);
             if (!resultado) {
                 showToast('error', 'Erro', 'Senha atual incorreta');
                 return;

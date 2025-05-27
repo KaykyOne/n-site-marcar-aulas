@@ -7,16 +7,20 @@ import Button from '../components/Button'; // Importe o Button
 import ModalLogin from '../components/ModalLogin';
 import ModalErroHora from '../components/ModalHoraInvalida';
 import Modal from '../components/Modal';
-import { LoginFunc } from '../controller/ControllerUser';
-import { GetInstrutor } from '../controller/ControllerInstrutor';
 import useUserStore from '../store/useUserStore';
 
 import logoNovusTech from '../imgs/logoNovusTech.png';
 import LogoApp from "../imgs/LogoNovusCFC.png";
 
+import useGeneric from '../hooks/useGeneric';
+import useInstrutor from '../hooks/useInstrutor';
+
+
 export default function Login() {
     //#region Logica 
     const { usuario } = useUserStore();
+    const { GetInstrutor } = useInstrutor();
+    const { LoginFunc } = useGeneric();
 
     const [cpfNormal, setCpf] = useState('');
     const [senhaInput, setSenha] = useState('');
@@ -61,6 +65,7 @@ export default function Login() {
         // console.log(usuario);
         try {
             let responseUsuario = await LoginFunc(cpfNormal, senhaInput, usuario.updated_at ? usuario.updated_at : null, usuario.autoescola_id, usuario.configuracoes);
+            console.log(responseUsuario);
             if (!responseUsuario) {
                 showToast('error', 'Erro', 'Cpf ou senha incorretos, ou usuário não existe!');
                 return;

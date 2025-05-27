@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast, ToastContainer } from 'react-toastify';
 import LoadingIndicator from '../../components/LoadingIndicator';
@@ -7,7 +7,8 @@ import Button from '../../components/Button';
 import ButtonBack from '../../components/ButtonBack';
 import ButtonHome from '../../components/ButtonHome';
 import Count from '../../components/Count';
-import { SelectVeicleByInstrutor } from '../../controller/ControllerVeiculo';
+
+import useAula from '../../hooks/useAula';
 
 import useAulaStore from '../../store/useAulaStore';
 import useUserStore from '../../store/useUserStore';
@@ -16,6 +17,7 @@ export default function SelectVeicle() {
 
     //#region Logica
     const { updateAula, aula } = useAulaStore.getState();
+    const { SelectVeicleByInstrutor } = useAula();
     const { usuario } = useUserStore();
 
     const [veiculos, setVeiculos] = useState([]);
