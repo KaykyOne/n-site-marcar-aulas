@@ -63,7 +63,7 @@ export default function SelectTypeView() {
         };
         resetAula();
         fetchCategorias();
-    }, [usuario]);
+    }, [usuario, resetAula]);
 
     const showToast = (title, message) => {
         toast.dismiss();

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import LoadingIndicator from '../../components/LoadingIndicator';
 import { toast, ToastContainer } from 'react-toastify';
@@ -27,7 +27,7 @@ export default function ListAlunosView() {
         toast[type](message);
     };
 
-    const fetchAlunos = async () => {
+    const fetchAlunos = useCallback(async () => {
         setLoading(true);
         setError(null);
 
@@ -45,7 +45,7 @@ export default function ListAlunosView() {
         } finally {
             setLoading(false);
         }
-    };
+    }, [instrutor.instrutor_id]);
 
     useEffect(() => {
         if (instrutor) fetchAlunos();

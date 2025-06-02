@@ -1,13 +1,10 @@
-import React from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import Button from '../components/Button';
 
 export default function EndView() {
 
   //#region Logica
   const navigate = useNavigate();
-  const location = useLocation();
-  const { usuario, configs } = location.state || {}; // Obtém o parâmetro 'cpf' da navegação anterior
 
   const handleSecondButton = () => {
     navigate('/home');

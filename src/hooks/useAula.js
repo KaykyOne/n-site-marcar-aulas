@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useCallback } from "react";
 import useGeneric from "./useGeneric";
 import { toast } from "react-toastify";
 
@@ -11,8 +11,9 @@ export default function useAula() {
         loading
     } = useGeneric();
 
-    const SearchAndFilterHour = async (instrutor_id, veiculo_id, data) => {
+    const SearchAndFilterHour = useCallback(async (instrutor_id, veiculo_id, data) => {
         if (!instrutor_id || !veiculo_id || !data) {
+            console.log(`${instrutor_id} ${veiculo_id} ${data}`)
             toast.error("Todos os campos são obrigatórios!");
             return false;
         }
@@ -21,10 +22,9 @@ export default function useAula() {
         const result = await GenericSearch('aulas', 'buscarHorarioLivre', pesquisa);
 
         return result;
-    };
+    }, [GenericSearch]);
 
     const InsertClass = async (aula) => {
-        console.log(aula.autoescola_id);
         const {
             instrutor_id,
             aluno_id,
@@ -37,7 +37,7 @@ export default function useAula() {
             configuracoes
         } = aula;
 
-        if (!instrutor_id || !aluno_id || !data || !tipo || !hora || !veiculo_id || !autoescola_id) {
+        if (!instrutor_id || !aluno_id || !data || !tipo || !hora || !veiculo_id || !autoescola_id || !marcada_por || !configuracoes) {
             toast.error("Todos os campos obrigatórios devem ser preenchidos!");
             return false;
         }
@@ -52,7 +52,7 @@ export default function useAula() {
         return result;
     };
 
-    const SelectVeicleByInstrutor = async (id_instrutor, type, autoescola_id) => {
+    const SelectVeicleByInstrutor = useCallback(async (id_instrutor, type, autoescola_id) => {
         if (!id_instrutor || !type) {
             toast.error("ID do instrutor ou tipo não encontrado!");
             return false;
@@ -62,7 +62,7 @@ export default function useAula() {
         const response = await GenericSearch("veiculos", "buscarVeiculos", pesquisa);
 
         return response;
-    };
+    }, [GenericSearch]);
 
     const SearchAulas = async (id) => {
         if (!id) {

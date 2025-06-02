@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate } from 'react-router-dom';
@@ -30,7 +30,7 @@ export default function Login() {
     const [seePass, setSeePass] = useState(false);
     const [modalMan, setModalMan] = useState(false);
     const [modalHoraErro, setModalErroHora] = useState(false);
-    const [chechRemember, setCheckRemember] = useState(true);
+    const [checkRemember, setCheckRemember] = useState(true);
     const navigate = useNavigate(); // Use useNavigate aqui
 
     const toggleModal = (message) => {
@@ -95,7 +95,7 @@ export default function Login() {
                     rememberMe("login");
                     navigate("home");
                     return;
-                }else if(usuarioAtual.tipo_usuario === "instrutor"){
+                } else if (usuarioAtual.tipo_usuario === "instrutor") {
                     rememberMe("login");
                     await GetInstrutor(usuarioAtual.usuario_id);
                     navigate("homeinstrutor");
@@ -120,8 +120,9 @@ export default function Login() {
         }
     };
 
-    const rememberMe = (type) => {
+    const rememberMe = useCallback((type) => {
         setLoading(true);
+
         try {
             if (type === 'restore') {
                 let senha = localStorage.getItem("senha");
@@ -135,25 +136,25 @@ export default function Login() {
                     return;
                 }
             } else if (type === 'login') {
-                if (chechRemember) {
+                if (checkRemember) {  // corrigido typo aqui
                     localStorage.setItem('senha', senhaInput);
                     localStorage.setItem('cpf', cpfNormal);
                 } else {
                     localStorage.removeItem("senha");
                     localStorage.removeItem("cpf");
                 }
-
             }
         } catch (error) {
-            console.error('erro ao salvar dados: ', error.message)
+            console.error('Erro ao salvar dados: ', error.message);
         } finally {
             setLoading(false);
         }
-    };
+    }, [checkRemember, senhaInput, cpfNormal]);
+
 
     const alterRemember = () => {
-        setCheckRemember(!chechRemember)
-        // console.log(chechRemember);
+        setCheckRemember(!checkRemember)
+        // console.log(checkRemember);
     };
 
     useEffect(() => {
@@ -201,8 +202,8 @@ export default function Login() {
 
                     <label className="flex items-center gap-2">
                         <input
-                            checked={chechRemember}
-                            value={chechRemember}
+                            checked={checkRemember}
+                            value={checkRemember}
                             onChange={alterRemember}
                             type="checkbox"
                             id="minhaCheckbox"

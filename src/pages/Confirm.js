@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from 'react';
-import moment from 'moment';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import LoadingIndicator from '../components/LoadingIndicator';
 import Modal from '../components/Modal';
@@ -10,8 +9,8 @@ import ButtonHome from '../components/ButtonHome';
 
 import useAulaStore from '../store/useAulaStore';
 import useUserStore from '../store/useUserStore';
-import { formatarDataParaExibir, formatarDataParaSalvar } from '../utils/dataFormat';
-import { toast, ToastContainer } from 'react-toastify';
+import { formatarDataParaExibir } from '../utils/dataFormat';
+import { ToastContainer } from 'react-toastify';
 import useAula from '../hooks/useAula.js';
 
 export default function Confirm() {
@@ -22,7 +21,6 @@ export default function Confirm() {
   const { aula } = useAulaStore.getState();
   const { usuario } = useUserStore();
   const instrutor = aula.instrutor;
-  const configs = usuario.configuracoes;
   const veiculo = aula.veiculo;
   const type = aula.tipo;
   const data = aula.data;

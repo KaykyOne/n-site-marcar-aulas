@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import useInstrutorStore from '../../store/useInstrutorStore';
 import useUserStore from '../../store/useUserStore';
 import Select from '../../components/Select';
@@ -6,7 +6,6 @@ import InputField from '../../components/Input';
 import ButtonBack from '../../components/ButtonBack';
 import DateTimePicker from '../../components/DateTimePicker';
 import Button from '../../components/Button';
-import { formatarDataParaSalvar } from '../../utils/dataFormat';
 import { toast, ToastContainer } from 'react-toastify';
 
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -81,7 +80,7 @@ export default function CreateAula() {
             usuario.configuracoes
         );
     
-        if (result.status == 201) {
+        if (+result.status === 201) {
             showToast('success', 'Sucesso', 'Aula marcada com sucesso!');
             setHora('');
             setVeiculo('');
@@ -100,7 +99,7 @@ export default function CreateAula() {
             setHoras(response);
         }
         searchHoras();
-    }, [selectedTipo, selectedVeiculo, dataSelecionada])
+    }, [selectedTipo, selectedVeiculo, dataSelecionada, SearchAndFilterHour])
 
     useEffect(() => {
         console.log(usuario)
@@ -110,7 +109,7 @@ export default function CreateAula() {
             setVeiculos(response);
         }
         searchVeiculos();
-    }, [selectedTipo])
+    }, [selectedTipo, SelectVeicleByInstrutor])
 
     return (
         <div className='flex flex-col text-start'>

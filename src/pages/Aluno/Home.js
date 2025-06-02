@@ -41,6 +41,7 @@ export default function HomeView() {
     let horas = usuario.configuracoes.find(config => config.chave === "horasPraDesmarcarAulas");
     setHorasAntes(horas.valor)
     verificarSenha();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const alterPage = (page) => {
@@ -88,7 +89,7 @@ export default function HomeView() {
 
       <LoadingIndicator visible={loading} />
       <Modal isOpen={isModalVisible}>
-          <img className='image' src={modalIcon}/>
+          <img alt='imageModal' className='image' src={modalIcon}/>
           <p>{modalMessage}</p>
           <Button back={'#4B003B'} onClick={() => setModalVisible(false)}cor="#FFF">
             Fechar
