@@ -72,7 +72,7 @@ export default function SelectVeicle() {
     const renderVeicleItem = (item) => (
         <div className='flex bg-white shadow-md p-3 rounded-xl align-middle justify-start gap-3' key={item.veiculo_id} onClick={() => handleButtonClick(item)}>
             <div className='w-full text-start'>
-                <h1>Instrutor: </h1>
+                <h1>Veiculo: </h1>
                 <h1 className='font-bold text-4xl capitalize'>{item.modelo}</h1>
                 <Button className='mt-2'>
                     Selecionar
