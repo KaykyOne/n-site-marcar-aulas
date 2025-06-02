@@ -1,23 +1,19 @@
 import { useState } from 'react';
-import useUserStore from "../store/useInstrutorStore";
+import useUserStore from "../store/useUserStore";
+import { toast } from "react-toastify";
 
 export default function useGeneric() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
 
     // 🔥 DELETE - Excluir por ID
-    const GenericDelete = async (rota, id, caminho, campo) => {
-        if (!id) {
-            setError('ID inválido!');
-            return;
-        }
-
+    const GenericDelete = async (rota, caminho, campos) => {
         setError('');
         setLoading(true);
         try {
             const res = await fetch(
-                `${process.env.REACT_APP_URL_BACK}/${rota}/${caminho}?${campo}=${id}`,
-                { method: 'DELETE' }
+                `${process.env.REACT_APP_URL_BACK}/${rota}/${caminho}?${campos}`,
+                { method: 'DELETE', }
             );
 
             const response = await res.json();
@@ -151,63 +147,55 @@ export default function useGeneric() {
             });
 
             const result = await response.json();
-            console.log("Data e hora recebidas:", result);  // Verifique se os valores de data e hora são válidos
 
-            return result.data;  // Certifique-se de que está retornando os dados no formato correto
+            return result.data;
         } catch (err) {
-            console.error("Erro na requisição:", err);
+            toast.error("Erro na requisição ao buscar a data!");
             return false;
         }
     };
 
-    const LoginFunc = async (cpf, senha, lastUpdated, autoescola_id, configuracoes) => {
+    const LoginFunc = async (cpf, senha) => {
         const setUsuario = useUserStore.getState().setUsuario;
 
+        const aluno = {
+            cpf: cpf,
+            senha: senha,
+        };
         if (!cpf || !senha) {
-            console.error("Senha ou CPF não encontrado");
+            toast.error("CPF ou senha não preenchidos!");
             return false;
         }
 
-        try {
-            const response = await fetch(`${process.env.REACT_APP_URL_BACK}/usuario/login`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ cpf, senha, lastUpdate: lastUpdated, autoescola_id, configuracoes }),
-            });
-
-            if (response.status === 304) {
-                console.log("Dados não modificados, mantendo os dados locais.");
-                return true;
-            }
-
-            const data = await response.json();
-            // console.log(data);
-            if (response.ok) {
-                await setUsuario(data); // Atualiza o Zustand
-
-                return data; // Retorna os dados para serem usados imediatamente
-            } else {
-                console.error("Erro no login:", data?.message || "Erro desconhecido");
-                return false;
-            }
-
-        } catch (err) {
-            console.error("Erro na requisição:", err);
+        const response = await GenericCreate("usuario", "login", aluno)
+        if (response) {
+            await setUsuario(response);
+            toast.success("Login realizado com sucesso!");
+            return response;
+        } else {
+            toast.error(response?.message || "Erro no login!");
             return false;
         }
+
     };
 
     const AlterarSenha = async (id, senha) => {
         if (!id || !senha) {
-            setError('ID ou senha inválidos!');
+            toast.error('ID ou senha inválidos!');
             return null;
         }
 
         const body = { id, senha };
         const res = await GenericUpdate('usuario', 'alterarsenha', body);
+        console.log(res);
+        if (res) {
+            toast.success("Senha alterada com sucesso!");
+        } else {
+            toast.error("Erro ao alterar a senha!");
+        }
+
         return res;
     };
-
 
     return {
         GenericDelete,

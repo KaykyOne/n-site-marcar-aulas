@@ -16,7 +16,7 @@ import useAula from '../hooks/useAula.js';
 
 export default function Confirm() {
 
-  const { InsertClass } = useAula();
+  const { InsertClass, loading, error } = useAula();
 
   //#region Logica
   const { aula } = useAulaStore.getState();
@@ -30,65 +30,46 @@ export default function Confirm() {
 
   const navigate = useNavigate();
   const [date] = useState(data);
-  const [loading, setLoading] = useState(false);
   const [modalMessage, setModalMessage] = useState('');
   const [isModalVisible, setModalVisible] = useState(false);
 
   const toggleModal = (message) => {
-    setLoading(false);
     setModalMessage(message);
     setModalVisible(!isModalVisible);
   };
-
-  const showToast = (type, text1, text2) => {
-    toast.dismiss();  // Remove todos os toasts anteriores
-    toast[type](`${text1}: ${text2}`);
-  };
-
   // useEffect(() => {
 
   //   console.log((configs.find(item => item.chave === type)).valor);
   // }, []);
 
   const handleConfirm = async () => {
-    // Validação dos campos obrigatórios
-    if (!type || !veiculo || !hora || !date) {
-      showToast('error', 'Campos obrigatórios', 'Preencha todos os campos antes de continuar!');
+    // Inserir a aula com base no tipo de usuário
+    const aula = {
+      instrutor_id: instrutor.instrutor_id,
+      aluno_id: usuario.usuario_id,
+      data: date,
+      tipo: type,
+      hora: hora,
+      veiculo_id: veiculo.veiculo_id,
+      autoescola_id: usuario.autoescola_id,
+      marcada_por: 1, 
+      configuracoes: usuario.configuracoes
+    };
+
+    const result = await InsertClass(aula);
+    console.log(result);
+    if (error) {
+      toggleModal(error);
       return;
     }
 
-    try {
-      setLoading(true);
-      let result;
-
-      // Inserir a aula com base no tipo de usuário
-      result = await InsertClass(
-        instrutor.instrutor_id,
-        usuario.usuario_id,
-        date,
-        type,
-        hora,
-        veiculo.veiculo_id,
-        instrutor.autoescola_id,
-        1,
-        usuario.configuracoes
-      );
-
-      console.log(result);
-      // Verificar se a inserção foi bem-sucedida
-      if (result === "Aula criada com sucesso") {
-        navigate('/Fim', { state: { usuario, configs, instrutor, type } });
-      } else {
-        toggleModal(result);
-        return;
-      }
-    } catch (error) {
-      console.error('Error:', error);
-      showToast('error', 'Erro ao criar aula', error.message);
-      navigate('/Erro', { state: { message: error.message } });
-    } finally {
-      setLoading(false);
+    if (result === "Aula criada com sucesso") {
+      navigate('/fim');
+    } else {
+      toggleModal(result);
+      return;
     }
+
   };
   //#endregion
 

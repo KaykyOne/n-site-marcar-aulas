@@ -1,5 +1,6 @@
 import useInstrutorStore from "../store/useInstrutorStore";
 import useGeneric from "./useGeneric";
+import { toast } from "react-toastify";
 
 export default function useInstrutor() {
     const {
@@ -14,7 +15,7 @@ export default function useInstrutor() {
         const setInstrutor = useInstrutorStore.getState().setInstrutor;
 
         if (!instrutorId) {
-            console.warn("ID do instrutor não informado");
+            toast.error("ID do instrutor não informado!");
             return null;
         }
 
@@ -31,7 +32,7 @@ export default function useInstrutor() {
     // 🔵 GET - Buscar alunos do instrutor
     const GetAlunos = async (instrutorId) => {
         if (!instrutorId) {
-            console.warn("ID do instrutor não informado");
+            toast.error("ID do instrutor não informado!");
             return null;
         }
 
@@ -44,7 +45,7 @@ export default function useInstrutor() {
     // 🔵 GET - Buscar aulas do instrutor por data
     const SearchAulasInstrutor = async (instrutorId, data) => {
         if (!instrutorId || !data) {
-            console.warn("ID do instrutor ou data não informado");
+            toast.error("ID do instrutor ou data não informado!");
             return null;
         }
 
@@ -57,7 +58,7 @@ export default function useInstrutor() {
     // 🔵 GET - Buscar instrutor por aluno
     const SearchInstrutorByAluno = async (aluno_id, tipo, autoescola_id) => {
         if (!aluno_id || !tipo || !autoescola_id) {
-            console.warn("Todos os parâmetros são obrigatórios");
+            toast.error("Todos os parâmetros são obrigatórios!");
             return null;
         }
 
@@ -66,7 +67,7 @@ export default function useInstrutor() {
 
         return result;
     };
-
+    
     return {
         GetInstrutor,
         GetAlunos,

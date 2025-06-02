@@ -54,7 +54,8 @@ export default function CreateAula() {
         setDataSelecionada(novaData);
     };
 
-    const createAula = async () => {
+    const createAula = async (aula) => {
+        
         if (!selectedTipo || !selectedVeiculo || !selectedHora || !dataSelecionada) {
             showToast('error', 'Campos obrigatórios', 'Preencha todos os campos antes de continuar!');
             return;
@@ -68,12 +69,10 @@ export default function CreateAula() {
             return;
         }
     
-        const dataFormatada = formatarDataParaSalvar(dataSelecionada);
-    
         const result = await InsertClass(
             instrutor.instrutor_id,
             aluno.usuario_id,
-            dataFormatada,
+            dataSelecionada,
             selectedTipo,
             selectedHora,
             idDoVeiculo,

@@ -64,7 +64,7 @@ export default function Login() {
 
         // console.log(usuario);
         try {
-            let responseUsuario = await LoginFunc(cpfNormal, senhaInput, usuario.updated_at ? usuario.updated_at : null, usuario.autoescola_id, usuario.configuracoes);
+            let responseUsuario = await LoginFunc(cpfNormal, senhaInput);
             console.log(responseUsuario);
             if (!responseUsuario) {
                 showToast('error', 'Erro', 'Cpf ou senha incorretos, ou usuário não existe!');

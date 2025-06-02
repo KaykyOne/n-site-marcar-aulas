@@ -7,18 +7,14 @@ export default function EndView() {
   //#region Logica
   const navigate = useNavigate();
   const location = useLocation();
-  const { usuario, configs, instrutor, tipo = 'normal' } = location.state || {}; // Obtém o parâmetro 'cpf' da navegação anterior
+  const { usuario, configs } = location.state || {}; // Obtém o parâmetro 'cpf' da navegação anterior
 
   const handleSecondButton = () => {
-    navigate('/');
+    navigate('/home');
   };
 
   const secondClassButton = () => {
-    if (tipo === 'adm') {
-      navigate('/homeinstrutor', { state: { usuario, configs, instrutor } });
-    } else {
-      navigate('/selecionarTipo', { state: { usuario, configs } });
-    }
+      navigate('/selecionarTipo');
   };
 
   //#endregion

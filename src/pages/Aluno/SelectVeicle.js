@@ -35,13 +35,8 @@ export default function SelectVeicle() {
             }
             setLoading(true);
             try {
-
-                const instrutor = aula.instrutor.id_instrutor;
-                console.log(aula)
-                console.log(aula.instrutor.instrutor_id);
-                console.log(aula.tipo);
-
-                const veiclesData = await SelectVeicleByInstrutor(aula.instrutor.instrutor_id, aula.tipo);
+                console.log(usuario.autoescola_id);
+                const veiclesData = await SelectVeicleByInstrutor(aula.instrutor.instrutor_id, aula.tipo, usuario.autoescola_id);
                 setVeiculos(veiclesData || []); // Garante que seja um array                
             } catch (error) {
                 showToast('Erro', 'Ocorreu um erro ao buscar os veículos.');

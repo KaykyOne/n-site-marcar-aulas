@@ -22,7 +22,7 @@ export default function RenderAula({ item, tipo, handleAction = null }) {
             {/* Infos principais */}
             <div className='flex flex-col flex-1'>
                 {tipo !== 1 && (
-                    <h1 className='font-bold'>{formatarDataParaExibir(item.data)}</h1>
+                    <h1 className='font-bold'>{item.data}</h1>
                 )
                 }
 
@@ -31,7 +31,7 @@ export default function RenderAula({ item, tipo, handleAction = null }) {
                 {tipo === 1 ? (
                     <p className='capitalize'><strong>Aluno:</strong> <br/> {(`${item.nome} ${item.sobrenome}`) || 'Não especificado'}</p>
                 ) : (
-                    <p className='capitalize'><strong>Instrutor:</strong> <br/> {item.instrutores?.nome_instrutor || 'Não especificado'}</p>
+                    <p className='capitalize'><strong>Instrutor:</strong> <br/> {item.nome_instrutor || 'Não especificado'}</p>
                 )}
 
                 {tipo === 1 && (

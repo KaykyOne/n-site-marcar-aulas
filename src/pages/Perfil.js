@@ -22,7 +22,6 @@ export default function Perfil() {
     const [nivelDaSenha, setNivelDaSenha] = useState('Ruim.');
     const [nivelProgressBar, setnivelProgressBar] = useState(0);
     const navigate = useNavigate();
-    const userModel = new UserModel();
 
     const showToast = (type, text1, text2) => {
         toast.dismiss();  // Remove todos os toasts anteriores
@@ -49,13 +48,13 @@ export default function Perfil() {
 
         setLoading(true);
         try {
-            const { resultado, senhaAtt } = await AlterarSenha(usuario.usuario_id, usuario.senha);
+            const resultado = await AlterarSenha(usuario.usuario_id, newPassword);
             if (!resultado) {
                 showToast('error', 'Erro', 'Senha atual incorreta');
                 return;
             }
-            usuario.senha = senhaAtt;
             showToast('success', 'Sucesso', 'Senha Alterada!');
+            navigate('/')
 
         } catch (error) {
             showToast('error', 'Erro', `Erro ao alterar Senha: ${error}`);
