@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import LoadingIndicator from '../../components/LoadingIndicator';
-import { GetAlunos } from '../../controller/ControllerInstrutor';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Button from '../../components/Button';
@@ -9,8 +8,12 @@ import InputField from '../../components/Input';
 import ButtonBack from '../../components/ButtonBack';
 
 import useInstrutorStore from '../../store/useInstrutorStore';
+import useInstrutor from '../../hooks/useInstrutor';
 
 export default function ListAlunosView() {
+
+    const { GetAlunos } = useInstrutor()
+
     const { instrutor } = useInstrutorStore();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);

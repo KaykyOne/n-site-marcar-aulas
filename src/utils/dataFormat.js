@@ -15,7 +15,8 @@ export function formatarDataParaSalvar(date) {
 
 // dd/MM/yyyy → para exibir pro usuário
 export function formatarDataParaExibir(dateStr) {
-  const [ano, mes, dia] = dateStr.split(/[-/]/); // aceita "-" ou "/"
+  const [ano, mes, diaComHora] = dateStr.split(/[-/]/); // aceita "-" ou "/"
+  const dia = diaComHora.slice(0, 2);
   return `${dia.padStart(2, '0')}/${mes.padStart(2, '0')}/${ano}`;
 }
 

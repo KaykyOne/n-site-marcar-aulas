@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast, ToastContainer } from 'react-toastify';
 import LoadingIndicator from '../../components/LoadingIndicator';
@@ -7,7 +7,8 @@ import Button from '../../components/Button';
 import ButtonBack from '../../components/ButtonBack';
 import ButtonHome from '../../components/ButtonHome';
 import Count from '../../components/Count';
-import { SelectVeicleByInstrutor } from '../../controller/ControllerVeiculo';
+
+import useAula from '../../hooks/useAula';
 
 import useAulaStore from '../../store/useAulaStore';
 import useUserStore from '../../store/useUserStore';
@@ -16,6 +17,7 @@ export default function SelectVeicle() {
 
     //#region Logica
     const { updateAula, aula } = useAulaStore.getState();
+    const { SelectVeicleByInstrutor } = useAula();
     const { usuario } = useUserStore();
 
     const [veiculos, setVeiculos] = useState([]);
@@ -33,13 +35,8 @@ export default function SelectVeicle() {
             }
             setLoading(true);
             try {
-
-                const instrutor = aula.instrutor.id_instrutor;
-                console.log(aula)
-                console.log(aula.instrutor.instrutor_id);
-                console.log(aula.tipo);
-
-                const veiclesData = await SelectVeicleByInstrutor(aula.instrutor.instrutor_id, aula.tipo);
+                console.log(usuario.autoescola_id);
+                const veiclesData = await SelectVeicleByInstrutor(aula.instrutor.instrutor_id, aula.tipo, usuario.autoescola_id);
                 setVeiculos(veiclesData || []); // Garante que seja um array                
             } catch (error) {
                 showToast('Erro', 'Ocorreu um erro ao buscar os veículos.');
@@ -75,7 +72,7 @@ export default function SelectVeicle() {
     const renderVeicleItem = (item) => (
         <div className='flex bg-white shadow-md p-3 rounded-xl align-middle justify-start gap-3' key={item.veiculo_id} onClick={() => handleButtonClick(item)}>
             <div className='w-full text-start'>
-                <h1>Instrutor: </h1>
+                <h1>Veiculo: </h1>
                 <h1 className='font-bold text-4xl capitalize'>{item.modelo}</h1>
                 <Button className='mt-2'>
                     Selecionar

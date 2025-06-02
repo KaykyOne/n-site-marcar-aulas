@@ -6,14 +6,17 @@ import InputField from '../../components/Input';
 import ButtonBack from '../../components/ButtonBack';
 import DateTimePicker from '../../components/DateTimePicker';
 import Button from '../../components/Button';
-import { SelectVeicleByInstrutor } from '../../controller/ControllerVeiculo';
-import { SearchAndFilterHour, InsertClass } from '../../controller/ControllerAulas';
 import { formatarDataParaSalvar } from '../../utils/dataFormat';
 import { toast, ToastContainer } from 'react-toastify';
 
 import { useNavigate, useLocation } from 'react-router-dom';
+import useAula from '../../hooks/useAula';
+
 
 export default function CreateAula() {
+
+    const { SelectVeicleByInstrutor, SearchAndFilterHour, InsertClass } = useAula();
+
     const navigate = useNavigate();
     const location = useLocation();
     const { aluno } = location.state || {};
@@ -51,7 +54,8 @@ export default function CreateAula() {
         setDataSelecionada(novaData);
     };
 
-    const createAula = async () => {
+    const createAula = async (aula) => {
+        
         if (!selectedTipo || !selectedVeiculo || !selectedHora || !dataSelecionada) {
             showToast('error', 'Campos obrigatórios', 'Preencha todos os campos antes de continuar!');
             return;
@@ -65,12 +69,10 @@ export default function CreateAula() {
             return;
         }
     
-        const dataFormatada = formatarDataParaSalvar(dataSelecionada);
-    
         const result = await InsertClass(
             instrutor.instrutor_id,
             aluno.usuario_id,
-            dataFormatada,
+            dataSelecionada,
             selectedTipo,
             selectedHora,
             idDoVeiculo,
