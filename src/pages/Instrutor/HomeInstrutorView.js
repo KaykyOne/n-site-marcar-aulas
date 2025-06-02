@@ -1,10 +1,9 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import LoadingIndicator from '../../components/LoadingIndicator';
-import { toast, ToastContainer } from 'react-toastify';
+import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Button from '../../components/Button'; // Importe o componente Button
-import useUserStore from '../../store/useUserStore';
 import useInstrutorStore from '../../store/useInstrutorStore';
 
 export default function HomeInstrutorView() {
@@ -14,11 +13,6 @@ export default function HomeInstrutorView() {
   const [modalMessage, setModalMessage] = useState('');
   const [isModalVisible, setModalVisible] = useState(false);
   const navigate = useNavigate();
-
-  const toggleModal = (message) => {
-    setModalMessage(message);
-    setModalVisible(!isModalVisible);
-  };
 
   const alterPage = async (page) => {
     setLoading(true);

@@ -35,7 +35,6 @@ export default function SelectVeicle() {
             }
             setLoading(true);
             try {
-                console.log(usuario.autoescola_id);
                 const veiclesData = await SelectVeicleByInstrutor(aula.instrutor.instrutor_id, aula.tipo, usuario.autoescola_id);
                 setVeiculos(veiclesData || []); // Garante que seja um array                
             } catch (error) {
@@ -47,7 +46,7 @@ export default function SelectVeicle() {
         };
 
         fetchVeicles();
-    }, [usuario, aula]);
+    }, [usuario, aula, SelectVeicleByInstrutor]);
 
     const showToast = (title, message) => {
         toast.dismiss();

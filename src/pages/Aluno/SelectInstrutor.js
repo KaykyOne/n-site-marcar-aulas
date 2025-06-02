@@ -46,7 +46,7 @@ export default function SelectInstructor() {
         };
 
         fetchInstructors();
-    }, [usuario, aula]);
+    }, [usuario, aula, SearchInstrutorByAluno]);
 
     const showToast = (title, message) => {
         toast.dismiss();

@@ -1,3 +1,4 @@
+import { useCallback } from "react";
 import useInstrutorStore from "../store/useInstrutorStore";
 import useGeneric from "./useGeneric";
 import { toast } from "react-toastify";
@@ -56,7 +57,7 @@ export default function useInstrutor() {
     };
 
     // 🔵 GET - Buscar instrutor por aluno
-    const SearchInstrutorByAluno = async (aluno_id, tipo, autoescola_id) => {
+    const SearchInstrutorByAluno = useCallback( async (aluno_id, tipo, autoescola_id) => {
         if (!aluno_id || !tipo || !autoescola_id) {
             toast.error("Todos os parâmetros são obrigatórios!");
             return null;
@@ -66,7 +67,7 @@ export default function useInstrutor() {
         const result = await GenericSearch('instrutor', 'buscarInstrutorPorAluno', query);
 
         return result;
-    };
+    }, []);
     
     return {
         GetInstrutor,

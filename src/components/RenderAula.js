@@ -1,5 +1,3 @@
-import React from 'react';
-import { formatarDataParaExibir } from '../utils/dataFormat';
 import Button from './Button';
 
 export default function RenderAula({ item, tipo, handleAction = null }) {

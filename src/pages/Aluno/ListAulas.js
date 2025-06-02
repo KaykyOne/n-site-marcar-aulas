@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import LoadingIndicator from '../../components/LoadingIndicator';
 import 'react-toastify/dist/ReactToastify.css';
@@ -23,17 +23,17 @@ export default function ListAulas() {
   const [selectedAula, setSelectedAula] = useState(null);
   const [modalAction, setModalAction] = useState(null);
 
-  const fetchAulas = async () => {
+  const fetchAulas = useCallback(async () => {
     const data = await SearchAulas(usuario.usuario_id);
     setAulas(data || []);
-  };
+  }, [usuario.usuario_id]);
 
   useEffect(() => {
     if (usuario) fetchAulas();
-  }, [usuario]);
+  }, [usuario, fetchAulas]);
 
   const handleAction = async (acao, item) => {
-    if (acao == "Excluir") {
+    if (acao === "Excluir") {
       setSelectedAula(item);
       setModalAction('Excluir');
       setModalVisible(true);

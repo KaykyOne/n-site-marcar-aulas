@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import useUserStore from "../store/useUserStore";
 import { toast } from "react-toastify";
 
@@ -86,7 +86,7 @@ export default function useGeneric() {
     };
 
     // 🔵 GET - Buscar dados
-    const GenericSearch = async (rota, caminho, pesquisa = '') => {
+    const GenericSearch = useCallback(async (rota, caminho, pesquisa = '') => {
         setError('');
         setLoading(true);
         try {
@@ -108,7 +108,7 @@ export default function useGeneric() {
         } finally {
             setLoading(false);
         }
-    };
+    }, []);
 
     // 🟠 PUT - Atualizar dados
     const GenericUpdate = async (rota, caminho, body) => {

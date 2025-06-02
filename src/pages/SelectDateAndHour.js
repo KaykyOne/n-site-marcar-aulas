@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { AiOutlineLeft, AiOutlineRight } from 'react-icons/ai';
 import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
@@ -23,7 +23,7 @@ import { formatarDataParaSalvar } from '../utils/dataFormat';
 export default function SelectDateAndHour() {
 
   const { PegarData } = useGeneric();
-  const { SearchAndFilterHour} = useAula();
+  const { SearchAndFilterHour } = useAula();
 
   const navigate = useNavigate();
   const [initialLoading, setInitialLoading] = useState(true);
@@ -40,27 +40,26 @@ export default function SelectDateAndHour() {
 
   const { updateAula, aula } = useAulaStore.getState();
   const { usuario } = useUserStore();
-  const instrutor = aula.instrutor.instrutor_id;
-  const veiculo = aula.veiculo.veiculo_id;
+  const instrutor = aula?.instrutor?.instrutor_id;
+  const veiculo = aula?.veiculo?.veiculo_id;
   const tipo = usuario.tipo_usuario === "aluno" ? "normal" : "adm";
 
   const namesForDays = ["Erro", "Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira", "Sábado", "Domingo"];
 
-  const fetchInitialData = async () => {
+  const fetchInitialData = useCallback(async () => {
     try {
-      const now = await PegarData(); // Obtendo data e hora atual do dispositivo
-      const dataAtual = format(now, 'yyyy-MM-dd'); // Formatar para 'yyyy-MM-dd'
-      const horaAtual = format(now, 'HH:mm'); // Formatar para 'HH:mm'
+      const now = await PegarData(); // Pega data e hora atual
+      const dataAtual = format(now, 'yyyy-MM-dd'); // Formata data
+      const horaAtual = format(now, 'HH:mm'); // Formata hora
 
       setCurrentDate(dataAtual);
       setCurrentTime(horaAtual);
       setDate(now);
-      // console.log(horaAtual);
-      // console.log(dataAtual);
 
-
-      // Feriados (opcional, ainda pode continuar buscando de uma API se desejar)
+      // Busca feriados da API BrasilAPI
       const response = await fetch('https://brasilapi.com.br/api/feriados/v1/2024');
+      if (!response.ok) throw new Error('Erro ao buscar feriados');
+
       const data = await response.json();
       setHolidays(data.map(holiday => holiday.date));
     } catch (error) {
@@ -69,47 +68,45 @@ export default function SelectDateAndHour() {
     } finally {
       setInitialLoading(false);
     }
-  }
+  }, []);
 
-  async function fetchHours() {
+
+  const fetchHours = useCallback(async () => {
+    if (!date) return;
+
     const dayOfWeek = format(date, 'i');
     setDayName(namesForDays[dayOfWeek]);
-    if(dayOfWeek == 7 || dayOfWeek == 6){
+
+    if (+dayOfWeek === 7 || +dayOfWeek === 6) { // o retorno do 'i' é string? Se for string, compara com string
       setHoras([]);
       return;
     }
+
     setLoading(true);
     try {
-      const result = await SearchAndFilterHour(
-        instrutor,
-        veiculo,
-        date
-      );
-
-      // Retorna o índice do dia da semana (1 = Segunda-feira, 2 = Terça-feira, ...)
-      // console.log(dayOfWeek);
+      const result = await SearchAndFilterHour(instrutor, veiculo, date);
       setHoras(result);
-
     } catch (error) {
       setError(error.message);
     } finally {
       setLoading(false);
     }
-  }
+  }, [date, instrutor, veiculo, SearchAndFilterHour]);
+
 
   useEffect(() => {
     fetchInitialData();
-  }, []);
+  }, [fetchInitialData]);
 
   useEffect(() => {
     if (date) fetchHours();
-  }, [date]);
+  }, [date, fetchHours]);
 
   const handleDateChange = (selectedDate) => {
-    if(isAfter(currentDate, selectedDate)){
+    if (isAfter(currentDate, selectedDate)) {
       return;
     }
-
+    console.log(selectedDate)
     if (!date) {
       setDate(selectedDate);
       return;
@@ -121,7 +118,6 @@ export default function SelectDateAndHour() {
 
     setDate(selectedDate);
   };
-
 
   const handleHourClick = (hora) => {
     const selectedHourParsed = new Date(`1970-01-01T${hora}:00`); // Parse a hora
@@ -213,15 +209,15 @@ export default function SelectDateAndHour() {
 
       <Modal isOpen={modalVisible}>
         <p>Você tem certeza que deseja selecionar essa data: <strong>{format(date, 'dd/MM/yyyy')} </strong>  ás <strong>{selectedHour}</strong> </p>
-                <Button onClick={confirmSelection} type={4}>Sim
-                    <span className="material-icons">
-                        check
-                    </span></Button>
-                <Button onClick={() => setModalVisible(false)} type={3}>Não
-                    <span className="material-icons">
-                        close
-                    </span></Button>
-            </Modal>
+        <Button onClick={confirmSelection} type={4}>Sim
+          <span className="material-icons">
+            check
+          </span></Button>
+        <Button onClick={() => setModalVisible(false)} type={3}>Não
+          <span className="material-icons">
+            close
+          </span></Button>
+      </Modal>
       <Count className='bottom-0' num={4} />
       <ToastContainer />
     </div>
