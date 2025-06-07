@@ -110,25 +110,14 @@ export default function Perfil() {
         }
     }
 
-    const handleBack = () => {
-        if(tipo === 1){
-            navigate('/homeInstrutor')
-            return;
-        }else{
-            navigate('/home')
-            return;
-        }
-    }
-
     //#endregion
 
     return (
-        <div className='flex flex-col gap-2 p-3'>
-            <ButtonBack event={handleBack} />
-            <h1>Olá, {usuario.nome}</h1>
-            <h3>Altere sua Senha!</h3>
+        <div className='flex flex-col gap-2 p-3 h-screen items-center justify-center'>
+            <h1 className='text-2xl font-bold'>Olá, {usuario.nome}</h1>
+            <h3 className='font-medium'>Altere sua Senha!</h3>
             <h5>Lembrando, a senha deve ter no minimo 6 e no máximo 12 caracteres!</h5>
-            <InputField
+            <InputField 
                 placeholder="Senha Atual"
                 value={currentPassword}
                 onChange={(e) => setCurrentPassword(e.target.value)}

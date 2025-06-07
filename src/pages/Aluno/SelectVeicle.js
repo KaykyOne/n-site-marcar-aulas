@@ -4,8 +4,6 @@ import { toast, ToastContainer } from 'react-toastify';
 import LoadingIndicator from '../../components/LoadingIndicator';
 import Modal from '../../components/Modal';
 import Button from '../../components/Button';
-import ButtonBack from '../../components/ButtonBack';
-import ButtonHome from '../../components/ButtonHome';
 import Count from '../../components/Count';
 
 import useAula from '../../hooks/useAula';
@@ -69,7 +67,7 @@ export default function SelectVeicle() {
     };
 
     const renderVeicleItem = (item) => (
-        <div className='flex bg-white shadow-md p-3 rounded-xl align-middle justify-start gap-3' key={item.veiculo_id} onClick={() => handleButtonClick(item)}>
+        <div className='flex bg-gray-100 border border-gray-200 shadow-md p-3 rounded-xl align-middle justify-start gap-3' key={item.veiculo_id} onClick={() => handleButtonClick(item)}>
             <div className='w-full text-start'>
                 <h1>Veiculo: </h1>
                 <h1 className='font-bold text-4xl capitalize'>{item.modelo}</h1>
@@ -89,15 +87,12 @@ export default function SelectVeicle() {
     //#endregion
 
     return (
-        <div className='flex flex-col gap-5'>
+        <div className='flex flex-col gap-5 p-3 w-screen h-screen items-center justify-center'>
             <LoadingIndicator visible={loading} />
-            <div className='flex justify-between items-center w-full mb-3'>
-                <ButtonBack event={() => navigate('/selecionarInstrutor')} />
-                <ButtonHome event={() => navigate('/home')} />
-            </div>
-            <h1 className='greatText'>
+            <h1 className='text-2xl font-bold'>Selecionar Veiculo</h1>
+            <h2>
                 Clique no veículo que deseja utilizar na aula!
-            </h1>
+            </h2>
             {veiculos.length === 0 ? (
                 <div className='flex flex-col'>
                     <p className='text-error'>
@@ -106,7 +101,7 @@ export default function SelectVeicle() {
                     <span className="material-icons">error</span>
                 </div>
             ) : (
-                <div className='flex flex-col gap-3 max-h-[400px] overflow-y-auto'>
+                <div className='flex flex-col gap-3 max-h-[400px] overflow-y-auto w-full max-w-[800px]'>
                     {veiculos.map(renderVeicleItem)}
                 </div>
             )}

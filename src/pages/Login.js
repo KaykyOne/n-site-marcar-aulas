@@ -65,7 +65,7 @@ export default function Login() {
         // console.log(usuario);
         try {
             let responseUsuario = await LoginFunc(cpfNormal, senhaInput);
-            console.log(responseUsuario);
+            // console.log(responseUsuario);
             if (!responseUsuario) {
                 showToast('error', 'Erro', 'Cpf ou senha incorretos, ou usuário não existe!');
                 return;
@@ -98,7 +98,7 @@ export default function Login() {
                 } else if (usuarioAtual.tipo_usuario === "instrutor") {
                     rememberMe("login");
                     await GetInstrutor(usuarioAtual.usuario_id);
-                    navigate("homeinstrutor");
+                    navigate("selecionarAutoescola");
                 }
             } else {
                 return;
@@ -163,16 +163,16 @@ export default function Login() {
 
     //#endregion    
     return (
-        <div className="flex flex-col justify-center h-full w-full">
+        <div className="flex flex-col h-screen w-screen justify-center items-center">
 
-            <div className="flex flex-col pt-10 items-center text-center gap-2  bg-primary rounded-t-[50px]">
+            <div className="flex flex-col w-full pt-10 items-center text-center gap-2 bg-primary rounded-t-[50px] max-w-[800px]">
                 <img
                     src={LogoApp}
                     alt="Logo Auto Escola Ideal"
                     className="h-full w-full max-w-[200px] max-h-[200px]"
                 />
 
-                <div className='flex flex-col w-full h-full gap-4 p-4 bg-[#f4f4f4] rounded-tl-[50px] pt-10 align-middle justify-center items-center'>
+                <div className='flex flex-col w-full h-full gap-4 p-4 bg-white rounded-tl-[50px] pt-10 align-middle justify-center items-center'>
                     <h1 className='text-3xl mb-2'>Login</h1>
                     {/* CPF */}
                     <InputField

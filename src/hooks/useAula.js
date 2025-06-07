@@ -7,7 +7,6 @@ export default function useAula() {
         GenericCreate,
         GenericSearch,
         GenericDelete,
-        error,
         loading
     } = useGeneric();
 
@@ -20,8 +19,14 @@ export default function useAula() {
 
         const pesquisa = `?instrutor_id=${instrutor_id}&veiculo_id=${veiculo_id}&data=${data}`;
         const result = await GenericSearch('aulas', 'buscarHorarioLivre', pesquisa);
+        if (result.success) {
+            return result.data;
+        } else {
+            toast.error("Erro ao buscar horários disponíveis.");
+            return result;
+        }
 
-        return result;
+
     }, [GenericSearch]);
 
     const InsertClass = async (aula) => {
@@ -37,31 +42,49 @@ export default function useAula() {
             configuracoes
         } = aula;
 
+        // console.log({
+        //     instrutor_id,
+        //     aluno_id,
+        //     data,
+        //     tipo,
+        //     hora,
+        //     veiculo_id,
+        //     autoescola_id,
+        //     marcada_por,
+        //     configuracoes
+        // });
+
         if (!instrutor_id || !aluno_id || !data || !tipo || !hora || !veiculo_id || !autoescola_id || !marcada_por || !configuracoes) {
             toast.error("Todos os campos obrigatórios devem ser preenchidos!");
             return false;
         }
 
         const result = await GenericCreate('aulas', 'inserirAula', aula);
-        if (result) {
-            return result.message;
+        console.log(result);
+        if (result?.message) {
+            toast.success("Aula cadastrada com sucesso!");
+            return result;
         } else {
-            toast.error("Erro ao cadastrar aula!");
+            toast.error(result?.error || "Erro ao cadastrar aula!");
+            return result;
         }
-
-        return result;
     };
 
     const SelectVeicleByInstrutor = useCallback(async (id_instrutor, type, autoescola_id) => {
-        if (!id_instrutor || !type) {
-            toast.error("ID do instrutor ou tipo não encontrado!");
+        if (!id_instrutor || !type || !autoescola_id) {
+            toast.error("ID do instrutor, tipo ou autoescola não encontrado!");
             return false;
         }
 
+
         const pesquisa = `?instrutor_id=${id_instrutor}&tipo=${type}&autoescola_id=${autoescola_id}`;
         const response = await GenericSearch("veiculos", "buscarVeiculos", pesquisa);
-
-        return response;
+        if (response.success) {
+            return response.data;
+        } else {
+            toast.error("Erro ao buscar veículos.");
+            return response;
+        }
     }, [GenericSearch]);
 
     const SearchAulas = async (id) => {
@@ -73,20 +96,27 @@ export default function useAula() {
         const pesquisa = `?id=${id}`;
         const result = await GenericSearch("aulas", "buscarAulas", pesquisa);
 
-        return result;
+        if (result.success) {
+            return result.data;
+        } else {
+            toast.error("Erro ao buscar aulas.");
+            return false;
+        }
+
+
     };
 
     const DeleteAula = async (aulaA, tempoAntes) => {
         const dados = `aula_id=${aulaA.aula_id}&&data=${aulaA.data}&&hora=${aulaA.hora}&&tempoAntes=${tempoAntes.valor}`;
         const res = await GenericDelete('aulas', 'removerAula', dados);
-        console.log(res);
-        if (res) {
-            toast.warn(res);
+
+        if (res.success) {
+            toast.warn(res.data);
+            return res;
         } else {
             toast.error("Erro ao excluir aula!");
+            return false;
         }
-
-        return res;
     };
 
     return {
@@ -95,7 +125,6 @@ export default function useAula() {
         SelectVeicleByInstrutor,
         SearchAulas,
         DeleteAula,
-        error,
         loading
     };
 }

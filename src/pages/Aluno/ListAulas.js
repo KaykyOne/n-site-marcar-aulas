@@ -58,11 +58,10 @@ export default function ListAulas() {
 
   //#endregion
   return (
-    <div className='flex flex-col max-w-md mx-auto px-4'>
-      <ButtonBack className={"ml-5"} event={() => navigate(`/home`)} />
+    <div className='flex flex-col w-screen h-screen mx-auto px-4 justify-center items-center'>
       <h1 className='font-bold text-2xl mb-2'>Aulas</h1>
 
-      <div className='w-full mt-3 h-[60vh] overflow-y-auto rounded-md border'>
+      <div className='w-full mt-3 h-[60vh] overflow-y-auto rounded-2xl border max-w-[800px] max-h-[500px]'>
         {loading && <LoadingIndicator />}
         {error || aulas.length === 0 ? (
           <div className='p-5'>

@@ -13,6 +13,8 @@ import ListAulasInstrutor from './pages/Instrutor/ListAulasInstrutorView';
 import ListAlunosView from './pages/Instrutor/ListAlunosView';
 import SelectVeicle from './pages/Aluno/SelectVeicle';
 import CreateAula from './pages/Instrutor/CreateAula';
+import NavBar from './components/NavBar';
+import SelectAutoescola from './pages/Instrutor/SelectAutoescola';
 
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
@@ -23,34 +25,109 @@ function App() {
         <Routes>
           {/* Página de login */}
           <Route path="/" element={<Login />} />
+
           {/* Página principal (home) */}
-          <Route path="/home" element={<Home />} />
-          {/* Página Listar Aulas (listarAulas) */}
-          <Route path="/listarAulas" element={<ListAulas />} />
-          {/* Página Selecionar tipo da Aula (selecionarTipo) */}
-          <Route path="/selecionarTipo" element={<SelectType />} />
-          {/* Página Selecionar tipo da Aula (selecionarInstrutor) */}
-          <Route path="/selecionarInstrutor" element={<SelectInstructor />} />
-          {/* Página Selecionar tipo da Aula (selecionarDataEHora) */}
-          <Route path="/selecionarDataEHora" element={<SelectDateAndHour />} />
-          {/* Página Selecionar tipo da Aula (confirmar) */}
-          <Route path="/confirmar" element={<Confirm />} />
-          {/* Página Selecionar tipo da Aula (Fim) */}
-          <Route path="/fim" element={<End />} />
-          {/* Página Selecionar tipo da Aula (Erro) */}
-          <Route path="/erro" element={<Erro />} />
-          {/* Página Perfil */}
-          <Route path="/perfil" element={<Perfil />} />
-          {/* Página Home Instrutor */}
-          <Route path="/homeinstrutor" element={<HomeInstrutor />} />
-          {/* Página de Selecionar o Aluno */}
-          <Route path="/listAulasInstrutor" element={<ListAulasInstrutor />} />
-          {/* Página de Listar Os Alunos do instrutor o Aluno */}
-          <Route path="/listarAlunosInstrutor" element={<ListAlunosView />} />
-          {/* Página de Listar Os veiculos do instrutor ao Aluno */}
-          <Route path="/selecionarVeiculo" element={<SelectVeicle />} />
-          {/* Página de Listar Os veiculos do instrutor ao Aluno */}
-          <Route path="/criarAula" element={<CreateAula />} />
+          <Route path="/home" element={
+            <>
+              <Home />
+              <NavBar back={'/'} home={''} />
+            </>
+          } />
+
+          <Route path="/listarAulas" element={
+            <>
+              <ListAulas />
+              <NavBar back={'/home'} home={'/home'} />
+            </>
+          } />
+
+          <Route path="/selecionarTipo" element={
+            <>
+              <SelectType />
+              <NavBar back={'/home'} home={'/home'} />
+            </>
+          } />
+
+          <Route path="/selecionarAutoescola" element={
+            <>
+              <SelectAutoescola />
+            </>
+          } />
+
+          <Route path="/selecionarInstrutor" element={
+            <>
+              <SelectInstructor />
+              <NavBar back={'/selecionarTipo'} home={'/home'} />
+            </>
+          } />
+
+          <Route path="/selecionarVeiculo" element={
+            <>
+              <SelectVeicle />
+              <NavBar  back={'/selecionarInstrutor'} home={'/home'} />
+            </>
+          } />
+
+          <Route path="/selecionarDataEHora" element={
+            <>
+              <SelectDateAndHour />
+              <NavBar back={'/selecionarVeiculo'} home={'/home'} />
+            </>
+          } />
+
+          <Route path="/confirmar" element={
+            <>
+              <Confirm />
+              <NavBar back={'/selecionarDataEHora'} home={'/home'} />
+            </>
+          } />
+
+          <Route path="/fim" element={
+            <>
+              <End />
+            </>
+          } />
+
+          <Route path="/erro" element={
+            <>
+              <Erro />
+            </>
+          } />
+
+          <Route path="/perfil" element={
+            <>
+              <Perfil />
+              <NavBar back={-1} home={-1} />
+            </>
+          } />
+
+          <Route path="/homeinstrutor" element={
+            <>
+              <HomeInstrutor />
+              <NavBar back={'/'} home={''} />
+            </>
+          } />
+
+          <Route path="/listAulasInstrutor" element={
+            <>
+              <ListAulasInstrutor />
+              <NavBar back={'/homeinstrutor'} home={'/homeinstrutor'} />
+            </>
+          } />
+
+          <Route path="/listarAlunosInstrutor" element={
+            <>
+              <ListAlunosView />
+              <NavBar back={'/homeinstrutor'} home={'/homeinstrutor'} />
+            </>
+          } />
+
+          <Route path="/criarAula" element={
+            <>
+              <CreateAula />
+              <NavBar back={'/listarAlunosInstrutor'} home={'/homeinstrutor'} />
+            </>
+          } />
         </Routes>
       </BrowserRouter>
     </div>

@@ -10,8 +10,6 @@ export default function HomeInstrutorView() {
 
   const { instrutor } = useInstrutorStore();
   const [loading, setLoading] = useState(false);
-  const [modalMessage, setModalMessage] = useState('');
-  const [isModalVisible, setModalVisible] = useState(false);
   const navigate = useNavigate();
 
   const alterPage = async (page) => {
@@ -26,14 +24,10 @@ export default function HomeInstrutorView() {
     }
   };
 
-  useEffect(() => {
-    console.log(instrutor);
-  }, [])
-
   //#endregion
 
   return (
-    <div className='flex flex-col gap-3 min-w-[200px]'>
+    <div className='flex flex-col gap-3 h-screen justify-center items-center'>
       <h1 className='font-bold text-2xl capitalize'>Bem-vindo, {instrutor.nome_instrutor}!</h1>  
       <Button onClick={() => alterPage('listAulasInstrutor')} type={1}>
         Aulas
@@ -47,20 +41,8 @@ export default function HomeInstrutorView() {
         Alterar Senha
         <span className="material-icons">key</span>
       </Button>
-      <Button onClick={() => navigate('/')} type={2}>
-        Sair
-        <span className="material-icons">logout</span>
-      </Button>
 
       <LoadingIndicator visible={loading} />
-      {isModalVisible && (
-        <div className='flex flex-col'>
-          <p>{modalMessage}</p>
-          <Button onClick={() => setModalVisible(false)} type={1}>
-            Fechar
-          </Button>
-        </div>
-      )}
       <ToastContainer position="top-center" />
     </div>
   );

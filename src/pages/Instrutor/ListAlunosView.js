@@ -30,12 +30,12 @@ export default function ListAlunosView() {
     const fetchAlunos = useCallback(async () => {
         setLoading(true);
         setError(null);
-
+        // console.log('data')
         try {
             const data = await GetAlunos(instrutor.instrutor_id);
             setAlunos(data || []);
             setAlunosFiltrados(data || []);
-
+            // console.log(data)
             if (!data || data.length === 0) {
                 setError('Nenhum aluno encontrado.');
             }
@@ -49,7 +49,7 @@ export default function ListAlunosView() {
 
     useEffect(() => {
         if (instrutor) fetchAlunos();
-    }, [instrutor]);
+    }, []);
 
     const renderAlunoItem = (aluno) => (
         <div
@@ -90,8 +90,7 @@ export default function ListAlunosView() {
 
 
     return (
-        <div className="flex flex-col max-w-2xl h-full p-6 gap-2 mt-16">
-            <ButtonBack event={() => navigate(`/homeInstrutor`)} />
+        <div className="flex flex-col w-screen max-w-[800px] h-full p-6 gap-2 mt-16">
             <h1 className="text-2xl font-bold mb-6 text-center text-gray-900">Lista de Alunos</h1>
             <InputField onChange={(e) => pesquisarAluno(e.target.value)} placeholder={'Nome...'} />
             <h1 className='font-medium mb-6 text-start text-gray-900'>Contagem de Alunos Ativos: <strong>{alunos.length}</strong></h1>

@@ -16,6 +16,11 @@ export default function CreateAula() {
 
     const { SelectVeicleByInstrutor, SearchAndFilterHour, InsertClass } = useAula();
 
+    const getAutoescolaId = () => {
+        const id = sessionStorage.getItem("autoescola_id");
+        return id ? parseInt(id) : null;
+    };
+
     const navigate = useNavigate();
     const location = useLocation();
     const { aluno } = location.state || {};
@@ -53,40 +58,46 @@ export default function CreateAula() {
         setDataSelecionada(novaData);
     };
 
-    const createAula = async (aula) => {
-        
+    const createAula = async () => {
+
         if (!selectedTipo || !selectedVeiculo || !selectedHora || !dataSelecionada) {
             showToast('error', 'Campos obrigatórios', 'Preencha todos os campos antes de continuar!');
             return;
         }
-    
+
         const veiculoSelecionado = veiculos.find(v => v.placa === selectedVeiculo);
         const idDoVeiculo = veiculoSelecionado?.veiculo_id;
-    
+
         if (!idDoVeiculo) {
             showToast('error', 'Veículo inválido', 'Selecione um veículo válido!');
             return;
         }
-    
-        const result = await InsertClass(
-            instrutor.instrutor_id,
-            aluno.usuario_id,
-            dataSelecionada,
-            selectedTipo,
-            selectedHora,
-            idDoVeiculo,
-            instrutor.autoescola_id,
-            2,
-            usuario.configuracoes
-        );
-    
-        if (+result.status === 201) {
+        const autoescola_id = getAutoescolaId();
+        // console.log(aluno);
+        // console.log(instrutor);
+        // console.log(usuario);
+
+        const aula1 = {
+            instrutor_id: instrutor.instrutor_id,
+            aluno_id: aluno.usuario_id,
+            data: dataSelecionada,
+            tipo: selectedTipo,
+            hora: selectedHora,
+            veiculo_id: idDoVeiculo,
+            autoescola_id: autoescola_id,
+            marcada_por: 2,
+            configuracoes: usuario.configuracoes
+        };
+
+        const result = await InsertClass(aula1);
+
+        if (result.success) {
             showToast('success', 'Sucesso', 'Aula marcada com sucesso!');
             setHora('');
             setVeiculo('');
-            setTipo('');            
+            setTipo('');
         } else {
-            showToast('error', 'Erro ao criar aula', result);
+            showToast('error', 'Erro ao criar aula', result.error);
         }
     };
 
@@ -102,18 +113,19 @@ export default function CreateAula() {
     }, [selectedTipo, selectedVeiculo, dataSelecionada, SearchAndFilterHour])
 
     useEffect(() => {
-        console.log(usuario)
+        // console.log(usuario)
+        const autoescola_id = getAutoescolaId();
         if (!selectedTipo) return;
         const searchVeiculos = async () => {
-            const response = await SelectVeicleByInstrutor(instrutor.instrutor_id, selectedTipo);
-            setVeiculos(response);
+            const response = await SelectVeicleByInstrutor(instrutor.instrutor_id, selectedTipo, autoescola_id);
+            setVeiculos(response || []);
         }
         searchVeiculos();
     }, [selectedTipo, SelectVeicleByInstrutor])
 
     return (
-        <div className='flex flex-col text-start'>
-            <ButtonBack event={() => navigate("/listarAlunosInstrutor")} />
+        <div className='flex flex-col text-start h-screen justify-center'>
+            <h1 className='text-2xl font-bold w-full text-center'>Marcar Aula</h1>
             <div id='form' className='flex flex-col mt-5 gap-1'>
                 <h1 className='font-bold'>Aluno:</h1>
                 <InputField
@@ -141,7 +153,7 @@ export default function CreateAula() {
                     options={horas}
                     placeholder={"Selecione a Hora:"} />
                 <Button className='mt-2' onClick={createAula}>
-                    Confirmar
+                    Finalizar
                     <span className="material-icons">
                         check
                     </span>

@@ -4,53 +4,52 @@ import { toast } from "react-toastify";
 
 export default function useGeneric() {
     const [loading, setLoading] = useState(false);
-    const [error, setError] = useState('');
 
     // 🔥 DELETE - Excluir por ID
     const GenericDelete = async (rota, caminho, campos) => {
-        setError('');
+        
         setLoading(true);
         try {
             const res = await fetch(
                 `${process.env.REACT_APP_URL_BACK}/${rota}/${caminho}?${campos}`,
-                { method: 'DELETE', }
+                { method: 'DELETE' }
             );
-
             const response = await res.json();
 
             if (!res.ok) {
-                setError(response?.message || 'Erro na requisição');
-                return null;
+                const msg = response?.message || 'Erro na requisição';
+                return { success: false, error: msg, status: res.status };
             }
 
-            return response.message;
+            return { success: true, data: response.message, status: res.status };
         } catch (error) {
-            setError(`Erro ao excluir ${caminho}: ${error.message}`);
+            const msg = `Erro ao excluir ${caminho}: ${error.message}`;
+            return { success: false, error: msg };
         } finally {
             setLoading(false);
         }
     };
 
-    // 🔥 DELETE - Excluir relação (Ex.: tabela relacional)
+    // 🔥 DELETE - Excluir relação
     const GenericDeleteRelation = async (rota, caminho, campo1, campo2, id1, id2) => {
-        setError('');
+        
         setLoading(true);
         try {
             const res = await fetch(
                 `${process.env.REACT_APP_URL_BACK}/${rota}/${caminho}?${campo1}=${id1}&&${campo2}=${id2}`,
                 { method: 'DELETE' }
             );
-
             const response = await res.json();
 
             if (!res.ok) {
-                setError(response?.message || 'Erro na requisição');
-                return null;
+                const msg = response?.message || 'Erro na requisição';
+                return { success: false, error: msg, status: res.status };
             }
 
-            return response.message;
+            return { success: true, data: response.message, status: res.status };
         } catch (error) {
-            setError(`Erro ao excluir ${caminho}: ${error.message}`);
+            const msg = `Erro ao excluir ${caminho}: ${error.message}`;
+            return { success: false, error: msg };
         } finally {
             setLoading(false);
         }
@@ -58,7 +57,7 @@ export default function useGeneric() {
 
     // 🟢 POST - Criar novo registro
     const GenericCreate = async (rota, caminho, body) => {
-        setError('');
+        
         setLoading(true);
         try {
             const res = await fetch(
@@ -73,13 +72,14 @@ export default function useGeneric() {
             const response = await res.json();
 
             if (!res.ok) {
-                setError(response?.message || 'Erro na criação');
-                return null;
+                const msg = response?.message || 'Erro na criação';
+                return { success: false, error: msg, status: res.status };
             }
 
-            return response;
+            return { success: true, data: response, status: res.status };
         } catch (error) {
-            setError(`Erro ao criar ${caminho}: ${error.message}`);
+            const msg = `Erro ao criar ${caminho}: ${error.message}`;
+            return { success: false, error: msg };
         } finally {
             setLoading(false);
         }
@@ -87,7 +87,7 @@ export default function useGeneric() {
 
     // 🔵 GET - Buscar dados
     const GenericSearch = useCallback(async (rota, caminho, pesquisa = '') => {
-        setError('');
+        
         setLoading(true);
         try {
             const res = await fetch(
@@ -98,13 +98,14 @@ export default function useGeneric() {
             const response = await res.json();
 
             if (!res.ok) {
-                setError(response?.message || 'Erro na requisição');
-                return null;
+                const msg = response?.message || 'Erro na requisição';
+                return { success: false, error: msg, status: res.status };
             }
 
-            return response;
+            return { success: true, data: response, status: res.status };
         } catch (error) {
-            setError(`Erro ao buscar ${caminho}: ${error.message}`);
+            const msg = `Erro ao buscar ${caminho}: ${error.message}`;
+            return { success: false, error: msg };
         } finally {
             setLoading(false);
         }
@@ -112,7 +113,7 @@ export default function useGeneric() {
 
     // 🟠 PUT - Atualizar dados
     const GenericUpdate = async (rota, caminho, body) => {
-        setError('');
+        
         setLoading(true);
         try {
             const res = await fetch(
@@ -127,13 +128,14 @@ export default function useGeneric() {
             const response = await res.json();
 
             if (!res.ok) {
-                setError(response?.message || 'Erro na atualização');
-                return null;
+                const msg = response?.message || 'Erro na atualização';
+                return { success: false, error: msg, status: res.status };
             }
 
-            return response;
+            return { success: true, data: response, status: res.status };
         } catch (error) {
-            setError(`Erro ao atualizar ${caminho}: ${error.message}`);
+            const msg = `Erro ao atualizar ${caminho}: ${error.message}`;
+            return { success: false, error: msg };
         } finally {
             setLoading(false);
         }
@@ -147,7 +149,6 @@ export default function useGeneric() {
             });
 
             const result = await response.json();
-
             return result.data;
         } catch (err) {
             toast.error("Erro na requisição ao buscar a data!");
@@ -158,25 +159,21 @@ export default function useGeneric() {
     const LoginFunc = async (cpf, senha) => {
         const setUsuario = useUserStore.getState().setUsuario;
 
-        const aluno = {
-            cpf: cpf,
-            senha: senha,
-        };
         if (!cpf || !senha) {
             toast.error("CPF ou senha não preenchidos!");
             return false;
         }
 
-        const response = await GenericCreate("usuario", "login", aluno)
-        if (response) {
-            await setUsuario(response);
+        const result = await GenericCreate("usuario", "login", { cpf, senha });
+
+        if (result.success) {
+            await setUsuario(result.data);
             toast.success("Login realizado com sucesso!");
-            return response;
+            return result.data;
         } else {
-            toast.error(response?.message || "Erro no login!");
+            toast.error(result.error || "Erro no login!");
             return false;
         }
-
     };
 
     const AlterarSenha = async (id, senha) => {
@@ -186,15 +183,15 @@ export default function useGeneric() {
         }
 
         const body = { id, senha };
-        const res = await GenericUpdate('usuario', 'alterarsenha', body);
-        console.log(res);
-        if (res) {
-            toast.success("Senha alterada com sucesso!");
-        } else {
-            toast.error("Erro ao alterar a senha!");
-        }
+        const result = await GenericUpdate('usuario', 'alterarsenha', body);
 
-        return res;
+        if (result.success) {
+            toast.success("Senha alterada com sucesso!");
+            return result.data;
+        } else {
+            toast.error(result.error || "Erro ao alterar a senha!");
+            return null;
+        }
     };
 
     return {
@@ -207,6 +204,5 @@ export default function useGeneric() {
         LoginFunc,
         AlterarSenha,
         loading,
-        error,
     };
 }

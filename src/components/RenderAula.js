@@ -9,7 +9,7 @@ export default function RenderAula({ item, tipo, handleAction = null }) {
         E: "local_shipping"
     };
     return (
-        <div className='flex gap-3 bg-white shadow-md rounded-lg p-3 justify-start items-stretch text-start m-2'>
+        <div className='flex gap-3 bg-gray-100 shadow-md rounded-xl p-3 justify-start items-stretch text-start m-2 border border-gray-200'>
             {/* Ícone */}
             <div className='flex flex-col border-r-2 border-gray-400 p-1 m-2 justify-center'>
                 <span className="material-icons text-7xl">
@@ -34,7 +34,7 @@ export default function RenderAula({ item, tipo, handleAction = null }) {
 
                 {tipo === 1 && (
                     <>
-                        <p><strong>Veículo:</strong> {`${item.placa} <br/> ${item.modelo}`}</p>
+                        <p><strong>Veículo:</strong> {`${item.placa} ${item.modelo}`}</p>
                     </>
                 )}
             </div>

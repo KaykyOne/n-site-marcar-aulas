@@ -1,11 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import LoadingIndicator from '../components/LoadingIndicator';
 import Modal from '../components/Modal';
 import 'react-toastify/dist/ReactToastify.css';
 import Button from '../components/Button';
-import ButtonBack from '../components/ButtonBack';
-import ButtonHome from '../components/ButtonHome';
 
 import useAulaStore from '../store/useAulaStore';
 import useUserStore from '../store/useUserStore';
@@ -15,7 +13,7 @@ import useAula from '../hooks/useAula.js';
 
 export default function Confirm() {
 
-  const { InsertClass, loading, error } = useAula();
+  const { InsertClass, loading } = useAula();
 
   //#region Logica
   const { aula } = useAulaStore.getState();
@@ -50,35 +48,44 @@ export default function Confirm() {
       hora: hora,
       veiculo_id: veiculo.veiculo_id,
       autoescola_id: usuario.autoescola_id,
-      marcada_por: 1, 
+      marcada_por: 1,
       configuracoes: usuario.configuracoes
     };
 
     const result = await InsertClass(aula);
-    console.log(result);
-    if (error) {
-      toggleModal(error);
-      return;
-    }
-
-    if (result === "Aula criada com sucesso") {
+    if (result.success) {
       navigate('/fim');
     } else {
-      toggleModal(result);
+      toggleModal(result.error);
       return;
     }
 
   };
+
+  const ModalContent = () => {
+    return (
+      <>
+        <div className='flex gap-3 p-2 items-center'>
+          <span className="material-icons !text-7xl text-red-600" >
+            error
+          </span >
+          <div className='text-start'>
+            <h1 className='text-2xl font-bold '>Aviso!</h1>
+            <p className="text-gray-800">{modalMessage}</p>
+          </div>
+        </div>
+
+        <Button onClick={() => setModalVisible(false)} className="mt-4" type={3}>
+          Ok
+        </Button>
+      </>
+    )
+  }
   //#endregion
 
   return (
-    <div className="flex flex-col  px-4 py-6 bg-white shadow-md rounded-xl max-w-2xl mx-auto">
-      <div className="flex justify-between items-center w-full mb-6">
-        <ButtonBack event={() => navigate('/selecionarDataEHora')} />
-        <ButtonHome event={() => navigate('/home')} />
-      </div>
-
-      <h1 className="text-3xl font-semibold text-center mb-6 text-gray-800">Confirme sua Aula</h1>
+    <div className="flex flex-col  px-4 py-6 mx-auto w-screen h-screen justify-center items-center p-2 max-w-[800px]">
+      <h1 className="text-3xl font-bold text-center mb-6 text-gray-800">Confirme sua Aula</h1>
 
       <div className="space-y-3 mb-6">
         <h3 className="text-lg text-gray-700">
@@ -112,10 +119,7 @@ export default function Confirm() {
         onConfirm={() => setModalVisible(false)}
         onCancel={() => setModalVisible(false)}
       >
-        <p className="text-gray-800">{modalMessage}</p>
-        <Button onClick={() => setModalVisible(false)} className="mt-4">
-          Ok
-        </Button>
+        <ModalContent />
       </Modal>
     </div>
 

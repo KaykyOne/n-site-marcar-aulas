@@ -6,7 +6,6 @@ import 'react-toastify/dist/ReactToastify.css';
 import Button from '../../components/Button'; 
 
 import Modal from '../../components/Modal';
-import ButtonBack from '../../components/ButtonBack';
 import useUserStore from '../../store/useUserStore';
 import modalIcon from '../../imgs/icons/undraw_notify_rnwe.svg'
 
@@ -61,8 +60,7 @@ export default function HomeView() {
   //#endregion
 
   return (
-    <div className='flex flex-col md:w-[600px] p-4 gap-4'>
-      <ButtonBack event={() => navigate("/")}/>
+    <div className='flex flex-col gap-3 h-screen justify-center items-center'>
       <h1 className='font-bold text-2xl capitalize'>Bem-vindo, {usuario.nome}!</h1>
       <Button onClick={() => alterPage('selecionarTipo')}>
         Marcar Aulas
@@ -72,10 +70,11 @@ export default function HomeView() {
         Listar Aulas
         <span className="material-icons">directions_car</span>
       </Button>
-      <Button onClick={() => navigate(`/perfil`, { state: { tipo: 2 } })} type={2}>
+      <Button onClick={() => alterPage('perfil')} type={2}>
         Alterar Senha
         <span className="material-icons">key</span>
       </Button>
+
       <a
         className='txtTermo'
         onClick={() =>
