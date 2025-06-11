@@ -34,7 +34,7 @@ export default function SelectInstructor() {
             setLoading(true);
             try {
                 const instructorsData = await SearchInstrutorByAluno(usuario.usuario_id, aula.tipo, usuario.autoescola_id);
-                setInstrutores(instructorsData);
+                setInstrutores(instructorsData || []);
             } catch (error) {
                 showToast('Erro', 'Ocorreu um erro ao buscar os instrutores.');
                 console.error(error);

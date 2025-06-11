@@ -75,9 +75,9 @@ export default function useInstrutor() {
         }
     };
 
-    const SearchInstrutorByAluno = useCallback(async (aluno_id, tipo) => {
-        const autoescola_id = getAutoescolaId();
-
+    const SearchInstrutorByAluno = useCallback(async (aluno_id, tipo, autoescola_id_vindo) => {
+        const autoescola_id_guardado = getAutoescolaId();
+        let autoescola_id = autoescola_id_guardado ? autoescola_id_guardado : autoescola_id_vindo;
         if (!aluno_id || !tipo || !autoescola_id) {
             toast.error("Todos os parâmetros são obrigatórios!");
             return null;
@@ -85,12 +85,13 @@ export default function useInstrutor() {
 
         const query = `?aluno_id=${aluno_id}&tipo=${tipo}&autoescola_id=${autoescola_id}`;
         const result = await GenericSearch('instrutor', 'buscarInstrutorPorAluno', query);
-        if (!result) {
-            toast.error("Erro ao buscar instrutor do aluno.");
-            return null;
-        }
+        if (result.success) {
+            return result.data
 
-        return result.data;
+        } else {
+
+            return result;
+        }
     }, [GenericSearch]);
 
     const GetAutoescolas = useCallback(async (instrutor_id) => {
