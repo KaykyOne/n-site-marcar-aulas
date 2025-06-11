@@ -1,7 +1,7 @@
 {
   "files": {
     "main.css": "/static/css/main.e08a2816.css",
-    "main.js": "/static/js/main.f1b06d9c.js",
+    "main.js": "/static/js/main.3cf1d95b.js",
     "static/media/imgManutencao.png": "/static/media/imgManutencao.ca9c687083c3404a3098.png",
     "static/media/LogoNovusCFC.png": "/static/media/LogoNovusCFC.f46aadacefabadf2e0a9.png",
     "static/media/imagemErroTempo.png": "/static/media/imagemErroTempo.a5f5cbf50f06aa865551.png",
@@ -9,10 +9,10 @@
     "static/media/undraw_notify_rnwe.svg": "/static/media/undraw_notify_rnwe.2ff4ad18406a601f54ed7f5baa084370.svg",
     "index.html": "/index.html",
     "main.e08a2816.css.map": "/static/css/main.e08a2816.css.map",
-    "main.f1b06d9c.js.map": "/static/js/main.f1b06d9c.js.map"
+    "main.3cf1d95b.js.map": "/static/js/main.3cf1d95b.js.map"
   },
   "entrypoints": [
     "static/css/main.e08a2816.css",
-    "static/js/main.f1b06d9c.js"
+    "static/js/main.3cf1d95b.js"
   ]
 }
