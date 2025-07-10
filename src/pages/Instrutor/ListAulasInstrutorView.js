@@ -32,6 +32,13 @@ export default function ListAulasInstrutorView() {
             if (data.length === 0) {
                 setError('Nenhuma aula encontrada.');
             }
+            data.sort((a, b) => {
+                const [h1, m1] = a.hora.split(':').map(Number);
+                const [h2, m2] = b.hora.split(':').map(Number);
+                return h1 !== h2 ? h1 - h2 : m1 - m2;
+            });
+
+            console.log(data);
             setAulas(data);
         } catch (err) {
             setError(error.message);
@@ -45,6 +52,7 @@ export default function ListAulasInstrutorView() {
     const renderAulaItem = (item) => (
         <RenderAula key={item.aula_id} item={item} tipo={1} />
     );
+
 
     return (
         <div className="flex flex-col w-screen p-6 gap-2 h-screen max-w-[800px] items-center justify-start">

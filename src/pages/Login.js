@@ -72,13 +72,14 @@ export default function Login() {
             }
             // console.log(responseUsuario);
             let atividade = responseUsuario.atividade;
+            console.log(responseUsuario);
             if (atividade === false && responseUsuario) {
                 showToast('error', 'Erro', 'Você está desativado');
                 return;
             }
             let usuarioAtual;
             if (responseUsuario === true) {
-                usuarioAtual = usuario;
+                usuarioAtual = usuario; 
             } else {
                 usuarioAtual = responseUsuario;
             }
