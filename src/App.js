@@ -16,12 +16,12 @@ import CreateAula from './pages/Instrutor/CreateAula';
 import NavBar from './components/NavBar';
 import SelectAutoescola from './pages/Instrutor/SelectAutoescola';
 
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { HashRouter, Routes, Route } from 'react-router-dom';
 
 function App() {
   return (
     <div className="App">
-      <BrowserRouter basename="/">
+      <HashRouter basename="/">
         <Routes>
           {/* Página de login */}
           <Route path="/" element={<Login />} />
@@ -129,7 +129,7 @@ function App() {
             </>
           } />
         </Routes>
-      </BrowserRouter>
+      </HashRouter>
     </div>
   );
 }
