@@ -1,18 +1,18 @@
 {
   "files": {
-    "main.css": "/static/css/main.e08a2816.css",
-    "main.js": "/static/js/main.255e88a8.js",
+    "main.css": "/static/css/main.f6cdb177.css",
+    "main.js": "/static/js/main.23979a32.js",
     "static/media/imgManutencao.png": "/static/media/imgManutencao.ca9c687083c3404a3098.png",
     "static/media/LogoNovusCFC.png": "/static/media/LogoNovusCFC.f46aadacefabadf2e0a9.png",
     "static/media/imagemErroTempo.png": "/static/media/imagemErroTempo.a5f5cbf50f06aa865551.png",
     "static/media/logoNovusTech.png": "/static/media/logoNovusTech.b93cd39e6f6917377c74.png",
     "static/media/undraw_notify_rnwe.svg": "/static/media/undraw_notify_rnwe.2ff4ad18406a601f54ed7f5baa084370.svg",
     "index.html": "/index.html",
-    "main.e08a2816.css.map": "/static/css/main.e08a2816.css.map",
-    "main.255e88a8.js.map": "/static/js/main.255e88a8.js.map"
+    "main.f6cdb177.css.map": "/static/css/main.f6cdb177.css.map",
+    "main.23979a32.js.map": "/static/js/main.23979a32.js.map"
   },
   "entrypoints": [
-    "static/css/main.e08a2816.css",
-    "static/js/main.255e88a8.js"
+    "static/css/main.f6cdb177.css",
+    "static/js/main.23979a32.js"
   ]
 }
