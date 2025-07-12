@@ -20,23 +20,22 @@ export default function Login() {
     //#region Logica 
     const { usuario } = useUserStore();
     const { GetInstrutor } = useInstrutor();
-    const { LoginFunc } = useGeneric();
+    const { LoginFunc, ForPass } = useGeneric();
 
     const [cpfNormal, setCpf] = useState('');
     const [senhaInput, setSenha] = useState('');
     const [loading, setLoading] = useState(false);
-    const [isModalVisible, setModalVisible] = useState(false);
-    const [modalMessage, setModalMessage] = useState('');
     const [seePass, setSeePass] = useState(false);
     const [modalMan, setModalMan] = useState(false);
     const [modalHoraErro, setModalErroHora] = useState(false);
     const [checkRemember, setCheckRemember] = useState(true);
-    const navigate = useNavigate(); // Use useNavigate aqui
+    const [cpfEsqueci, setCpfEsqueci] = useState("");
 
-    const toggleModal = (message) => {
-        setModalMessage(message);
-        setModalVisible(!isModalVisible);
-    };
+    const [modalAberto, setModalAberto] = useState(false);
+    const [modalTipo, setModalTipo] = useState(""); // ex: 'esqueci', 'manutencao', 'erroHora'
+
+
+    const navigate = useNavigate(); // Use useNavigate aqui
 
     const showToast = (type, text1, text2) => {
         toast.dismiss();  // Remove todos os toasts anteriores
@@ -62,9 +61,10 @@ export default function Login() {
             }
         }, 5000);
 
+        const cpfLimpo = cpfNormal.replace(/\D/g, "");
         // console.log(usuario);
         try {
-            let responseUsuario = await LoginFunc(cpfNormal, senhaInput);
+            let responseUsuario = await LoginFunc(cpfLimpo, senhaInput);
             // console.log(responseUsuario);
             if (!responseUsuario) {
                 showToast('error', 'Erro', 'Cpf ou senha incorretos, ou usuário não existe!');
@@ -79,7 +79,7 @@ export default function Login() {
             }
             let usuarioAtual;
             if (responseUsuario === true) {
-                usuarioAtual = usuario; 
+                usuarioAtual = usuario;
             } else {
                 usuarioAtual = responseUsuario;
             }
@@ -88,7 +88,8 @@ export default function Login() {
                 const manutencaoConfig = usuarioAtual.configuracoes.find(config => config.chave === "manutencao");
                 const manutencao = manutencaoConfig ? manutencaoConfig.valor : "TRUE";
                 if (manutencao === "TRUE") {
-                    toggleModal("O sistema de sua autoescola está em manutenção!");
+                    setModalTipo("manutencao");
+                    setModalAberto(true);
                     return;
                 }
                 // console.log(usuarioAtual.tipo_usuario);
@@ -111,15 +112,17 @@ export default function Login() {
         }
     };
 
-    const handleCpfChange = (event) => {
-        const text = event.target.value;
-        if (/^\d+$/.test(text)) {
-            setCpf(text);
+    const confirmEsqueciSenha = async () => {
+        if (cpfEsqueci.length >= 11) {
+            const cpfLimpo = cpfEsqueci.replace(/\D/g, "");
+            await ForPass(cpfLimpo);
+            setCpfEsqueci("");
+            setModalAberto(false)
+            setModalTipo("");
         } else {
-            showToast('error', 'Erro', 'O CPF deve conter Apenas numeros!');
-            setCpf('');
+            toast.error("CPF incorreto para solicitar senha!");
         }
-    };
+    }
 
     const rememberMe = useCallback((type) => {
         setLoading(true);
@@ -181,8 +184,8 @@ export default function Login() {
                         placeholder="Digite seu CPF"
                         inputMode="numeric"
                         value={cpfNormal}
-                        onChange={handleCpfChange}
-                        classNamePersonalized="input"
+                        onChange={(e) => setCpf(e.target.value)}
+                        maxLength={14}
                     />
 
                     {/* Senha + botão de mostrar/ocultar */}
@@ -192,7 +195,6 @@ export default function Login() {
                             placeholder="Digite sua Senha"
                             value={senhaInput}
                             onChange={(e) => setSenha(e.target.value)}
-                            classNamePersonalized="input password-input"
                         />
                         <button onClick={() => setSeePass(!seePass)} className="flex h-[50px] rounded-md w-[100px]  bg-secondary justify-center align-middle items-center">
                             <span className="material-icons">
@@ -219,6 +221,16 @@ export default function Login() {
                         <span className="material-icons">login</span>
                     </Button>
 
+                    <div className='flex gap-2 hover:text-primary transition-all duration-300 cursor-pointer' onClick={() => {
+                        setModalTipo("esqueci");
+                        setModalAberto(true);
+                    }}>
+                        <a>Esqueci a senha</a>
+                        <span className="material-icons">
+                            lock_reset
+                        </span>
+                    </div>
+
                     {/* Footer */}
                     <div className="footer text-sm text-gray-500 flex items-center gap-2 mt-4">
                         <p>Feito por NovusTech</p>
@@ -232,16 +244,45 @@ export default function Login() {
             {/* Modais */}
             <ModalLogin visible={modalMan} setModalVisible={setModalMan} />
             <ModalErroHora visible={modalHoraErro} setModalVisible={setModalErroHora} />
-            <Modal isOpen={isModalVisible}>
-                <p>{modalMessage}</p>
-                <Button
-                    back="#A61723"
-                    onClick={() => setModalVisible(false)}
-                    className="modal-button"
-                >
-                    Fechar
-                </Button>
+
+            <Modal isOpen={modalAberto}>
+                {modalTipo === "esqueci" && (
+                    <div className="flex flex-col gap-4">
+                        <h1 className="text-2xl font-bold">Digite seu CPF</h1>
+                        <p>Enviaremos uma nova senha para você pelo celular!</p>
+
+                        <InputField
+                            type="text"
+                            placeholder="Digite seu CPF"
+                            inputMode="numeric"
+                            value={cpfEsqueci}
+                            onChange={(e) => setCpfEsqueci(e.target.value)}
+                            maxLength={14}
+                        />
+
+                        <div className="flex flex-col w-full gap-1">
+                            <Button type={4} onClick={confirmEsqueciSenha}>
+                                Confirmar
+                                <span className="material-icons">check</span>
+                            </Button>
+                            <Button type={3} onClick={() => setModalAberto(false)}>
+                                Cancelar
+                                <span className="material-icons">clear</span>
+                            </Button>
+                        </div>
+
+                        <p className="italic text-sm">Pode demorar até 5 minutos para a senha chegar!</p>
+                    </div>
+                )}
+
+                {modalTipo === "manutencao" && (
+                    <div className="flex flex-col gap-4 items-center text-center">
+                        <p className="text-lg">O sistema da sua autoescola está em manutenção.</p>
+                        <Button back="#A61723" onClick={() => setModalAberto(false)}>Fechar</Button>
+                    </div>
+                )}
             </Modal>
+
 
             {/* Toast */}
             <ToastContainer position="top-center" />

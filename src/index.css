@@ -11,39 +11,59 @@
 
 /* Reset básico para evitar problemas de estilo entre navegadores */
 * {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-  }
-  
-  html, body, #root {
-    height: 100%;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+
+.App {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+  text-align: center;
+}
+
+
+/* Links */
+a {
+  color: #3498db;
+  /* Cor dos links */
+  text-decoration: none;
+  /* Remove sublinhado */
+  cursor: pointer;
+  color: black;
+}
+
+a:hover {
+  text-decoration: none;
+  color: #4B003B;
+}
+
+/* styles.css */
+.fade-in {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
   }
 
-  
-  .App {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    height: 100%;
-    width: 100%;
-    text-align: center;
+  to {
+    opacity: 1;
   }
-  
-  
-  /* Links */
-  a {
-    color: #3498db; /* Cor dos links */
-    text-decoration: none; /* Remove sublinhado */
-    cursor: pointer;
-    color: black;
-  }
-  
-  a:hover {
-    text-decoration: none; 
-    color: #4B003B;
-  }
-  
-  /* Estilos adicionais podem ser adicionados aqui */
-  
+}
+
+
+
+/* Estilos adicionais podem ser adicionados aqui */

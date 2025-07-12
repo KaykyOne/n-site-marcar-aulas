@@ -6,6 +6,7 @@ export default function InputField({
     type = "text",
     className = "",
     disabled = false,
+    ...props
   }) {
     return (
       <input
@@ -33,6 +34,7 @@ export default function InputField({
           ${className}
         `}
         disabled={disabled}
+        {...props}
       />
     );
   }

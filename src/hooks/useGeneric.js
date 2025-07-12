@@ -7,7 +7,7 @@ export default function useGeneric() {
 
     // 🔥 DELETE - Excluir por ID
     const GenericDelete = async (rota, caminho, campos) => {
-        
+
         setLoading(true);
         try {
             const res = await fetch(
@@ -32,7 +32,7 @@ export default function useGeneric() {
 
     // 🔥 DELETE - Excluir relação
     const GenericDeleteRelation = async (rota, caminho, campo1, campo2, id1, id2) => {
-        
+
         setLoading(true);
         try {
             const res = await fetch(
@@ -57,7 +57,7 @@ export default function useGeneric() {
 
     // 🟢 POST - Criar novo registro
     const GenericCreate = async (rota, caminho, body) => {
-        
+
         setLoading(true);
         try {
             const res = await fetch(
@@ -87,7 +87,7 @@ export default function useGeneric() {
 
     // 🔵 GET - Buscar dados
     const GenericSearch = useCallback(async (rota, caminho, pesquisa = '') => {
-        
+
         setLoading(true);
         try {
             const res = await fetch(
@@ -113,7 +113,7 @@ export default function useGeneric() {
 
     // 🟠 PUT - Atualizar dados
     const GenericUpdate = async (rota, caminho, body) => {
-        
+
         setLoading(true);
         try {
             const res = await fetch(
@@ -168,10 +168,25 @@ export default function useGeneric() {
 
         if (result.success) {
             await setUsuario(result.data);
-            toast.success("Login realizado com sucesso!");
             return result.data;
         } else {
             toast.error(result.error || "Erro no login!");
+            return false;
+        }
+    };
+
+    const ForPass = async (cpf) => {
+        if (!cpf) {
+            return false;
+        }
+
+        const result = await GenericUpdate("usuario", "esqueciSenha", { cpf });
+        console.log(result);
+        if (result.success && !!result.data.message) {
+            toast.success("Senha enviada com sucesso!");
+            return result.data;
+        } else {
+            toast.error(result.error || "Erro no ao enviar senha!");
             return false;
         }
     };
@@ -203,6 +218,7 @@ export default function useGeneric() {
         PegarData,
         LoginFunc,
         AlterarSenha,
+        ForPass,
         loading,
     };
 }
