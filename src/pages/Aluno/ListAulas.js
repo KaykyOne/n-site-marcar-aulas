@@ -6,7 +6,7 @@ import Modal from '../../components/Modal';
 import ButtonBack from '../../components/ButtonBack';
 import Button from '../../components/Button';
 import RenderAula from '../../components/RenderAula.js';
-import { format } from 'date-fns';
+import { parse } from "date-fns";
 
 import useUserStore from '../../store/useUserStore.js';
 import useAula from '../../hooks/useAula.js'
@@ -87,20 +87,20 @@ export default function ListAulas() {
     <RenderAula item={item} key={item.aula_id} tipo={2} handleAction={handleAction} />
   );
 
+  const aulasFuturas = (aulas || []).filter(
+    (item) => parse(item.data, "dd/MM/yyyy", new Date()) >= new Date()
+  );
+
   //#endregion
   return (
-    <div className='flex flex-col w-screen h-screen mx-auto px-4 justify-start items-center mt-[50px]'>
-      <h1 className='font-bold text-3xl mb-2'>Aulas</h1>
-      <p className="text-sm font-light text-justify">
-        <strong className="font-bold">Aviso:</strong> Os dados são estimados pelo sistema e podem conter erros. Confirme com a sua autoescola!
-      </p>
-      <div className='w-full max-w-[800px] bg-gray-100 shadow-md rounded-2xl p-3'>
-        <h1 className='font-medium'>Progresso</h1>
+    <div className='flex flex-col w-screen h-screen mx-auto px-4 justify-start items-center'>
+      <div className='w-full max-w-[800px] mt-[40px] bg-gray-100 shadow-md rounded-2xl p-3'>
+        <h1 className='font-medium '>Progresso nas Aulas</h1>
         <div className='flex gap-2 justify-center items-center p-2 flex-wrap'>
           {(categorias || []).map((item) =>
-            <div key={item} className='flex flex-1 max-h-[40vh] flex-col bg-primary text-white hover:scale-95 transition-all duration-300 rounded-full justify-center items-center p-3 min-w-[120px] shadow-md'>
+            <div key={item} className='flex flex-1 max-h-[40vh] h-full flex-col bg-primary text-white hover:scale-95 transition-all duration-300 rounded-full justify-center items-center p-3 min-w-[120px] shadow-md'>
               <div className='flex gap-1 justify-center items-center mb-1'>
-                <h1 className='font-medium capitalize text-white/90'>{nameTips[item.toUpperCase()]}</h1>
+                <h1 className='font-medium text-sm capitalize text-white/90'>{nameTips[item.toUpperCase()]}</h1>
                 <span className="material-icons">
                   {iconsButton[(item.toUpperCase() || "").toUpperCase()] || ""}
                 </span>
@@ -117,7 +117,8 @@ export default function ListAulas() {
       <h2 className='font-bold mt-[10px]'>Aulas Marcadas:</h2>
       <div className='w-full mt-3 overflow-y-auto rounded-2xl border max-w-[800px] max-h-[400px]'>
         {loading && <LoadingIndicator />}
-        {error || aulas.filter((item) => item.data > format(new Date(), "dd/MM/yyyy")).length === 0 ? (
+
+        {!loading && (error || aulasFuturas.length === 0) ? (
           <div className='p-5'>
             <p className='text-error'>
               {error ? `Erro: ${error}` : 'Nenhuma aula marcada!'}
@@ -125,17 +126,14 @@ export default function ListAulas() {
           </div>
         ) : (
           <div className="flex flex-col p-2 gap-2">
-            {(aulas || [])
-              .filter((item) => item.data > format(new Date(), "dd/MM/yyyy"))
-              .map(renderAulaItem)}
+            {aulasFuturas.map(renderAulaItem)}
           </div>
         )}
       </div>
+
       <div className='flex gap-2 mt-[10px]'>
         <h1>Arraste para ver mais aulas!</h1>
-        <span class="material-icons">
-          swipe_up
-        </span>
+        <span className="material-icons">swipe_up</span>
       </div>
 
       <Modal isOpen={modalVisible}>

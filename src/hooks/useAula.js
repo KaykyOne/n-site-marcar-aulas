@@ -95,7 +95,7 @@ export default function useAula() {
 
         const pesquisa = `?id=${id}`;
         const result = await GenericSearch("aulas", "buscarAulas", pesquisa);
-        console.log(result.data);
+
         if (result.success) {
             return result.data;
         } else {

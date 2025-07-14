@@ -70,7 +70,7 @@ export default function ListAulasInstrutorView() {
                     <p>{error ? `Erro: ${error}` : 'Nenhuma aula marcada!'}</p>
                 </div>
             ) : (
-                <div className="flex flex-col max-h-[400px] overflow-y-auto w-full">
+                <div className="flex flex-col max-h-[400px] gap-2 overflow-y-auto w-full">
                     {aulas.map(renderAulaItem)}
                 </div>
             )}
