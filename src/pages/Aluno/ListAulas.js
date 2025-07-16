@@ -3,10 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import LoadingIndicator from '../../components/LoadingIndicator';
 import 'react-toastify/dist/ReactToastify.css';
 import Modal from '../../components/Modal';
-import ButtonBack from '../../components/ButtonBack';
 import Button from '../../components/Button';
 import RenderAula from '../../components/RenderAula.js';
-import { parse } from "date-fns";
+import { parse, subDays } from "date-fns";
 
 import useUserStore from '../../store/useUserStore.js';
 import useAula from '../../hooks/useAula.js'
@@ -88,7 +87,7 @@ export default function ListAulas() {
   );
 
   const aulasFuturas = (aulas || []).filter(
-    (item) => parse(item.data, "dd/MM/yyyy", new Date()) >= new Date()
+    (item) => parse(item.data, "dd/MM/yyyy", new Date()) >= subDays(new Date(), 1)
   );
 
   //#endregion
