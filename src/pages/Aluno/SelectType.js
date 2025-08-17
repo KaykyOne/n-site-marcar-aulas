@@ -1,13 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import LoadingIndicator from '../../components/LoadingIndicator';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import Modal from '../../components/Modal';
-import Button from '../../components/Button'; // Importe o componente Button
-import Count from '../../components/Count';
-import ButtonBack from '../../components/ButtonBack';
-
+import {Button, Modal, Count, Loading} from '../../NovusUI/All';
 import useAulaStore from '../../store/useAulaStore';
 import useUserStore from '../../store/useUserStore';
 
@@ -86,7 +81,7 @@ export default function SelectTypeView() {
     };
 
     const renderCategoriaItem = (item, index) => (
-        <div className='flex bg-gray-100 shadow-md p-3 rounded-xl align-middle justify-start gap-3 border border-gray-200' key={index} onClick={() => handleButtonClick(item)}>
+        <div className='flex bg-white shadow-md p-3 rounded-xl align-middle justify-start gap-3 border border-gray-200' key={index} onClick={() => handleButtonClick(item)}>
             <h1 className='text-7xl font-bold p-2 border-r-2 border-gray-400'>{item}</h1>
             <div className='w-full'>
                 <div className='flex justify-start align-middle gap-1'>
@@ -111,10 +106,10 @@ export default function SelectTypeView() {
     //#endregion
 
     return (
-        <div className='flex flex-col gap-5 p-3 w-screen h-screen items-center justify-center'>
+        <div className='flex flex-col gap-5 p-3 w-full h-screen items-center justify-center'>
             <h1 className='text-2xl font-bold'>Selecionar Tipo</h1>
             <h2>Clique no tipo da AULA que deseja marcar!</h2>
-            <LoadingIndicator visible={loading} />
+            <Loading visible={loading} />
             {categorias.Count === 0 ? (
                 <div className='flex flex-col'>
                     <p className='text-red-800'>

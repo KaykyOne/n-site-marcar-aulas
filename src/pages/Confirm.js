@@ -1,10 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import LoadingIndicator from '../components/LoadingIndicator';
-import Modal from '../components/Modal';
 import 'react-toastify/dist/ReactToastify.css';
-import Button from '../components/Button';
-
+import { Button, Modal, Loading } from '../NovusUI/All';
 import useAulaStore from '../store/useAulaStore';
 import useUserStore from '../store/useUserStore';
 import { formatarDataParaExibir } from '../utils/dataFormat';
@@ -84,7 +81,7 @@ export default function Confirm() {
   //#endregion
 
   return (
-    <div className="flex flex-col  px-4 py-6 mx-auto w-screen h-screen justify-center items-center p-2 max-w-[800px]">
+    <div className="flex flex-col  px-4 py-6 mx-auto w-full h-screen justify-center items-center p-2 max-w-[800px]">
       <h1 className="text-3xl font-bold text-center mb-6 text-gray-800">Confirme sua Aula</h1>
 
       <div className="space-y-3 mb-6">
@@ -102,7 +99,7 @@ export default function Confirm() {
         </h3>
       </div>
 
-      <LoadingIndicator visible={loading} />
+      <Loading visible={loading} />
 
       <Button
         onClick={loading ? null : handleConfirm}
@@ -110,6 +107,7 @@ export default function Confirm() {
         className="mt-4"
       >
         {loading ? 'Processando...' : 'Finalizar'}
+        
       </Button>
 
       <ToastContainer />

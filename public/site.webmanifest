@@ -1,6 +1,6 @@
 {
-  "name": "MyWebSite",
-  "short_name": "MySite",
+  "name": "NovusCFC",
+  "short_name": "Marque suas aulas aqui!",
   "icons": [
     {
       "src": "/web-app-manifest-192x192.png",

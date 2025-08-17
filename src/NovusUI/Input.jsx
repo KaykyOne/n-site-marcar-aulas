@@ -1,4 +1,5 @@
-export default function InputField({
+import './public.css';
+export default function Input({
     placeholder,
     inputMode = "text",
     value,

@@ -1,12 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast, ToastContainer } from 'react-toastify';
-import LoadingIndicator from '../../components/LoadingIndicator';
 import 'react-toastify/dist/ReactToastify.css';
-import Modal from '../../components/Modal';
-import Button from '../../components/Button';
-import Count from '../../components/Count';
-
+import {Button, Modal, Count, Loading} from '../../NovusUI/All';
 import useAulaStore from '../../store/useAulaStore';
 import useUserStore from '../../store/useUserStore';
 import useInstrutor from '../../hooks/useInstrutor'
@@ -67,7 +63,7 @@ export default function SelectInstructor() {
     };
 
     const renderInstrutorItem = (item) => (
-        <div className='flex bg-gray-100 border border-gray-200 shadow-md p-3 rounded-xl align-middle justify-start gap-3' key={item.instrutor_id} onClick={() => handleButtonClick(item)}>
+        <div className='flex bg-white border border-gray-200 shadow-md p-3 rounded-xl align-middle justify-start gap-3' key={item.instrutor_id} onClick={() => handleButtonClick(item)}>
             <div className='w-full text-start'>
                 <h1>Instrutor: </h1>
                 <h1 className='font-bold text-4xl capitalize'>{item.nome_instrutor}</h1>
@@ -87,8 +83,8 @@ export default function SelectInstructor() {
     //#endregion
 
     return (
-        <div className='flex flex-col gap-5 w-screen h-screen justify-center items-center p-3'>
-            <LoadingIndicator visible={loading} />
+        <div className='flex flex-col gap-5 w-full h-screen justify-center items-center p-3'>
+            <Loading visible={loading} />
             <h1 className='text-2xl font-bold'>Selecionar Instrutor</h1>
             <h2 className='greatText'>
                 Clique no instrutor que deseja marcar a aula!

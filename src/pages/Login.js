@@ -1,13 +1,12 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, memo } from 'react';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate } from 'react-router-dom';
-import InputField from '../components/Input';
-import Button from '../components/Button'; // Importe o Button
-import ModalLogin from '../components/ModalLogin';
-import ModalErroHora from '../components/ModalHoraInvalida';
-import Modal from '../components/Modal';
 import useUserStore from '../store/useUserStore';
+import ModalLogin from '../components/ModalLogin';
+
+
+import { Button, Input, Modal } from '../NovusUI/All';
 
 import logoNovusTech from '../imgs/logoNovusTech.png';
 import LogoApp from "../imgs/LogoNovusCFC.png";
@@ -18,7 +17,7 @@ import useInstrutor from '../hooks/useInstrutor';
 
 export default function Login() {
     //#region Logica 
-    const { usuario } = useUserStore();
+    const { usuario, resetUsuario } = useUserStore();
     const { GetInstrutor } = useInstrutor();
     const { LoginFunc, ForPass } = useGeneric();
 
@@ -27,7 +26,6 @@ export default function Login() {
     const [loading, setLoading] = useState(false);
     const [seePass, setSeePass] = useState(false);
     const [modalMan, setModalMan] = useState(false);
-    const [modalHoraErro, setModalErroHora] = useState(false);
     const [checkRemember, setCheckRemember] = useState(true);
     const [cpfEsqueci, setCpfEsqueci] = useState("");
 
@@ -65,7 +63,7 @@ export default function Login() {
         // console.log(usuario);
         try {
             let responseUsuario = await LoginFunc(cpfLimpo, senhaInput);
-            // console.log(responseUsuario);
+            console.log(responseUsuario);
             if (!responseUsuario) {
                 showToast('error', 'Erro', 'Cpf ou senha incorretos, ou usuário não existe!');
                 return;
@@ -94,6 +92,7 @@ export default function Login() {
                 }
                 // console.log(usuarioAtual.tipo_usuario);
                 if (usuarioAtual.tipo_usuario === "aluno") {
+                    console.log("indo pra home")
                     rememberMe("login");
                     navigate("home");
                     return;
@@ -165,6 +164,15 @@ export default function Login() {
         rememberMe('restore');
     }, [])
 
+    const resetarUsuario = () => {
+        resetUsuario();
+        localStorage.removeItem("user-storage");
+        setCpf("");
+        setSenha("");
+        localStorage.removeItem("senha");
+        localStorage.removeItem("cpf");
+    }
+
     //#endregion    
     return (
         <div className="flex flex-col h-screen w-screen justify-center items-center">
@@ -175,11 +183,10 @@ export default function Login() {
                     alt="Logo Auto Escola Ideal"
                     className="h-full w-full max-w-[200px] max-h-[200px]"
                 />
-
-                <div className='flex flex-col w-full h-full gap-4 p-4 bg-white rounded-tl-[50px] pt-10 align-middle justify-center items-center'>
+                <div className='flex flex-col w-full h-full gap-4 p-4 bg-gray-100 rounded-tl-[50px] pt-10 align-middle justify-center items-center'>
                     <h1 className='text-3xl mb-2'>Login</h1>
                     {/* CPF */}
-                    <InputField
+                    <Input
                         type="text"
                         placeholder="Digite seu CPF"
                         inputMode="numeric"
@@ -190,7 +197,7 @@ export default function Login() {
 
                     {/* Senha + botão de mostrar/ocultar */}
                     <div className="flex items-center align-middle justify-center w-full gap-2">
-                        <InputField
+                        <Input
                             type={seePass ? 'text' : 'password'}
                             placeholder="Digite sua Senha"
                             value={senhaInput}
@@ -214,7 +221,7 @@ export default function Login() {
                         />
                         Salvar login
                     </label>
-
+                    <a className='font-medium' onClick={() => resetarUsuario()}>Limpar dados Salvos (CPF E SENHA)</a>
                     {/* Botão login */}
                     <Button onClick={login} disabled={loading}>
                         {loading ? 'Carregando...' : 'Entrar'}
@@ -243,7 +250,6 @@ export default function Login() {
 
             {/* Modais */}
             <ModalLogin visible={modalMan} setModalVisible={setModalMan} />
-            <ModalErroHora visible={modalHoraErro} setModalVisible={setModalErroHora} />
 
             <Modal isOpen={modalAberto}>
                 {modalTipo === "esqueci" && (
@@ -251,7 +257,7 @@ export default function Login() {
                         <h1 className="text-2xl font-bold">Digite seu CPF</h1>
                         <p>Enviaremos uma nova senha para você pelo celular!</p>
 
-                        <InputField
+                        <Input
                             type="text"
                             placeholder="Digite seu CPF"
                             inputMode="numeric"

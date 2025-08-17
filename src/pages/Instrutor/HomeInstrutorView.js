@@ -1,9 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import LoadingIndicator from '../../components/LoadingIndicator';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import Button from '../../components/Button'; // Importe o componente Button
+import { Button, Loading } from '../../NovusUI/All';
 import useInstrutorStore from '../../store/useInstrutorStore';
 
 export default function HomeInstrutorView() {
@@ -28,7 +27,7 @@ export default function HomeInstrutorView() {
 
   return (
     <div className='flex flex-col gap-3 h-screen justify-center items-center'>
-      <h1 className='font-bold text-2xl capitalize'>Bem-vindo, {instrutor.nome_instrutor}!</h1>  
+      <h1 className='font-bold text-2xl capitalize'>Bem-vindo, {instrutor.nome_instrutor}!</h1>
       <Button onClick={() => alterPage('listAulasInstrutor')} type={1}>
         Aulas
         <span className="material-icons">directions_car</span>
@@ -37,12 +36,8 @@ export default function HomeInstrutorView() {
         Alunos
         <span className="material-icons">groups</span>
       </Button>
-      <Button onClick={() => navigate(`/perfil`, { state: { tipo: 1 } })} type={1}>
-        Alterar Senha
-        <span className="material-icons">key</span>
-      </Button>
 
-      <LoadingIndicator visible={loading} />
+      <Loading visible={loading} />
       <ToastContainer position="top-center" />
     </div>
   );

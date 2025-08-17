@@ -1,11 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import InputField from '../components/Input';
-import ButtonBack from '../components/ButtonBack';
-import Button from '../components/Button';
-
+import { Button, Input, Modal, Loading } from '../NovusUI/All';
+import modalIcon from '../imgs/icons/undraw_notify_rnwe.svg'
 import useUserStore from '../store/useUserStore';
 import useGeneric from '../hooks/useGeneric';
 
@@ -15,18 +13,32 @@ export default function Perfil() {
 
 
     const location = useLocation();
-    const tipo = location.state?.tipo;
     const [currentPassword, setCurrentPassword] = useState('');
+    const [modalMessage, setModalMessage] = useState('');
+    const [isModalVisible, setModalVisible] = useState(false);
     const [newPassword, setNewPassword] = useState('');
     const [loading, setLoading] = useState(false);
     const [nivelDaSenha, setNivelDaSenha] = useState('Ruim.');
     const [nivelProgressBar, setnivelProgressBar] = useState(0);
     const navigate = useNavigate();
+    const [horasAntes, setHorasAntes] = useState('');
+
 
     const showToast = (type, text1, text2) => {
         toast.dismiss();  // Remove todos os toasts anteriores
         toast[type](`${text1}: ${text2}`);
     };
+
+    const toggleModal = (message) => {
+        setModalMessage(message);
+        setModalVisible(!isModalVisible);
+    };
+
+    useEffect(() => {
+        let horas = usuario.configuracoes.find(config => config.chave === "horasPraDesmarcarAulas");
+        setHorasAntes(horas.valor)
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
 
     const handleChangePassword = async () => {
@@ -117,13 +129,13 @@ export default function Perfil() {
             <h1 className='text-2xl font-bold'>Olá, {usuario.nome}</h1>
             <h3 className='font-medium'>Altere sua Senha!</h3>
             <h5>Lembrando, a senha deve ter no minimo 6 e no máximo 12 caracteres!</h5>
-            <InputField 
+            <Input
                 placeholder="Senha Atual"
                 value={currentPassword}
                 onChange={(e) => setCurrentPassword(e.target.value)}
                 typ={'password'}
             />
-            <InputField
+            <Input
                 placeholder="Nova Senha"
                 value={newPassword}
                 onChange={(e) => AlterandoSenhaEVerificando(e.target.value)}
@@ -137,6 +149,7 @@ export default function Perfil() {
             ></progress>
 
 
+
             <Button
                 onClick={handleChangePassword}
                 disabled={loading}
@@ -145,6 +158,25 @@ export default function Perfil() {
                 {loading ? 'Alterando...' : 'Alterar Senha'}
                 <span className="material-icons">check</span>
             </Button>
+
+            <a
+                className='txtTermo'
+                onClick={() =>
+                    toggleModal(
+                        `Termos de Utilização\n\nO usuario é responsável por:\n- Marcar suas aulas no sistema.\n- Desmarcar as aulas com antecedência mínima de ${horasAntes} horas.\n- Comparecer no horário agendado. Ausências podem levar a penalidades.\n\nAo continuar utilizando o sistema, você aceita esses termos.`
+                    )
+                }
+            >
+                Termos de Utilização
+            </a>
+            <Loading visible={loading} />
+            <Modal isOpen={isModalVisible}>
+                <img alt='imageModal' className='image' src={modalIcon} />
+                <p>{modalMessage}</p>
+                <Button back={'#4B003B'} onClick={() => setModalVisible(false)} cor="#FFF">
+                    Fechar
+                </Button>
+            </Modal>
             <ToastContainer position="top-center" />
         </div>
     );

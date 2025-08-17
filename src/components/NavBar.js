@@ -4,21 +4,27 @@ import { useNavigate } from 'react-router-dom'
 export default function NavBar({ back, home }) {
   const navigate = useNavigate();
   return (
-    <div className='p-4 w-full flex justify-center'>
-      <div className='bg-gray-100 flex-1 p-2 shadow-md flex gap-2 rounded-full max-w-[300px] border border-gray-200'>
-        <button className='flex rounded-full flex-1 text-primary flex-col p-2 font-medium hover:bg-primary hover:text-white transition duration-300'
-          onClick={() => navigate(home)}>
-          <span className="material-icons">
-            home
-          </span>
-          <span className="text-xs">Início</span>
-        </button>
-        <button className='flex rounded-full  flex-1 text-primary flex-col p-2 font-medium hover:bg-primary hover:text-white transition duration-300'
+    <div className='flex justify-center w-full items-center fixed left-1/2 -translate-x-1/2 bottom-0 max-w-[500px]'>
+      <div className='flex-1 p-2 shadow-md flex gap-2 bg-white rounded-t-3xl'>
+        <button className='flex  flex-1 text-primary flex-col p-2 font-medium hover:text-gray-600 transition duration-300'
           onClick={() => navigate(back)}>
           <span className="material-icons">
             arrow_back
           </span>
           <span className="text-xs">Voltar</span>
+        </button>
+        <button className='flex items-center justify-center fixed left-1/2 -translate-x-1/2 bottom-2 bg-primary text-white  rounded-full  w-[80px] h-[80px] flex-col p-2 font-medium hover:bg-primary/80 hover:text-white transition duration-300'
+          onClick={() => navigate(home)}>
+          <span className="material-icons !text-5xl">
+            home
+          </span>
+        </button>
+        <button className='flex  flex-1 text-primary flex-col p-2 font-medium hover:text-gray-600 transition duration-300'
+          onClick={() => navigate('../perfil')}>
+          <span class="material-icons">
+            account_circle
+          </span>
+          <span className="text-xs">Perfil</span>
         </button>
       </div>
     </div>

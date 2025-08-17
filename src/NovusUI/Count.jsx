@@ -1,5 +1,3 @@
-import React from 'react';
-
 export default function Count({ num = 0, className = '' }) {
   // Array com 5 posições (índices de 0 a 4)
   const items = Array.from({ length: 5 });

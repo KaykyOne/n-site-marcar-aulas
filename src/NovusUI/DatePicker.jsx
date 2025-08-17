@@ -44,7 +44,7 @@ export default function DatePicker({ dias, onChange }) {
     }
 
     return (
-        <div className="flex flex-col gap-3 items-center relative p-4 border border-gray-200 rounded-lg shadow bg-gray-100 w-full max-w-md">
+        <div className="flex flex-col gap-3 items-center relative p-4 border rounded-md shadow-md bg-white w-full max-w-md">
             {/* Seletor principal com setas */}
             <h1 className='font-medium'>{selectedDate ? namesForDays[format(selectedDate, 'i')] : 'Selecione uma data'}</h1>
             <div className="flex items-center justify-center gap-2 w-full">

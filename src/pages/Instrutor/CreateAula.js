@@ -2,10 +2,7 @@ import { useState, useEffect } from 'react';
 import useInstrutorStore from '../../store/useInstrutorStore';
 import useUserStore from '../../store/useUserStore';
 import Select from '../../components/Select';
-import InputField from '../../components/Input';
-import ButtonBack from '../../components/ButtonBack';
-import DateTimePicker from '../../components/DateTimePicker';
-import Button from '../../components/Button';
+import {Button, Input, DatePicker} from '../../NovusUI/All';
 import { toast, ToastContainer } from 'react-toastify';
 
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -124,11 +121,11 @@ export default function CreateAula() {
     }, [selectedTipo, SelectVeicleByInstrutor])
 
     return (
-        <div className='flex flex-col text-start h-screen justify-center'>
+        <div className='flex flex-col text-start h-screen justify-center p-3'>
             <h1 className='text-2xl font-bold w-full text-center'>Marcar Aula</h1>
             <div id='form' className='flex flex-col mt-5 gap-1'>
                 <h1 className='font-bold'>Aluno:</h1>
-                <InputField
+                <Input
                     disabled={true}
                     value={`${aluno.nome} ${aluno.sobrenome}`}
                     className='capitalize' />
@@ -145,7 +142,7 @@ export default function CreateAula() {
                     options={veiculos.map(v => v.placa)}
                     placeholder={"Selecione o Veículo:"} />
                 <h1 className='font-bold'>Data:</h1>
-                <DateTimePicker onChange={changeData} />
+                <DatePicker onChange={changeData}/>
                 <h1 className='font-bold'>Hora:</h1>
                 <Select
                     value={selectedHora}

@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default function LoadingIndicator ({ visible }){
+export default function Loading ({ visible }){
   if (!visible) return null;
 
   return (

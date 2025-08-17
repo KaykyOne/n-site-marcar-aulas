@@ -19,6 +19,7 @@
 html,
 body,
 #root {
+  background-color: rgba(211, 211, 211, 0.123);
   height: 100%;
 }
 

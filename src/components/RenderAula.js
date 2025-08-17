@@ -1,4 +1,4 @@
-import Button from './Button';
+import { Button } from '../NovusUI/All';
 
 export default function RenderAula({ item, tipo, handleAction = null }) {
     const iconsButton = {
@@ -9,7 +9,7 @@ export default function RenderAula({ item, tipo, handleAction = null }) {
         E: "local_shipping"
     };
     return (
-        <div className='flex gap-3 flex-shrink-0 bg-gray-100 shadow-md rounded-xl justify-start items-stretch text-start border border-gray-200 flex-col fade-in overflow-hidden'>
+        <div className='flex gap-3 flex-shrink-0 bg-white shadow-md rounded-md justify-start items-stretch text-start border border-gray-200 flex-col fade-in overflow-hidden'>
             {/* Ícone */}
             <div className='flex flex-col gap-2 justify-center items-start'>
                 <div className='flex w-full gap-3'>

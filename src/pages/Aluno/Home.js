@@ -1,101 +1,149 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import LoadingIndicator from '../../components/LoadingIndicator';
-import { toast, ToastContainer } from 'react-toastify';
+import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import Button from '../../components/Button'; 
-
-import Modal from '../../components/Modal';
+import { Button, Loading, Modal } from '../../NovusUI/All';
 import useUserStore from '../../store/useUserStore';
 import modalIcon from '../../imgs/icons/undraw_notify_rnwe.svg'
+import RenderAula from '../../components/RenderAula.js';
+import { parse, subDays } from "date-fns";
+
+import useAula from '../../hooks/useAula.js';
 
 export default function HomeView() {
   const { usuario } = useUserStore();
 
-  const [loading, setLoading] = useState(false);
+  const [loadingTotal, setLoading] = useState(false);
   const [modalMessage, setModalMessage] = useState('');
-  const [isModalVisible, setModalVisible] = useState(false);
   const navigate = useNavigate();
-  const [ horasAntes, setHorasAntes ] = useState('');
 
-  const toggleModal = (message) => {
-    setModalMessage(message);
-    setModalVisible(!isModalVisible);
-  };
+  const { SearchAulas, loading: loadingAulas, error, DeleteAula, RenderTotalAulas, aulas } = useAula();
 
-  const verificarSenha = () => {
-    if(usuario.senha === '123456'){
-      setModalMessage("Percebemos que sua senha ainda é a padrão(123456), aconselhamos mudar para uma maior segurança!");
-      setModalVisible(true); 
-      return;
-    }
-  }
-
-  const showToast = (type, text1, text2) => {
-    toast.dismiss();
-    toast[type](`${text1}: ${text2}`);
-  };
+  const loading = loadingAulas || loadingTotal && true;
 
   useEffect(() => {
-    let horas = usuario.configuracoes.find(config => config.chave === "horasPraDesmarcarAulas");
-    setHorasAntes(horas.valor)
+    const verificarSenha = () => {
+      if (usuario.senha === '123456') {
+        setModalMessage(
+          <>
+            <img alt='imageModal' className='image' src={modalIcon} />
+            <p>Percebemos que sua senha ainda é a padrão(123456), aconselhamos mudar para uma maior segurança!</p>
+            <Button back={'#4B003B'} onClick={() => setModalMessage('')} cor="#FFF">
+              Fechar
+            </Button>
+          </>
+        )
+        return;
+      }
+    };
     verificarSenha();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
+  }, [])
   const alterPage = (page) => {
     setLoading(true);
     try {
       if (usuario.atividade) {
         navigate(`/${page}`);
       } else {
-        toggleModal('Ops! Sua conta está bloqueada. Por favor, entre em contato com o nosso atendimento para resolver isso rapidinho!');
+        setModalMessage('Ops! Sua conta está bloqueada. Por favor, entre em contato com o nosso atendimento para resolver isso rapidinho!');
       }
     } catch (error) {
-      showToast('error', 'Erro', error.message);
+      toast.error(`Erro: ${error.message}`);
     } finally {
       setLoading(false);
     }
   };
-  //#endregion
+
+  const fetchAulas = useCallback(async () => {
+    await SearchAulas(usuario.usuario_id);
+  }, [usuario.usuario_id]);
+  useEffect(() => {
+    if (usuario) {
+      fetchAulas();
+    }
+  }, [usuario, fetchAulas]);
+  const handleAction = async (acao, item) => {
+    if (acao === "Excluir") {
+      setModalMessage(
+        <>
+          <p className='mb-4'>
+            Deseja excluir a aula do dia <strong>{item?.data}</strong>?
+          </p>
+          <div className="flex gap-2 justify-center">
+            <Button type={4} onClick={() => confirmAction(item)}>
+              sim <span className="material-icons">check</span>
+            </Button>
+            <Button type={3} onClick={() => setModalMessage('')}>
+              não <span className="material-icons">close</span>
+            </Button>
+          </div>
+        </>
+      )
+      await fetchAulas();
+    }
+  }
+  const confirmAction = async (item) => {
+    const horaPraPoderExcluir = usuario.configuracoes.find(item => item.chave === 'horasPraDesmarcarAulas');
+
+    if (!item || !horaPraPoderExcluir) {
+      toast.error('Erro ao excluir aula!')
+      fetchAulas();
+      setModalMessage('');
+      return;
+    }
+
+    let res = await DeleteAula(item, horaPraPoderExcluir);
+    if (res) {
+      fetchAulas();
+      setModalMessage('');
+    }
+  };
+  const renderAulaItem = (item) => (
+    <RenderAula item={item} key={item.aula_id} tipo={2} handleAction={handleAction} />
+  );
+  const aulasFuturas = (aulas || []).filter(
+    (item) => parse(item.data, "dd/MM/yyyy", new Date()) >= subDays(new Date(), 1)
+  );
+
+  localStorage.setItem('aulasFuturas', JSON.stringify(aulasFuturas));
 
   return (
-    <div className='flex flex-col gap-3 h-screen justify-center items-center'>
+    <div className='flex flex-col gap-3 h-screen justify-center items-center p-3'>
       <h1 className='font-bold text-2xl capitalize'>Bem-vindo, {usuario.nome}!</h1>
       <Button onClick={() => alterPage('selecionarTipo')}>
-        Marcar Aulas
+        Marcar Aula
         <span className="material-icons">add</span>
       </Button>
-      <Button onClick={() => alterPage('listarAulas')}>
-        Listar Aulas
-        <span className="material-icons">directions_car</span>
-      </Button>
-      <Button onClick={() => alterPage('perfil')} type={2}>
-        Alterar Senha
-        <span className="material-icons">key</span>
-      </Button>
+      <RenderTotalAulas categorias={(usuario.categoria_pretendida).split("")} />
+      <div className='w-full'>
+        <h1 className='text-xl font-semibold'>Aulas Agendadas:</h1>
+        <div className='w-full mt-3 overflow-y-auto rounded-md border max-w-[800px] max-h-[300px]'>
+          {loading && <Loading />}
 
-      <a
-        className='txtTermo'
-        onClick={() =>
-          toggleModal(
-            `Termos de Utilização\n\nO usuario é responsável por:\n- Marcar suas aulas no sistema.\n- Desmarcar as aulas com antecedência mínima de ${horasAntes} horas.\n- Comparecer no horário agendado. Ausências podem levar a penalidades.\n\nAo continuar utilizando o sistema, você aceita esses termos.`
-          )
+          {!loading && (error || aulasFuturas.length === 0) ? (
+            <div className='p-5'>
+              <p className='text-error'>
+                {error ? `Erro: ${error}` : 'Nenhuma aula agendada!'}
+              </p>
+            </div>
+          ) : (
+            <div className="flex flex-col p-2 gap-2">
+              {aulasFuturas.map(renderAulaItem)}
+            </div>
+          )}
+        </div>
+        {aulasFuturas?.length > 2 && 
+          <p className='flex gap-2 w-full items-center justify-center pt-2'>Arraste para ver mais aulas!
+            <span class="material-icons">
+              swipe_down
+            </span>
+          </p>
         }
-      >
-        Termos de Utilização
-      </a>
 
-      <LoadingIndicator visible={loading} />
-      <Modal isOpen={isModalVisible}>
-          <img alt='imageModal' className='image' src={modalIcon}/>
-          <p>{modalMessage}</p>
-          <Button back={'#4B003B'} onClick={() => setModalVisible(false)}cor="#FFF">
-            Fechar
-          </Button>
+      </div>
+      <Loading visible={loading} />
+      <Modal isOpen={modalMessage}>
+        {modalMessage}
       </Modal>
-      
-      <ToastContainer position="top-center" />
     </div>
   );
 };

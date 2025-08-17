@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import useInstrutor from '../../hooks/useInstrutor';
 import { useNavigate } from 'react-router-dom';
 
@@ -23,20 +23,23 @@ export default function SelectAutoescola() {
     };
 
     return (
-        <div className="flex flex-col gap-4 justify-center p-4">
-            {autoescolas.map((autoescola) => (
-                <div className='flex-1 p-2 rounded-md bg-white shadow-md' key={autoescola.autoescola_id}>
-                    <h1 className='text-2xl font-bold'>{autoescola.nome}</h1>
-                    <h1 className='font-medium'>{autoescola.endereco}</h1>
-                    <button
-                        onClick={() => selecionarAutoescola(autoescola.autoescola_id)}
-                        className="bg-primary text-white font-semibold py-3 px-6 rounded-lg shadow-md transition duration-300 w-full max-w-sm text-center"
-                    >
-                        Selecionar
-                    </button>
-                </div>
+        <div className="flex flex-col gap-4 justify-center p-4 h-screen ">
+            <div className='flex flex-col gap-4'>
+                {autoescolas.map((autoescola) => (
+                    <div className='flex-1 p-2 rounded-md bg-white shadow-md' key={autoescola.autoescola_id}>
+                        <h1 className='text-2xl font-bold'>{autoescola.nome}</h1>
+                        <h1 className='font-medium'>{autoescola.endereco}</h1>
+                        <button
+                        
+                            onClick={() => selecionarAutoescola(autoescola.autoescola_id)}
+                            className="bg-primary text-white font-semibold py-3 px-6 rounded-lg shadow-md transition duration-300 w-full max-w-sm text-center"
+                        >
+                            Selecionar
+                        </button>
+                    </div>
 
-            ))}
+                ))}
+            </div>
         </div>
     );
 }

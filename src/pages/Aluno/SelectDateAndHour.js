@@ -1,19 +1,15 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import Modal from '../components/Modal';
 import { useNavigate } from 'react-router-dom';
-import LoadingIndicator from '../components/LoadingIndicator';
-import Button from '../components/Button';
-import Count from '../components/Count';
+import { Button, Modal, Count, Loading, DatePicker } from '../../NovusUI/All';
 
-import useAula from '../hooks/useAula';
-import useGeneric from '../hooks/useGeneric';
-import useAulaStore from '../store/useAulaStore';
-import useUserStore from '../store/useUserStore';
-import { format, isBefore, addDays, subDays, isAfter } from 'date-fns';
-import { formatarDataParaSalvar } from '../utils/dataFormat';
-import DatePicker from '../components/DatePicker.';
+
+import useAula from '../../hooks/useAula';
+import useGeneric from '../../hooks/useGeneric';
+import useAulaStore from '../../store/useAulaStore';
+import { format, isBefore, addDays, isAfter } from 'date-fns';
+import { formatarDataParaSalvar } from '../../utils/dataFormat';
 
 export default function SelectDateAndHour() {
 
@@ -61,7 +57,6 @@ export default function SelectDateAndHour() {
     }
   }, []);
 
-
   const fetchHours = useCallback(async () => {
     if (!date) return;
 
@@ -83,7 +78,6 @@ export default function SelectDateAndHour() {
       setLoading(false);
     }
   }, [date, instrutor, veiculo, SearchAndFilterHour]);
-
 
   useEffect(() => {
     fetchInitialData();
@@ -130,21 +124,21 @@ export default function SelectDateAndHour() {
   };
 
   if (initialLoading) {
-    return <LoadingIndicator visible />;
+    return <Loading visible />;
   }
 
   return (
-    <div className='flex flex-col h-screen w-screen mt-10 p-5 max-w-[800px] items-center'>
-      <h1 className='font-bold text-2xl mb-4 capitalize'>Selecionar data e hora</h1>
+    <div className='flex flex-col h-screen w-full p-5 max-w-[800px] items-center'>
+      <h1 className='font-bold text-2xl mb-4'>Selecionar data e hora</h1>
       <h2 className='mb-4'>Mude a data e escolha a hora!</h2>
       <DatePicker
         onChange={handleDateChange}
         dias={7}
       />
-      <LoadingIndicator visible={loading} />
+      <Loading visible={loading} />
       {error && <p className='text-error'>{error}</p>}
 
-      <h1 className='font-semibold'>Horários disponíveis:</h1>
+      <h1 className='font-semibold mt-3'>Horários disponíveis:</h1>
       <div className='flex flex-col gap-5 mt-3 h-full w-full items-center max-h-[300px] overflow-y-auto'>
         {holidays.includes(format(date, 'yyyy-MM-dd')) ||
           format(date, 'i') === 7 ||
