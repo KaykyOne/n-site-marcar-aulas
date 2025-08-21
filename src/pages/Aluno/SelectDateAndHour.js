@@ -8,7 +8,7 @@ import { Button, Modal, Count, Loading, DatePicker } from '../../NovusUI/All';
 import useAula from '../../hooks/useAula';
 import useGeneric from '../../hooks/useGeneric';
 import useAulaStore from '../../store/useAulaStore';
-import { format, isBefore, addDays, isAfter } from 'date-fns';
+import { format, isBefore, addDays, isAfter, set, subHours } from 'date-fns';
 import { formatarDataParaSalvar } from '../../utils/dataFormat';
 
 export default function SelectDateAndHour() {
@@ -59,8 +59,17 @@ export default function SelectDateAndHour() {
 
   const fetchHours = useCallback(async () => {
     if (!date) return;
+    let dataFunc = date;
 
-    const dayOfWeek = format(date, 'i');
+    const hojeAs20 = set(new Date(), { hours: 20, minutes: 0, seconds: 0, milliseconds: 0 });
+    const agora = new Date();
+    // Agora
+    if (isAfter(agora, hojeAs20)) {
+      dataFunc = subHours(new Date(dataFunc), 3);
+      console.log(dataFunc)
+    } 
+
+    const dayOfWeek = format(dataFunc, 'i');
     setDayName(namesForDays[dayOfWeek]);
 
     if (+dayOfWeek === 7 || +dayOfWeek === 6) { // o retorno do 'i' é string? Se for string, compara com string
@@ -70,7 +79,8 @@ export default function SelectDateAndHour() {
 
     setLoading(true);
     try {
-      const result = await SearchAndFilterHour(instrutor, veiculo, date);
+      const result = await SearchAndFilterHour(instrutor, veiculo, dataFunc);
+      console.log(result);
       setHoras(result);
     } catch (error) {
       setError(error.message);
