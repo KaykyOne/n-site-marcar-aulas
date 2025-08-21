@@ -16,7 +16,7 @@ export default function RenderAula({ item, tipo, handleAction = null }) {
                     <span className="material-icons !text-2xl bg-primary text-white rounded-r-xl rounded-t-none p-2 w-fit h-fit">
                         {iconsButton[item.tipo] || ""}
                     </span>
-                    <div className='flex flex-col flex-1 text-sm '>
+                    <div className='flex flex-col flex-1 text-sm'>
 
                         {tipo !== 1 && (
                             <p className='text-md'><strong>Data:</strong> {item.data}</p>
@@ -36,8 +36,14 @@ export default function RenderAula({ item, tipo, handleAction = null }) {
                             </>
                         )}
                     </div>
+                    {tipo == 1 &&
+                        <div className='flex flex-col  h-full text-primary items-center justify-center w-[100px]'>
+                            <p>Autoescola:</p>
+                            <h1 className='text-4xl font-bold'>{item.autoescola_id}</h1>                      
+                        </div>
+                    }
                 </div>
-                <div className='w-full p-2'>
+                <div className='w-full p-2  '>
                     {/* Botão de excluir, só se tipo !== 1 */}
                     {tipo !== 1 && (
                         <Button type={3} onClick={() => handleAction && handleAction('Excluir', item)}>

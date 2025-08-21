@@ -21,7 +21,7 @@ export default function NavBar({ back, home }) {
         </button>
         <button className='flex  flex-1 text-primary flex-col p-2 font-medium hover:text-gray-600 transition duration-300'
           onClick={() => navigate('../perfil')}>
-          <span class="material-icons">
+          <span className="material-icons">
             account_circle
           </span>
           <span className="text-xs">Perfil</span>

@@ -19,7 +19,6 @@ export default function ListAulasInstrutorView() {
     const [loading, setLoading] = useState(false);
     const [aulas, setAulas] = useState([])
     const [error, setError] = useState(null);
-    const navigate = useNavigate();
 
     const handleDateChange = async (selectedDate) => {
         setLoading(true);
@@ -27,9 +26,6 @@ export default function ListAulasInstrutorView() {
         const formattedDate = formatarDataParaSalvar(selectedDate);
         try {
             const data = await SearchAulasInstrutor(instrutor.instrutor_id, formattedDate);
-            if (data.length === 0) {
-                setError('Nenhuma aula encontrada.');
-            }
             data.sort((a, b) => {
                 const [h1, m1] = a.hora.split(':').map(Number);
                 const [h2, m2] = b.hora.split(':').map(Number);
