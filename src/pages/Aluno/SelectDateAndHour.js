@@ -139,7 +139,7 @@ export default function SelectDateAndHour() {
 
   return (
     <div className='flex flex-col h-screen w-full p-5 max-w-[800px] items-center'>
-      <h1 className='font-bold text-2xl mb-4'>Selecionar data e hora</h1>
+      <h1 className='font-bold text-2xl mb-4 mt-5'>Selecionar data e hora</h1>
       <h2 className='mb-4'>Mude a data e escolha a hora!</h2>
       <DatePicker
         onChange={handleDateChange}

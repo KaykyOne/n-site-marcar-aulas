@@ -2,11 +2,12 @@ import { useState, useEffect } from 'react';
 import useInstrutorStore from '../../store/useInstrutorStore';
 import useUserStore from '../../store/useUserStore';
 import Select from '../../components/Select';
-import {Button, Input, DatePicker} from '../../NovusUI/All';
+import { Button, Input, DatePicker } from '../../NovusUI/All';
 import { toast, ToastContainer } from 'react-toastify';
 
 import { useNavigate, useLocation } from 'react-router-dom';
 import useAula from '../../hooks/useAula';
+import { addDays, format, getDate, getDay } from 'date-fns';
 
 
 export default function CreateAula() {
@@ -18,7 +19,9 @@ export default function CreateAula() {
         return id ? parseInt(id) : null;
     };
 
-    const navigate = useNavigate();
+    const hoje = format(new Date(), 'yyyy-MM-dd');
+    const seteDias = format(addDays(new Date(), 7), 'yyyy-MM-dd');
+
     const location = useLocation();
     const { aluno } = location.state || {};
     const { instrutor } = useInstrutorStore();
@@ -32,7 +35,7 @@ export default function CreateAula() {
     const categorias = categoria.split("");
     const [veiculos, setVeiculos] = useState([]);
     const [horas, setHoras] = useState([]);
-    const [dataSelecionada, setDataSelecionada] = useState(null);
+    const [dataSelecionada, setDataSelecionada] = useState('');
 
     const showToast = (type, text1, text2) => {
         toast.dismiss();  // Remove todos os toasts anteriores
@@ -52,6 +55,11 @@ export default function CreateAula() {
     }
 
     const changeData = (novaData) => {
+        const diaSemana = getDay(novaData);
+        if(diaSemana == 5 || diaSemana == 6 ){
+            toast.error("Dia Inválido!")
+            return;
+        }
         setDataSelecionada(novaData);
     };
 
@@ -121,7 +129,7 @@ export default function CreateAula() {
     }, [selectedTipo, SelectVeicleByInstrutor])
 
     return (
-        <div className='flex flex-col text-start h-screen justify-center p-3'>
+        <div className='flex flex-col text-start h-screen justify-center p-3 overflow-auto'>
             <h1 className='text-2xl font-bold w-full text-center'>Marcar Aula</h1>
             <div id='form' className='flex flex-col mt-5 gap-1'>
                 <h1 className='font-bold'>Aluno:</h1>
@@ -129,26 +137,42 @@ export default function CreateAula() {
                     disabled={true}
                     value={`${aluno.nome} ${aluno.sobrenome}`}
                     className='capitalize' />
-                <h1 className='font-bold'>Tipo da Aula:</h1>
-                <Select
-                    value={selectedTipo}
-                    onChange={(a) => changeComboTipo(a.target.value)}
-                    options={categorias}
-                    placeholder={"Seleciona o tipo da aula!"} />
-                <h1 className='font-bold'>Veículo:</h1>
-                <Select
-                    value={selectedVeiculo}
-                    onChange={(a) => changeComboVeiculo(a.target.value)}
-                    options={veiculos.map(v => v.placa)}
-                    placeholder={"Selecione o Veículo:"} />
+
+                <div className='grid grid-cols-2 gap-2 w-full'>
+                    <div>
+                        <h1 className='font-bold'>Tipo da Aula:</h1>
+                        <Select
+                            value={selectedTipo}
+                            onChange={(a) => changeComboTipo(a.target.value)}
+                            options={categorias}
+                            placeholder={"Selecione o tipo da aula!"}
+                            className="opacity-100"
+                        />
+                    </div>
+                    <div>
+                        <h1 className='font-bold'>Veículo:</h1>
+                        <Select
+                            value={selectedVeiculo}
+                            onChange={(a) => changeComboVeiculo(a.target.value)}
+                            options={veiculos.map(v => v.placa)}
+                            placeholder={"Selecione o Veículo:"}
+                            disabled={!selectedTipo} // só habilita se tiver tipo selecionado
+                            className={`${!selectedTipo ? "opacity-80 cursor-not-allowed" : "opacity-100"}`}
+                        />
+                    </div>
+                </div>
+
                 <h1 className='font-bold'>Data:</h1>
-                <DatePicker onChange={changeData}/>
+                <Input type='date' min={hoje} max={seteDias} value={dataSelecionada} onChange={e => changeData(e.target.value)} />
                 <h1 className='font-bold'>Hora:</h1>
                 <Select
                     value={selectedHora}
                     onChange={(a) => changComboHora(a.target.value)}
                     options={horas}
-                    placeholder={"Selecione a Hora:"} />
+                    placeholder={"Selecione a Hora:"}
+                    disabled={!selectedTipo || !selectedVeiculo || !dataSelecionada} // só habilita se tiver tudo
+                    className={`${(!selectedTipo || !selectedVeiculo || !dataSelecionada) ? "opacity-80 cursor-not-allowed" : "opacity-100"}`}
+                />
                 <Button className='mt-2' onClick={createAula}>
                     Finalizar
                     <span className="material-icons">

@@ -59,6 +59,7 @@ export default function ListAulasInstrutorView() {
 
             {loading && <Loading />}
 
+        
             {error || aulas.length === 0 ? (
                 <div className="bg-red-100 border border-red-300 text-red-700 p-4 rounded mb-4 text-center">
                     <p>{error ? `Erro: ${error}` : 'Nenhuma aula marcada!'}</p>
